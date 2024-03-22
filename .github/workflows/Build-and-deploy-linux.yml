@@ -1,0 +1,44 @@
+name: Build and Deploy — Linux
+run-name: ${{ github.actor }} is building a Linux release
+
+on:
+  push:
+    branches: ["latest"]
+
+  workflow_dispatch:
+
+permissions:
+  contents: write 
+
+jobs:
+  deploy-on-linux:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: vame-desktop
+          environment-file: environment.yml
+          auto-activate-base: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and deploy on Linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build -- --target desktop --publish
