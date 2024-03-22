@@ -1,0 +1,25 @@
+.vscode
+.env
+
+# Ruby
+Gemfile.lock
+
+# Global Workspace
+.commoners
+
+# Python Service Output
+build
+
+# Custom Build Output
+.site
+
+# Dependencies
+node_modules
+
+# Build Locations
+ios
+android
+
+# Control Files
+*.log
+*.spec
