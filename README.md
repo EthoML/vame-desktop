@@ -1,5 +1,5 @@
 # VAME
-A cross-platform app for the [C4 Foundation](https://c4foundation.org/).
+A cross-platform app for VAME.
 
 ### Scope
 - [ ] Upgrade VAME to Python 3.10+
