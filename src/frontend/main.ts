@@ -37,7 +37,8 @@ if (service) {
             }
           }).then(res => res.json())
           .then(data => {
-            display(`Response: ${JSON.stringify(data)}`)
+            if (data === null) display(`Project already created`)
+            else display(`New project created at ${data}`)
           })
           .catch(() => display(`Failed to initialize VAME project`))
         });
