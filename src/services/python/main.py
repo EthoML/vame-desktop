@@ -20,6 +20,52 @@ def post():
     config = vame.init_new_project(**data)
     return jsonify(config)
 
+@app.route('/align', methods=['POST'])
+@cross_origin()
+def egocentric_alignment():
+    import vame
+    data = json.loads(request.data) if request.data else {}
+    config = vame.egocentric_alignment(**data)
+
+    # # If your experiment is by design egocentrical (e.g. head-fixed experiment on treadmill etc) 
+    # # you can use the following to convert your .csv to a .npy array, ready to train vame on it
+    # vame.csv_to_numpy(config)
+
+    return jsonify(config)
+
+
+@app.route('/create', methods=['POST'])
+@cross_origin()
+def create_trainset():
+    import vame
+    data = json.loads(request.data) if request.data else {}
+    config = vame.create_trainset(**data)
+    return jsonify(config)
+
+@app.route('/train', methods=['POST'])
+@cross_origin()
+def train_model():
+    import vame
+    data = json.loads(request.data) if request.data else {}
+    config = vame.train_model(**data)
+    return jsonify(config)
+
+@app.route('/evaluate', methods=['POST'])
+@cross_origin()
+def evaluate_model():
+    import vame
+    data = json.loads(request.data) if request.data else {}
+    config = vame.evaluate_model(**data)
+    return jsonify(config)
+
+@app.route('/segment', methods=['POST'])
+@cross_origin()
+def pose_segmentation():
+    import vame
+    data = json.loads(request.data) if request.data else {}
+    config = vame.pose_segmentation(**data)
+    return jsonify(config)
+
 if __name__ == "__main__":
     env_port = os.getenv('PORT')
     PORT = int(env_port) if env_port else 8080

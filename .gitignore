@@ -1,7 +1,9 @@
 .vscode
 
-# Ruby
-Gemfile.lock
+# Demo
+demo_output
+data/*.mp4
+
 
 # Global Workspace
 .commoners
@@ -14,11 +16,3 @@ build
 
 # Dependencies
 node_modules
-
-# Build Locations
-ios
-android
-
-# Control Files
-*.log
-*.spec
