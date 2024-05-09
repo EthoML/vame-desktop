@@ -49,6 +49,9 @@ const endpoints = {
   }
 } 
 
+
+const header = (text: string) => text[0].toUpperCase() + text.slice(1)
+
 const display = (html: string) => {
   const message = document.createElement('div');
   message.innerHTML = html;
@@ -68,13 +71,15 @@ if (service) {
 
       const button = document.createElement('button');
 
-      button.innerText = name;
+      const headerName = header(name);
+
+      button.innerText = headerName;
 
       button.onclick = () => {
 
         button.setAttribute('disabled', '');
 
-        console.log(`Sending request to ${name}...`)
+        console.log(`Sending request to ${headerName}...`)
 
         fetch(new URL(name, pythonUrl), {
           method: 'POST',
@@ -86,9 +91,9 @@ if (service) {
         
         .then(res => res.json())
 
-        .then(data => info.onSuccess ? info.onSuccess(data) : display(`${name} completed`))
+        .then(data => info.onSuccess ? info.onSuccess(data) : display(`${headerName} completed`))
 
-        .catch((e) => info.onFailure ? info.onFailure(e) : display(`${name} failed`))
+        .catch((e) => info.onFailure ? info.onFailure(e) : display(`${headerName} failed`))
 
         button.removeAttribute('disabled');
 
