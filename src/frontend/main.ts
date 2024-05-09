@@ -28,7 +28,11 @@ if (service) {
       .then(() => {
         display('Python server is connected!')
         button.removeAttribute('disabled');
+
         button.addEventListener('click', () => {
+
+          button.setAttribute('disabled', '');
+          
           fetch(new URL('initialize', pythonUrl), {
             method: 'POST',
             body: JSON.stringify(config),
@@ -41,7 +45,11 @@ if (service) {
             else display(`New project created at ${data}`)
           })
           .catch(() => display(`Failed to initialize VAME project`))
+
+          button.removeAttribute('disabled');
+
         });
+
       })
       .catch(() => display(`Python server is not active...`))
   }

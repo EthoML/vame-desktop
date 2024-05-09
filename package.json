@@ -1,7 +1,7 @@
 {
   "name": "vame-desktop",
   "version": "0.0.1",
-  "description": "A research application for the C4 Foundation.",
+  "description": "An open-source machine learning tool for behavioral segmentation and analyses.",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -17,19 +17,14 @@
     "start": "commoners --target desktop",
     "dev": "commoners",
     "services": "commoners share",
-    "build": "commoners build",
+    "build": "commoners build --target desktop",
     "build:services": "commoners build --target services",
-    "build:desktop": "commoners build --target desktop",
-    "build:mobile": "commoners build --target mobile",
-    "launch": "commoners launch",
-    "launch:desktop": "commoners launch --desktop",
-    "launch:mobile": "commoners launch --mobile",
-    "env:init": "npm install",
-    "env:clear": "rm -rf package-lock.json && rm -rf node_modules"
+    "launch": "commoners launch  --desktop"
   },
   "devDependencies": {
     "@capacitor/cli": "^5.3.0",
     "@capacitor/core": "^5.3.0",
     "commoners": "0.0.46"
-  }
+  },
+  "main": "/Users/garrettflynn/Documents/GitHub/vame-desktop/.commoners/.temp/main.js"
 }

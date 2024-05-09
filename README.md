@@ -1,22 +1,42 @@
 # VAME
-A cross-platform app for the [C4 Foundation](https://c4foundation.org/).
+A cross-platform app for the Variational Animal Motion Encoding (VAME) project.
 
 ### Scope
 - [ ] Upgrade VAME to Python 3.10+
- 
-## Builds ([v0.0.0](https://github.com/garrettmflynn/vame-desktop/releases/tag/v0.0.0))
-- [Progressive Web App (PWA)](https://garrettflynn.com/vame-desktop/)
-- Desktop
-    - [Mac](https://github.com/garrettmflynn/vame-desktop/releases/download/v0.0.0/vame-desktop-0.0.0.dmg)
-    - [Windows](https://github.com/garrettmflynn/vame-desktop/releases/download/v0.0.0/vame-desktop-Setup-0.0.0.exe)
-    - [Linux](https://github.com/garrettmflynn/vame-desktop/releases/download/v0.0.0/vame-desktop-0.0.0.AppImage)
-
+- [ ] Fix the issue with the `sklearn` package
 
 ## Development
-### Prerequisites
-- [python-dotenv](https://pypi.org/project/python-dotenv/) - `pip install "python-dotenv[cli]"`
-
 ### Installation
+#### Python
+Create a new Conda environment and activate it:
+
+```bash
+conda create --name vame-desktop python=3.9
+conda activate vame-desktop
 ```
+
+Install [python-dotenv](https://pypi.org/project/python-dotenv/) to allow for configuring the environment to avoid an issue with the use of `sklearn`.
+```bash
+pip install "python-dotenv[cli]"
+```
+
+Then run the following command to install the necessary dependencies:
+```bash
 dotenv run -- conda env update --file environment.yml --prune
 ```
+
+This will install all the necessary Python dependencies for the project!
+
+#### Node.js
+Install the necessary Node.js dependencies by running the following command:
+```bash
+npm install
+```
+
+### Running the App
+To run the app, you will need to run the following command:
+```bash
+npm run start
+```
+
+This will start the Electron app and open the main window.
