@@ -14,10 +14,10 @@
   -webkit-text-size-adjust: 100%;
 
   --awb-custom_color_1: #e8e2de;
-  --awb-custom_color_2: #2b461c;
+  --awb-custom_color_2: rgb(147, 40, 40);
   --awb-custom_color_3: rgba(43,70,28,.75);
-  --awb-custom_color_4: #b3592d;
-  --awb-custom_color_5: #c63;
+  --awb-custom_color_4: #2db331;
+  --awb-custom_color_5: rgb(42, 147, 40);
   --awb-custom_color_6: #e4c22b;
   --awb-custom_color_7: #918e90;
   --awb-custom_color_9: #707070;
@@ -56,6 +56,25 @@ body {
   width: 100vw;
   height: 100vh;
   min-height: -webkit-fill-available;
+}
+
+#buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+#console {
+  margin-top: 25px;
+  padding: 10px;
+  background: rgb(19, 19, 19);
+  color: white;
+  font-family: monospace;
+  font-size: 0.8em;
+  overflow: auto;
+  height: 200px;
+  border-radius: 5px;
 }
 
 nav > div:last-child {
