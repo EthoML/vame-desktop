@@ -1,31 +1,14 @@
 name: vame-desktop
 channels:
-  - pytorch
   - defaults
 dependencies:
+  - python=3.11
   - pip
-  - torchvision
-  - jupyter
-  - nb_conda
   - pip:
     - flask
+    - flask_restx
     - flask-cors
     - pyinstaller
-    - vame @ git+https://github.com/LINCellularNeuroscience/VAME.git@master#vame
-    - pytest-shutil
-    - scipy
-    - numpy
-    - matplotlib
-    - pathlib
-    - pandas
-    - ruamel.yaml
-    - scikit-learn
-    - pyyaml
-    - opencv-python-headless
-    - h5py
-    - umap-learn
-    - networkx    
-    - tqdm
-    - hmmlearn
+    # - vame @ git+https://github.com/EthoML/VAME.git@dev#vame # Not working with latest requirements.txt (as of 2024-05-10). Please install manually.
 
 prefix: /opt/anaconda3/envs/vame-desktop

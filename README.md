@@ -10,24 +10,18 @@ A cross-platform app for the Variational Animal Motion Encoding (VAME) project.
 ## Development
 ### Installation
 #### Python
-Create a new Conda environment and activate it:
+Create the Conda environment for the project by running the following command:
 
 ```bash
-conda create --name vame-desktop python=3.9
-conda activate vame-desktop
-```
-
-Install [python-dotenv](https://pypi.org/project/python-dotenv/) to allow for configuring the environment to avoid an issue with the use of `sklearn`.
-```bash
-pip install "python-dotenv[cli]"
-```
-
-Then run the following command to install the necessary dependencies:
-```bash
-dotenv run -- conda env update --file environment.yml --prune
+conda env create -f environment.yml 
 ```
 
 This will install all the necessary Python dependencies for the project!
+
+To activate the environment, run the following command:
+```bash
+conda activate vame-desktop
+```
 
 #### Node.js
 Install the necessary Node.js dependencies by running the following command:

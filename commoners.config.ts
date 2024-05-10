@@ -13,7 +13,7 @@ export default defineConfig({
     electron: {
         splash: './splash.html',
         window: {
-            width: 1000 // Adjust default width
+            width: 1200 // Adjust default width
         }
     },
 

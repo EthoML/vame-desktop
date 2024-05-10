@@ -13,7 +13,6 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  --awb-custom_color_1: #e8e2de;
   --awb-custom_color_2: rgb(147, 40, 40);
   --awb-custom_color_3: rgba(43,70,28,.75);
   --awb-custom_color_4: #2db331;
@@ -39,7 +38,7 @@
 
 html, body {
   margin: 0;
-  background: var(--awb-custom_color_1);
+  background: white;
   overflow: hidden;
 }
 
@@ -58,22 +57,41 @@ body {
   min-height: -webkit-fill-available;
 }
 
+h2 {
+  font-size: 1.2em;
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #cbcbcb;
+
+}
+
 #buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: center;
+}
+
+.category {
+  flex-grow: 1;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 #console {
-  margin-top: 25px;
   padding: 10px;
   background: rgb(19, 19, 19);
   color: white;
   font-family: monospace;
   font-size: 0.8em;
   overflow: auto;
-  height: 200px;
+  height: 100%;
   border-radius: 5px;
 }
 
@@ -106,16 +124,13 @@ label {
   color: #0f0f0f;
 }
 
-h1, h2, h3 {
-  color: var(--awb-custom_color_2);
-}
-
 
 nav {
   padding: 65px 25px;
   padding-bottom: 15px !important;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
-  background: var(--awb-custom_color_1);
+  background: black;
+  color: white;
 
   display: flex;
   justify-content: space-between;
@@ -139,6 +154,9 @@ footer {
 main {
   padding: 25px;
   overflow: auto;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
 }
 
 a {
@@ -173,19 +191,27 @@ input {
 button {
   text-align: left;
   border: 1px solid transparent;
+  border-radius: 3px;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 700;
   font-family: inherit;
   color: white;
   cursor: pointer;
-  background-color: var(--awb-custom_color_5);
+  background-color: #396cd8;
   transition: background-color 0.25s;
 }
 
 button:hover {
-  border-color: #396cd8;
-  background-color: var(--awb-custom_color_4);
+  background-color: #0045db;
+}
+
+button.failing {
+  background-color: #ff4d4d;
+}
+
+button.failing:hover {
+  background-color: #ff0000;
 }
 
 button:active {
