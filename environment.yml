@@ -9,6 +9,6 @@ dependencies:
     - flask_restx
     - flask-cors
     - pyinstaller
-    # - vame @ git+https://github.com/EthoML/VAME.git@dev#vame # Not working with latest requirements.txt (as of 2024-05-10). Please install manually.
+    - vame-py @ git+https://github.com/EthoML/VAME.git@dev#vame
 
 prefix: /opt/anaconda3/envs/vame-desktop
