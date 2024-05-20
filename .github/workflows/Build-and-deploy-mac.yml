@@ -49,4 +49,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           appleId: ${{ secrets.APPLE_ID }}
           appleIdPassword: ${{ secrets.APPLE_PASSWORD }}
-        run: npm run build -- --target desktop --publish
+        run: npm run build -- --publish
