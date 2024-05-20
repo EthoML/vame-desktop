@@ -1,6 +1,6 @@
 {
   "name": "vame-desktop",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "An open-source machine learning tool for behavioral segmentation and analyses.",
   "private": true,
   "type": "module",
