@@ -8,7 +8,7 @@
   "author": "Garrett Flynn <garrettmflynn@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/garrettmflynn/vame-desktop.git"
+    "url": "https://github.com/catalystneuro/vame-desktop.git"
   },
   "workspaces": [
     "src/**"
