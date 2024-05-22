@@ -10,6 +10,7 @@ data/*.mp4
 
 # Python Service Output
 build
+*.spec
 
 # Custom Build Output
 .site

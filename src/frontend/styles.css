@@ -84,7 +84,7 @@ h2 {
   gap: 10px;
 }
 
-#console {
+.console {
   padding: 10px;
   background: rgb(19, 19, 19);
   color: white;
@@ -144,6 +144,14 @@ nav > div {
   align-items: center;
 }
 
+#controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: end;
+  flex-grow: 1;
+}
+
 footer {
   padding: 10px 25px;
   padding-bottom: 20px;
@@ -152,11 +160,61 @@ footer {
 }
 
 main {
+  overflow: auto;
+}
+
+main > section {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
   padding: 25px;
   overflow: auto;
+  width: 100%;
+  height: 100%;
+}
+
+#dev {
   display: grid;
   grid-template-rows: auto 1fr;
   gap: 20px;
+}
+
+#controls > button {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+  font-size: 80%;
+}
+
+form { 
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+}
+
+form > div {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  min-width: 250px;
+}
+
+form input[type="checkbox"] {
+  width: auto;
+}
+
+form input {
+  width: 100%;
+}
+
+form i {
+  font-size: 80%;
+  color: gray;
+  text-align: center;
 }
 
 a {
@@ -185,7 +243,7 @@ input {
   color: #0f0f0f;
   background-color: #ffffff;
   transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 button {

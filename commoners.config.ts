@@ -22,12 +22,12 @@ export default defineConfig({
         // Packaged with pyinstaller
         vame: {
             description: 'A simple Python server',
-            src: './src/services/python/main.py',
+            src: './src/services/vame/main.py',
             publish: {
-                build: 'python -m PyInstaller --name vame --onedir --clean ./src/services/vame/main.py --distpath ./build/vame',
+                build: 'python -m PyInstaller --name vame --onedir --clean ./src/services/vame/main.py --distpath ./build/vame --collect-all torch --collect-all scipy --collect-all vame --hidden-import tensorflow --hidden-import pandas',
                 local: {
-                    src: 'flask',
-                    base: './build/vame/flask', // Will be copied
+                    src: 'vame',
+                    base: './build/vame/vame', // Will be copied
                 }
             }
         }

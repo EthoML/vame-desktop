@@ -1,0 +1,11 @@
+{
+    "name": "Example VAME Project",
+    "videos": [
+        "/Users/garrettflynn/Documents/GitHub/vame-desktop/data/video-1.mp4"
+    ],
+    "csvs": [
+        "/Users/garrettflynn/Documents/GitHub/vame-desktop/data/video-1.csv"
+    ],
+    "videotype": "mp4",
+    "pose_ref_index": [ 0, 5 ]
+}

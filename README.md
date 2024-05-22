@@ -1,11 +1,7 @@
-# VAME
-A cross-platform app for the Variational Animal Motion Encoding (VAME) project.
+# VAME Desktop
+A desktop application for the Variational Animal Motion Encoding (VAME) project.
 
 > **NOTE:** Before you begin, make sure you [download the demo video](https://drive.google.com/file/d/1w6OW9cN_-S30B7rOANvSaR9c3O5KeF0c/view) to `data`.
-
-### Scope
-- [ ] Upgrade VAME to Python 3.10+
-- [ ] Fix the issue with the `sklearn` package
 
 ## Development
 ### Installation
