@@ -1,5 +1,8 @@
-
 const defineConfig = (o) => o 
+
+const serviceName = 'vame'
+const serviceBuildRoot = `./build/python`
+const pythonSrc = './src/backend/app.py'
 
 export default defineConfig({
 
@@ -20,14 +23,14 @@ export default defineConfig({
     services: {
 
         // Packaged with pyinstaller
-        vame: {
-            description: 'A simple Python server',
-            src: './src/services/vame/main.py',
+        [serviceName]: {
+            description: 'A simple Python service for VAME',
+            src: pythonSrc,
             publish: {
-                build: 'python -m PyInstaller --name vame --onedir --clean ./src/services/vame/main.py --distpath ./build/vame --collect-all torch --collect-all scipy --collect-all vame --hidden-import tensorflow --hidden-import pandas',
+                build: `python -m PyInstaller --name ${serviceName} --onedir --clean ${pythonSrc} --distpath ${serviceBuildRoot}`,
                 local: {
-                    src: 'vame',
-                    base: './build/vame/vame', // Will be copied
+                    src: serviceName,
+                    base: `${serviceBuildRoot}/${serviceName}`, // Will be copied
                 }
             }
         }
