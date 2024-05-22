@@ -11,9 +11,10 @@ import Form from "./Form";
 
 import { Logger } from "./Logger";
 import defaultLogConfig from './utils/log'
+import { sections, sectionButtons, createProjectButton, runPipelineButton, mainConsoleElement } from "./elements";
 
 
-const sections = {
+const sectionConfigurations = {
   edit: {
     onclick: () => open("edit")
   },
@@ -60,26 +61,15 @@ const sections = {
   },
 }
 
-const buttonRefs = Object.entries(sections).reduce((acc, [ section, config ]) => {
-  const el = acc[section] = document.querySelector(`#${section}-button`)! as HTMLButtonElement
-  el.onclick = config.onclick
-  return acc
-}, {})
-
-const sectionRefs = Object.keys(sections).reduce((acc, section) => {
-  const el = document.querySelector(`#${section}`) as HTMLDivElement
-  if (el) acc[section] = el
-  return acc
-}, {}) as Record<keyof sections, HTMLDivElement>
-
-
-const consoleElement = sectionRefs.edit.querySelector('.console')!;
+Object.entries(sectionConfigurations).forEach(([ key, value ]) => {
+  sectionButtons[key].onclick = value.onclick
+})
 
 const showInConsole = (html: string) => {
   const message = document.createElement('div');
   message.innerHTML = html;
-  consoleElement.append(message);
-  consoleElement.scrollTop = consoleElement.scrollHeight;
+  mainConsoleElement.append(message);
+  mainConsoleElement.scrollTop = mainConsoleElement.scrollHeight;
 }
 
 app.logger = new Logger(defaultLogConfig)
@@ -92,11 +82,11 @@ app.logger.console = {
 
 
 const open = (section: string) => {
-  const toOpen = sectionRefs[section]
+  const toOpen = sections[section]
 
   if (!toOpen) return
 
-  Object.entries(sectionRefs).forEach(([ key, value ]) => {
+  Object.entries(sections).forEach(([ key, value ]) => {
     if (key === section) value.removeAttribute('hidden')
     else value.setAttribute('hidden', '')
   })
@@ -106,19 +96,15 @@ open("edit")
 
 
 // --------------------------------------------------------- Button Callbacks ---------------------------------------------------------
-const createProjectButton = document.querySelector("#create-project")!
 createProjectButton.onclick = async (ev) => {
   ev.preventDefault()
-  const form = new Form(sectionRefs.create.querySelector('form')!)
+  const form = new Form(sections.create.querySelector('form')!)
   const pipeline = new Pipeline()
   const formData = form.export()
   await pipeline.create(formData)
   app.set(pipeline)
   open("edit")
 }
-
-const runPipelineButton = document.querySelector("#run-pipeline")!
-runPipelineButton.setAttribute('disabled', '')
 
 runPipelineButton.onclick = async () => {
   runPipelineButton.setAttribute('disabled', '')
@@ -148,10 +134,7 @@ commoners.onConnected(() => {
   showInDevConsole(`Loading VAME library..`)
 
   get('ready')
-  .then(() => {
-    runPipelineButton.removeAttribute('disabled')
-    showInDevConsole(`VAME is ready!`)
-  })
+  .then(() => showInDevConsole(`VAME is ready!`))
   .catch(() => showInDevConsole(`Failed to connect to VAME`))
 })
 

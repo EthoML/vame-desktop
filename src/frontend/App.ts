@@ -1,9 +1,9 @@
 import Form from "./Form";
 import { Logger } from "./Logger";
 import Pipeline, { PipelineMethodOptions } from "./Pipeline";
+import { runPipelineButton, sections } from "./elements";
 
-const editSection = document.querySelector("#edit")! as HTMLDivElement
-const pipelineForm = editSection.querySelector('form')! as HTMLFormElement
+const pipelineForm = sections.edit.querySelector('form')! as HTMLFormElement
 
 const IMMUTABLE_CONFIGURATION_OPTIONS = [
   // "Project",
@@ -29,6 +29,9 @@ class App {
 
       const configuration = structuredClone(this.pipeline.configuration)
       IMMUTABLE_CONFIGURATION_OPTIONS.forEach(key => delete configuration[key])
+
+
+      runPipelineButton.removeAttribute('disabled') // Enable the run button
 
       this.form.load(configuration)
     }
