@@ -194,6 +194,10 @@ form {
   width: 100%;
 }
 
+#create form {
+  flex-direction: column;
+}
+
 form > div {
   display: flex;
   flex-direction: column;
