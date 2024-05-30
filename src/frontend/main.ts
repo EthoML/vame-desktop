@@ -31,16 +31,17 @@ const sectionConfigurations = {
 
         fileInput.onchange = async (ev) => {
 
-          const files = ev.target.files;
-          const projectPath = files.length > 0 ? files[0].path : null
-          if (!projectPath) return reject()
+          const files = Array.from(ev.target.files);
+          const configPath = files.length > 0 ? files.find(f => f.name === 'config.yaml')?.path : null
+          if (!configPath) return reject()
 
-          const pipeline = new Pipeline(projectPath)
+          const pipeline = new Pipeline(configPath)
           await pipeline.load()
 
+          mainConsoleElement.innerHTML = '' // Clear the console
           app.set(pipeline)
 
-          resolve(projectPath)
+          resolve(configPath)
         }
       })
 

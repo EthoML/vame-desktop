@@ -95,7 +95,6 @@ class Create(Resource):
         import vame
         try:
 
-            print('TO AQUI')
             data = json.loads(request.data) if request.data else {}
 
             project_path = get_project_path(data["project"], VAME_APP_DIRECTORY)

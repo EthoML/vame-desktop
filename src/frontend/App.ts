@@ -28,11 +28,10 @@ class App {
       localStorage.setItem('pipeline', pipeline.path)
 
       const configuration = structuredClone(this.pipeline.configuration)
+      if (!configuration) return
+
       IMMUTABLE_CONFIGURATION_OPTIONS.forEach(key => delete configuration[key])
-
-
       runPipelineButton.removeAttribute('disabled') // Enable the run button
-
       this.form.load(configuration)
     }
 

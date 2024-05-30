@@ -30,6 +30,10 @@ export const showInConsole = (html: string) => {
     consoleElement.scrollTop = consoleElement.scrollHeight;
 }
 
+const logger = {
+  log: (message: string) => showInConsole(message),
+}
+
 const pipelineMethods = {
   load: {
     ...log.load
@@ -112,15 +116,15 @@ onConnected(() => {
 
         requestButtons.forEach(button => button.setAttribute('disabled', ''));
 
-        info.onRequest ? info.onRequest() : showInConsole(`Sending ${headerName} request...`)
+        info.onRequest ? info.onRequest.call(logger) : showInConsole(`Sending ${headerName} request...`)
 
         const pipelineMethod = app.pipeline[method as keyof Pipeline] as Function
 
         const methodPromise = 'payload' in info ? pipelineMethod(info.payload) : pipelineMethod()
 
         await methodPromise
-        .then((data) => info.onSuccess ? info.onSuccess(data) :showInConsole(`${headerName} completed`))
-        .catch((e) => info.onFailure ? info.onFailure() : showInConsole(`<small>${e}</small>`))
+        .then((data) => info.onSuccess ? info.onSuccess.call(logger, data) :showInConsole(`${headerName} completed`))
+        .catch((e) => info.onFailure ? info.onFailure.call(logger) : showInConsole(`<small>${e}</small>`))
 
         requestButtons.forEach(button => button.removeAttribute('disabled'));
 
