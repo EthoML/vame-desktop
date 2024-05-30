@@ -192,10 +192,6 @@ class Align(Resource):
 
             data, project_path = resolve_request_data(request)
 
-            with open(project_path / 'config.yaml', 'r') as file:
-                config = yaml.safe_load(file)
-
-
             # If your experiment is by design egocentrical (e.g. head-fixed experiment on treadmill etc)
             # you can use the following to convert your .csv to a .npy array, ready to train vame on it
             egocentric_data = data.pop('egocentric_data')
