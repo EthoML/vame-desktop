@@ -32,7 +32,7 @@ const sectionConfigurations = {
         fileInput.onchange = async (ev) => {
 
           const files = Array.from(ev.target.files);
-          const configPath = files.length > 0 ? files.find(f => f.name === 'config.yaml')?.path : null
+          const configPath = files.length > 0 ? files.find(file => file.name === 'config.yaml')?.path : null
           if (!configPath) return reject()
 
           const pipeline = new Pipeline(configPath)
@@ -104,6 +104,7 @@ createProjectButton.onclick = async (ev) => {
   const formData = form.export()
   await pipeline.create(formData)
   app.set(pipeline)
+  mainConsoleElement.innerHTML = '' // Clear the console
   open("edit")
 }
 
