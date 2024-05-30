@@ -14,7 +14,7 @@ type PipelineInputs = {
     videos: string[],
     csvs: string[],
     videotype: string,
-    [key: string]: any // Global default properties 
+    [key: string]: any // Global default properties
 }
 
 type PipelineConfiguration = {
@@ -25,6 +25,7 @@ type PipelineConfiguration = {
 type BasePipelineMethodOptions = {
     align: {
         pose_ref_index: number[],
+        egocentric_data: boolean
     },
     create_trainset: {
         check_parameter: boolean,
@@ -71,7 +72,7 @@ class Pipeline {
     #defaults: Record<string, any> = {
         pose_ref_index: [ 0, 5 ]
     }
-    
+
     constructor(absPath?: string) {
         this.path = absPath ?? ''
     }
@@ -110,8 +111,8 @@ class Pipeline {
         const { name, videos, csvs, videotype, ...globalDefaults } = propsCopy
 
         const result = await post('create', {
-            project: name, 
-            videos: videos, 
+            project: name,
+            videos: videos,
             poses_estimations: csvs,
             videotype: videotype,
         }) as {
@@ -124,8 +125,8 @@ class Pipeline {
         this.configuration = result.config
 
         console.log('Got', result, this.configuration)
-        
-        this.#path = result.project 
+
+        this.#path = result.project
 
         return result
     }
@@ -139,8 +140,8 @@ class Pipeline {
         return post('delete_project', { project: this.path })
     }
 
-    align = (options?: PipelineMethodOptions["align"]) => this.#request('align', options, { pose_ref_index: this.#defaults.pose_ref_index })
-        
+    align = (options?: PipelineMethodOptions["align"]) => this.#request('align', options, { pose_ref_index: this.#defaults.pose_ref_index, egocentric_data: this.configuration.egocentric_data})
+
     create_trainset = (options?: PipelineMethodOptions["create_trainset"]) => this.#request('create_trainset', options)
 
     train = (options?: PipelineMethodOptions["train"]) => this.#request('train', options)
@@ -185,8 +186,9 @@ class Pipeline {
 
         if (configuration) await this.#run('configure', configuration, logger)
 
-        if (this.configuration.egocentric_data) await this.#run('align', options.align, logger)
-
+        console.log('Running pipeline', options)
+        //if (this.configuration.egocentric_data) await this.#run('align', options.align, logger)
+        await this.#run('align', options.align, logger)
         await this.#run('create_trainset', options.create_trainset, logger)
         await this.#run('train', options.train, logger)
         await this.#run('evaluate', options.evaluate, logger)

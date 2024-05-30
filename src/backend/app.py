@@ -15,8 +15,8 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 api = Api(
-    app, 
-    version='1.0', 
+    app,
+    version='1.0',
     title='VAME API',
     description="The REST API for VAME.",
 )
@@ -73,18 +73,18 @@ class Preload(Resource):
     def get(self):
         import vame
         return { "payload": True }
-    
+
 
 @api.route('/load')
 class Load(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
-        
+
         _, project_path = resolve_request_data(request)
         config_path = project_path / "config.yaml"
 
         return jsonify(dict(
-            project=str(config_path.parent), 
+            project=str(config_path.parent),
             config=yaml.safe_load(open(config_path, "r")) if config_path.exists() else None,
         ))
 
@@ -96,22 +96,22 @@ class Create(Resource):
         try:
 
             data = json.loads(request.data) if request.data else {}
-            
+
             project_path = get_project_path(data["project"], VAME_APP_DIRECTORY)
 
             created = not project_path.exists()
-            
+
             config_path = Path(vame.init_new_project(
                 working_directory=VAME_APP_DIRECTORY,
                 **data
             ))
 
             return jsonify(dict(
-                project=str(config_path.parent), 
+                project=str(config_path.parent),
                 created=created,
                 config=yaml.safe_load(open(config_path, "r"))
             ))
-        
+
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))
@@ -127,9 +127,9 @@ class DeleteProject(Resource):
                 import shutil
                 shutil.rmtree(project_path, ignore_errors=True)
                 return jsonify(dict(project=str(project_path), deleted=True))
-            
+
             return jsonify(dict(project=str(project_path), deleted=False))
-        
+
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))
@@ -149,15 +149,15 @@ class ConfigureProject(Resource):
                 with open(config_path, "r") as file:
                     config = yaml.safe_load(file)
                     config_update = data["config"]
-                    
+
                     if config_update:
                         config.update(config_update)
                         auxiliary.write_config(config_path, config)
-                    
+
                     return jsonify(dict(config=config))
-            
+
             return jsonify(dict(config=None))
-        
+
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))
@@ -175,9 +175,9 @@ class UpdateConfig(Resource):
                 config.rename(config.with_name(f"{config.stem}_backup{config.suffix}"))
 
             result = vame.update_config(config, force_update=True)
-            
+
             return jsonify(dict(result = result ))
-        
+
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))
@@ -191,13 +191,16 @@ class Align(Resource):
 
             data, project_path = resolve_request_data(request)
 
-            result = vame.egocentric_alignment(**data)
-
-            # If your experiment is by design egocentrical (e.g. head-fixed experiment on treadmill etc) 
+            # If your experiment is by design egocentrical (e.g. head-fixed experiment on treadmill etc)
             # you can use the following to convert your .csv to a .npy array, ready to train vame on it
-            vame.csv_to_numpy(project_path / 'config.yaml')
+            egocentric_data = data.pop('egocentric_data')
+            if egocentric_data:
+                vame.csv_to_numpy(project_path / 'config.yaml')
+            else:
+                vame.egocentric_alignment(**data)
 
-            return jsonify(dict(result = result ))
+
+            return jsonify(dict(result='success'))
 
         except Exception as exception:
             if notBadRequestException(exception):
