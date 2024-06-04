@@ -19,8 +19,8 @@ To activate the environment, run the following command:
 conda activate vame-desktop
 ```
 
-#### Node.js
-Install the necessary Node.js dependencies by running the following command:
+#### [Node.js](https://nodejs.org/en)
+Install Node.js and project dependencies by running the following command:
 ```bash
 npm install
 ```
