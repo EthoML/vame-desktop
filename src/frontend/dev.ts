@@ -8,7 +8,7 @@ import { app } from "./refs";
 
 const defaultConfigOptions = {
     egocentric_data: true,
-    max_epochs: 5
+    max_epochs: 50
 }
 
 const defaultPoseRefIndex = [ 0, 5 ]
