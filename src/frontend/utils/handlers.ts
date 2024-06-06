@@ -1,3 +1,6 @@
+import { imageRenderElement } from "../elements"
+import { baseUrl } from "./requests"
+
 export default {
     load: {
       onRequest: function () { this.log(`Loading project...`) },
@@ -25,7 +28,17 @@ export default {
     },
     evaluate: {
       onRequest: function () { this.log(`Evaluating model...`) },
-      onSuccess: function () { this.log(`Model evaluated!`) },
+      onSuccess: function ({ result }) { 
+        this.log(`Model evaluated!`)
+
+        result.forEach(img => {
+          if (document.getElementById(img)) return
+          const imgElement = document.createElement('img')
+          imgElement.id = img
+          imgElement.src = (new URL(`./files/${img}`, baseUrl)).href
+          imageRenderElement.append(imgElement)
+        })
+       },
     },
     segment: {
       onRequest: function () { this.log(`Running pose segmentation...`) },

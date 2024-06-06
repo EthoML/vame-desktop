@@ -8,6 +8,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_restx import Api, Resource
 
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive matplotlib backend
+
 VAME_APP_DIRECTORY = Path.home() / 'vame-desktop'
 
 app = Flask(__name__)
@@ -73,7 +76,14 @@ class Preload(Resource):
     def get(self):
         import vame
         return { "payload": True }
+    
 
+@api.route('/files/<path:path>')
+class Files(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def get(self, path):
+        from flask import send_from_directory
+        return send_from_directory(VAME_APP_DIRECTORY, path)
 
 @api.route('/load')
 class Load(Resource):
@@ -240,8 +250,13 @@ class EvaluateModel(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.evaluate_model(**data)
-            return dict(result=result)
+            vame.evaluate_model(**data)
+
+            evaluation_output = project_path / 'model' / 'evaluate'
+            png_files = list(evaluation_output.glob('*.png'))
+            png_paths = [ str(png_file.relative_to(VAME_APP_DIRECTORY)) for png_file in png_files ]
+
+            return dict(result=png_paths)
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))

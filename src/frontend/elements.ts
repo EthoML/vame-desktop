@@ -20,3 +20,5 @@ export const sectionButtons = navSectionNames.reduce((acc, name) => {
 
 
 export const mainConsoleElement = sections.edit.querySelector('.console')!;
+
+export const imageRenderElement = sections.edit.querySelector('.image-render')!;

@@ -95,6 +95,20 @@ h2 {
   border-radius: 5px;
 }
 
+.image-render {
+  max-height: 400px;
+  overflow: auto;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.image-render img {
+  height: 300px;
+}
+
+
 nav > div:last-child {
   font-size: 80%;
 }
@@ -286,13 +300,13 @@ button {
   outline: none;
 }
 
-img {
+nav img {
   display: none;
 }
 
 @media (min-width:641px) {
 
-  img {
+  nav img {
     display: block;
   }
 

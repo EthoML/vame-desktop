@@ -10,7 +10,7 @@ import Form from "./Form";
 
 
 import { Logger } from "./Logger";
-import defaultLogConfig from './utils/log'
+import defaultLogConfig from './utils/handlers'
 import { sections, sectionButtons, createProjectButton, runPipelineButton, mainConsoleElement } from "./elements";
 
 

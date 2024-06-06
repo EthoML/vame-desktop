@@ -2,7 +2,7 @@ import Pipeline from "./Pipeline";
 import { onConnected, onReady } from "./commoners";
 import { header } from "./utils/text";
 
-import log from "./utils/log";
+import log from "./utils/handlers";
 
 import { app } from "./refs";
 
@@ -56,7 +56,6 @@ const pipelineMethods = {
     ...log.train
   },
   evaluate: {
-    tags: [ 'failing' ],
     ...log.evaluate
   },
   segment: {

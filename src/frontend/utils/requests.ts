@@ -2,7 +2,7 @@ type PathType = string
 type PayloadType = Record<string, any>
 
 const service = commoners.services.vame
-const baseUrl = new URL(service.url)
+export const baseUrl = new URL(service.url)
 
 
 // This function ensures that errors are thrown when the response is not ok
