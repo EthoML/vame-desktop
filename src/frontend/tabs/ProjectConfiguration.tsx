@@ -1,19 +1,19 @@
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
+import projectConfigSchema from '../../schema/config.schema.json'
+
 
 const ProjectConfiguration = ({
     configuration,
-    schema,
     onFormSubmit
 }: {
     configuration: DynamicFormProps['initialValues']
-    schema?: DynamicFormProps['schema']
     onFormSubmit?: DynamicFormProps['onFormSubmit']
 }) => {
     return (
         <DynamicForm 
             initialValues={configuration} 
-            schema={schema}
+            schema={projectConfigSchema}
             onFormSubmit={onFormSubmit} 
         />
     )

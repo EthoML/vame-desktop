@@ -1,0 +1,29 @@
+{
+    "properties": {
+        "name": {
+            "type": "string",
+            "title": "Project Name"
+        },
+        "videos": {
+            "type": "array",
+            "title": "Videos",
+            "items": {
+                "type": "file",
+                "accept": "video/*"
+            }
+        },
+        "csvs": {
+            "type": "array",
+            "title": "CSV Files",
+            "items": {
+                "type": "file",
+                "accept": [".csv"]
+            }
+        },
+        "videotype": {
+            "type": "string",
+            "title": "Video Type"
+        }
+    },
+    "required": [ "name", "videos", "csvs", "videotype" ]
+}

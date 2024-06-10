@@ -8,9 +8,7 @@ import Tabs from '../components/Tabs';
 import DynamicForm from '../components/DynamicForm';
 import ProjectConfiguration from '../tabs/ProjectConfiguration';
 import { CenteredFullscreenDiv } from '../components/divs';
-
-import projectConfigSchema from '../../schema/config.schema.json'
-
+import Alignment from '../tabs/Alignment';
 
 const ProjectHeader = styled.header`
   padding: 20px;
@@ -36,7 +34,7 @@ const Project: React.FC = () => {
 
   const [ searchParams ] = useSearchParams();
 
-  const [ pipeline, setPipelineInfo] = useState(null);
+  const [ pipeline, setPipeline ] = useState(null);
 
   const projectPath = searchParams.get("project")
 
@@ -44,7 +42,7 @@ const Project: React.FC = () => {
   useEffect(() => {
     onReady(() => {
       const pipeline = new Pipeline(projectPath)
-      pipeline.load().then(() => setPipelineInfo(pipeline))
+      pipeline.load().then(() => setPipeline(pipeline))
     })
    }, [])
 
@@ -56,22 +54,33 @@ const Project: React.FC = () => {
       </div>
     </CenteredFullscreenDiv>
 
-  const handleFormSubmit = (formData) => {
-    console.log('Form Data:', formData);
-  };
+
+   const loadedPipeline = pipeline as Pipeline
 
   const tabs = [
     {
       label: 'Project Configuration',
       content: <ProjectConfiguration 
-        configuration={pipeline.configuration} 
-        schema={projectConfigSchema}
-        onFormSubmit={handleFormSubmit} 
+        configuration={loadedPipeline.configuration} 
+        onFormSubmit={async (updatedConfiguration) => {
+          await loadedPipeline.configure(updatedConfiguration)
+
+          // Reload the pipeline
+          const pipeline = new Pipeline(projectPath)
+          await pipeline.load()
+          setPipeline(pipeline)
+        }} 
       />
     },
     {
       label: 'Data Alignment',
-      content: <div>Coming soon...</div>
+      content: <Alignment 
+        pipeline={loadedPipeline}
+        onFormSubmit={async (params) => {
+          const alignedResults = await loadedPipeline.align(params)
+          console.log(alignedResults)
+        }}
+      />,
     },
     {
       label: 'Data Preparation',
@@ -100,10 +109,10 @@ const Project: React.FC = () => {
   return (
     <div>
       <ProjectHeader>
-        <h2>{pipeline.configuration.Project}</h2>
+        <h2>{loadedPipeline.configuration.Project}</h2>
         <ProjectInformation>
-          <ProjectInformationCapsule><small><b>Creation Date</b> <small>{pipeline.creationDate.toLocaleDateString()}</small></small></ProjectInformationCapsule>
-          <ProjectInformationCapsule><small><b>Project Location</b> <small>{pipeline.configuration.project_path}</small></small></ProjectInformationCapsule>
+          <ProjectInformationCapsule><small><b>Creation Date</b> <small>{loadedPipeline.creationDate.toLocaleDateString()}</small></small></ProjectInformationCapsule>
+          <ProjectInformationCapsule><small><b>Project Location</b> <small>{loadedPipeline.configuration.project_path}</small></small></ProjectInformationCapsule>
         </ProjectInformation>
       </ProjectHeader>
       <Tabs tabs={tabs} />

@@ -1,0 +1,31 @@
+{
+    "title": "Egocentric Alignment Parameters",
+    "properties": {
+        "pose_ref_index": {
+            "type": "array",
+            "description": "Indices of the reference points in the pose vector.",
+            "items": {
+                "type": "integer"
+            }
+        },
+        "crop_size": {
+            "type": "array",
+            "description": "Size of the cropped image.",
+            "items": {
+                "type": "integer"
+            }
+        },
+        "use_video": {
+            "type": "boolean",
+            "description": "Whether to use video as input."
+        },
+        "video_format": {
+            "type": "string",
+            "description": "Format of the video file."
+        },
+        "check_video": {
+            "type": "boolean",
+            "description": "Whether to check the video file."
+        }
+    }
+}

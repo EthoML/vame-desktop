@@ -92,6 +92,8 @@ const DynamicForm = ({
   const renderInput = (key, value, property, additionalInfo = {}) => {
     const type = property?.type || inferType(value);
 
+    const required = schema?.required?.includes(key) || false;
+
     const isArray = type === 'array';
 
     const isReadOnly = property?.readOnly || false;
@@ -105,7 +107,11 @@ const DynamicForm = ({
 
     if (property?.enum) {
       return (
-        <select name={key} value={formState[key] || ''} onChange={handleChange}>
+        <select 
+        name={key} value={formState[key] || ''} 
+        required={required}
+        onChange={handleChange}
+        >
           {property.enum.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -134,6 +140,7 @@ const DynamicForm = ({
           type="file"
           name={key}
           accept={property.accept}
+          required={required}
           multiple={additionalInfo.multiple}
           onChange={handleChange}
           webkitdirectory={type === 'folder' ? 'true' : null}
@@ -149,6 +156,7 @@ const DynamicForm = ({
         <input
           type="number"
           name={ key }
+          required={required}
           step={ isInteger ? 1 : 0.01 }
           value={ formState[key] || '' }
           onChange={ handleChange }
@@ -160,6 +168,7 @@ const DynamicForm = ({
       <input
         type={type}
         name={key}
+        required={required}
         value={formState[key] || ''}
         onChange={handleChange}
       />

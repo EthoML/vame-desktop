@@ -262,14 +262,14 @@
     },
     "required": [
       "Project", "model_name", "n_cluster", "pose_confidence", "project_path", "video_sets", "all_data",
-      "egocentric_data", "robust", "iqr_factor", "axis", "test_fraction", "pretrained_model", "pretrained_weights",
+      "egocentric_data", "robust", "iqr_factor", "test_fraction", "pretrained_model", "pretrained_weights",
       "num_features", "batch_size", "max_epochs", "model_snapshot", "model_convergence", "transition_function", "beta",
       "beta_norm", "zdims", "learning_rate", "time_window", "prediction_decoder", "prediction_steps", "noise",
-      "scheduler", "scheduler_step_size", "scheduler_gamma", "scheduler_threshold", "softplus", "parameterization",
+      "scheduler", "scheduler_step_size", "scheduler_gamma", "softplus", 
       "hmm_trained", "load_data", "individual_parameterization", "random_state_kmeans", "n_init_kmeans",
       "length_of_motif_video", "min_dist", "n_neighbors", "random_state", "num_points", "hidden_size_layer_1",
-      "hidden_size_layer_2", "dropout_encoder", "hidden_size_rec", "dropout_rec", "n_layers", "hidden_size_pred",
-      "dropout_pred", "mse_reconstruction_reduction", "mse_prediction_reduction", "kmeans_loss", "kmeans_lambda",
+      "hidden_size_layer_2", "hidden_size_rec",  "n_layers", "hidden_size_pred",
+      "mse_reconstruction_reduction", "mse_prediction_reduction", "kmeans_loss", "kmeans_lambda",
       "anneal_function", "kl_start", "annealtime", "legacy"
     ]
   }

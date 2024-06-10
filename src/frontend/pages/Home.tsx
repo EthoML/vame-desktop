@@ -72,26 +72,17 @@ const Home: React.FC = () => {
     })
    }, [])
 
-   if (!pipelines) return <CenteredFullscreenDiv>
-      <div>
-        <b>Loading all projects...</b>
-        <br/>
-        <small>Requested from the local VAME API</small>
-      </div>
-    </CenteredFullscreenDiv>
-
-
-  // Sort the pipelines by creation date
-  pipelines.sort((a: any, b: any) => a.creationDate > b.creationDate ? -1 : 1)
 
   return (
     <PaddedContainer>
 
       <h2>My Projects</h2>
 
-      {pipelines.length > 0 ? (
+      {pipelines ? (pipelines?.length > 0 ? (
         <List>
-          {pipelines.map((pipeline: any) => (
+          {
+          pipelines.sort((a: any, b: any) => a.creationDate > b.creationDate ? -1 : 1) // Sort the pipelines by creation date
+          .map((pipeline: any) => (
             <ListItem key={pipeline.path}>
               <div>
                 <h3>{pipeline.configuration.Project}</h3>
@@ -119,7 +110,7 @@ const Home: React.FC = () => {
         </List>
       ) : (
         <p>No projects found.</p>
-      )}
+      )) : <p>Loading...</p>}
     </PaddedContainer>
   );
 };

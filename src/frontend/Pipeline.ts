@@ -130,8 +130,6 @@ class Pipeline {
 
         this.configuration = result.config
 
-        console.log('Got', result, this.configuration)
-
         this.#path = result.project
 
         return result
@@ -139,7 +137,7 @@ class Pipeline {
 
     configure = async (configUpdate: Record<string, any> = {}) => {
         const result = await post('configure', { project: this.path, config: configUpdate }) as { config: PipelineConfiguration }
-        this.configuration = result.config
+        return this.configuration = result.config
     }
 
     delete = () => {

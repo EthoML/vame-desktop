@@ -5,44 +5,12 @@ import { post } from '../utils/requests';
 import Pipeline from '../Pipeline';
 import { useNavigate } from 'react-router-dom';
 
+import createSchema from '../../schema/create.schema.json';
+
 const PaddedContainer = styled.div`
   padding: 20px;
 `;
 
-const creationSchema = {
-  properties:{
-    name: {
-      type: 'string',
-      title: 'Project Name',
-      required: true
-    },
-    videos: {
-      type: 'array',
-      title: 'Videos',
-      items: {
-        type: 'file',
-        accept: 'video/*',  // Accept only video files
-      },
-      required: true
-    },
-    csvs: {
-      type: 'array',
-      title: 'CSV Files',
-      items: {
-        type: 'file',
-        accept: [ '.csv' ],  // Accept only CSV files
-      },
-      required: true
-    },
-
-    videotype: {
-      type: 'string',
-      title: 'Video Type',
-      enum: ['mp4', 'avi', 'mkv', 'mov'],
-      required: true
-    },
-  }
-}
 
 const Create: React.FC = () => {
 
@@ -74,7 +42,7 @@ const Create: React.FC = () => {
 
       <DynamicForm 
         submitText='Create Project'
-        schema={creationSchema} 
+        schema={createSchema} 
         onFormSubmit={handleFormSubmit} 
       />
     </PaddedContainer>
