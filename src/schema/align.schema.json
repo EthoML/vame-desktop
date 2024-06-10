@@ -10,14 +10,14 @@
         },
         "crop_size": {
             "type": "array",
-            "description": "Size of the cropped image.",
+            "description": "Size to crop the video.",
             "items": {
                 "type": "integer"
             }
         },
         "use_video": {
             "type": "boolean",
-            "description": "Whether to use video as input."
+            "description": "Whether to use video to do the post alignment."
         },
         "video_format": {
             "type": "string",
