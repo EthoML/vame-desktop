@@ -1,0 +1,18 @@
+{
+    "title": "Create Trainset Parameters",
+    "properties": {
+        "pose_ref_index": {
+            "type": "array",
+            "description": "List of reference coordinate indices for alignment",
+            "items": {
+                "type": "integer"
+            },
+            "default": [0, 5]
+        },
+        "check_parameter": {
+            "type": "boolean",
+            "description": "Whether to plot the z-scored data and the filtered data",
+            "default": false
+        }
+    }
+}

@@ -22,6 +22,7 @@ const Alignment = ({
           <DynamicForm 
             initialValues={{}} 
             schema={pipeline.configuration.egocentric_data ? undefined : alignmentSchema }
+            submitText="Align Data"
             onFormSubmit={onFormSubmit} 
         />
         </>

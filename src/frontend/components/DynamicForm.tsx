@@ -49,7 +49,7 @@ const DynamicForm = ({
 
   useEffect(() => {
     if (initialValues) {
-      setFormState(initialValues);
+      setFormState(structuredClone(initialValues));
     }
   }, [initialValues]);
 
@@ -110,6 +110,7 @@ const DynamicForm = ({
     const isArray = type === 'array';
 
     const isReadOnly = property?.readOnly || false;
+
     if (isReadOnly) {
       if (isArray) {
         return <ol>{value.map((item) => <li key={item}>{item}</li>)}</ol>;
@@ -134,7 +135,10 @@ const DynamicForm = ({
       );
     }
 
-    if (isArray) return renderInput(key, value?.[0], property.items, { multiple: true });
+    if (isArray) {
+      if (Array.isArray(value)) return <ol>{value.map((item) => <li key={item}>{item}</li>)}</ol>; // Existing arrays are immutable
+      return renderInput(key, value?.[0], property.items, { multiple: true });
+    }
 
     if (type === 'boolean') {
       return (
@@ -197,10 +201,16 @@ const DynamicForm = ({
 
         const title = property.title || key;
 
+
+        const value = initialValues[key] || property.default;
+
+        // Set default value for the input 
+        if ('default' in property && !(key in formState)) formState[key] = property.default
+        
         return (
           <InputGroup key={key}>
               <InputLabel>{header(title)}<br/>{property.description && <small>{property.description}</small>}</InputLabel>
-            {renderInput(key, initialValues[key], property)}
+            {renderInput(key, value, property)}
           </InputGroup>
         );
       });

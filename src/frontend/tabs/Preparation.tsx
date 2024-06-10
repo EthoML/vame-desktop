@@ -1,24 +1,25 @@
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
-import projectConfigSchema from '../../schema/config.schema.json'
+import preparationSchema from '../../schema/prepare.schema.json'
 import Pipeline from "../Pipeline"
 
-
-const ProjectConfiguration = ({
+const Preparation = ({
     pipeline,
     onFormSubmit
 }: {
     pipeline: Pipeline
     onFormSubmit?: DynamicFormProps['onFormSubmit']
+
 }) => {
+
     return (
         <DynamicForm 
-            initialValues={pipeline.configuration} 
-            schema={projectConfigSchema}
-            submitText="Save Configuration"
+            initialValues={{}} 
+            schema={preparationSchema}
+            submitText="Train Model"
             onFormSubmit={onFormSubmit} 
         />
     )
 }
 
-export default ProjectConfiguration
+export default Preparation

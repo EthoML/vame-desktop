@@ -63,6 +63,12 @@ def resolve_request_data(request):
     return data, project_path
 
 
+def get_evaluation_images(project_path):
+    evaluation_output = project_path / 'model' / 'evaluate'
+    png_files = list(evaluation_output.glob('*.png'))
+    return [ str(png_file.relative_to(VAME_APP_DIRECTORY)) for png_file in png_files ]
+
+
 @api.route('/connected')
 class Connected(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
@@ -78,12 +84,12 @@ class Preload(Resource):
         return { "payload": True }
     
 
-@api.route('/files/<path:path>')
+@api.route('/files/<path:project>/<path:path>')
 class Files(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
-    def get(self, path):
+    def get(self, project, path):
         from flask import send_from_directory
-        return send_from_directory(VAME_APP_DIRECTORY, path)
+        return send_from_directory(VAME_APP_DIRECTORY, Path(project) / path)
     
 @api.route('/pipelines')
 class Files(Resource):
@@ -101,9 +107,20 @@ class Load(Resource):
         _, project_path = resolve_request_data(request)
         config_path = project_path / "config.yaml"
 
+        # Create a symlink to the project directory if it isn't in the VAME_APP_DIRECTORY
+        if project_path.parent != VAME_APP_DIRECTORY:
+            symlink = VAME_APP_DIRECTORY / project_path.name
+            if not symlink.exists():
+                symlink.symlink_to(project_path)
+
+        images = dict(
+            evaluation=get_evaluation_images(project_path)
+        )
+
         return jsonify(dict(
             project=str(config_path.parent),
             config=yaml.safe_load(open(config_path, "r")) if config_path.exists() else None,
+            images=images
         ))
 
 @api.route('/create', methods=['POST'])
@@ -259,12 +276,7 @@ class EvaluateModel(Resource):
         try:
             data, project_path = resolve_request_data(request)
             vame.evaluate_model(**data)
-
-            evaluation_output = project_path / 'model' / 'evaluate'
-            png_files = list(evaluation_output.glob('*.png'))
-            png_paths = [ str(png_file.relative_to(VAME_APP_DIRECTORY)) for png_file in png_files ]
-
-            return dict(result=png_paths)
+            return dict(result=get_evaluation_images(project_path))
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))

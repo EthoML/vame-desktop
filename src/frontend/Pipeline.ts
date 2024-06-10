@@ -97,6 +97,7 @@ class Pipeline {
     load = async () => {
         const result = await post('load', { project: this.path })
         this.configuration = result.config
+        this.images = result.images
         return result
     }
 

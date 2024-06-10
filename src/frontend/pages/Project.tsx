@@ -5,10 +5,16 @@ import Pipeline from '../Pipeline';
 import styled from 'styled-components';
 import { onReady } from '../commoners';
 import Tabs from '../components/Tabs';
-import DynamicForm from '../components/DynamicForm';
-import ProjectConfiguration from '../tabs/ProjectConfiguration';
+
 import { CenteredFullscreenDiv } from '../components/divs';
+
+import ProjectConfiguration from '../tabs/ProjectConfiguration';
 import Alignment from '../tabs/Alignment';
+import Preparation from '../tabs/Preparation';
+import Segmentation from '../tabs/Segmentation';
+import Quantification from '../tabs/Quantification';
+import Evaluation from '../tabs/Evaluation';
+
 
 const ProjectHeader = styled.header`
   padding: 20px;
@@ -34,7 +40,9 @@ const Project: React.FC = () => {
 
   const [ searchParams ] = useSearchParams();
 
-  const [ pipeline, setPipeline ] = useState(null);
+  const [ pipeline, setPipeline ] = useState();
+
+  const [ selectedTab, setSelectedTab ] = useState();
 
   const projectPath = searchParams.get("project")
 
@@ -57,56 +65,84 @@ const Project: React.FC = () => {
 
    const loadedPipeline = pipeline as Pipeline
 
+  const submitTab = async (
+    callback,
+    tab?: string
+  ) => {
+
+    const result = await callback().catch(e => window.alert(e))
+
+    // Reload the pipeline
+    const pipeline = new Pipeline(projectPath)
+    await pipeline.load()
+    setPipeline(pipeline)
+
+    // Set the selected tab if provided
+    if (tab) setSelectedTab(tab)
+
+
+    return result
+
+  }
+
+
+  console.log(pipeline)
+
   const tabs = [
     {
+      id: 'project-configuration',
       label: 'Project Configuration',
       content: <ProjectConfiguration 
-        configuration={loadedPipeline.configuration} 
-        onFormSubmit={async (updatedConfiguration) => {
-          await loadedPipeline.configure(updatedConfiguration)
-
-          // Reload the pipeline
-          const pipeline = new Pipeline(projectPath)
-          await pipeline.load()
-          setPipeline(pipeline)
-        }} 
+        pipeline={loadedPipeline} 
+        onFormSubmit={async (updatedConfiguration) => submitTab(() => loadedPipeline.configure(updatedConfiguration), 'data-alignment')} 
       />
     },
     {
+      id: 'data-alignment',
       label: 'Data Alignment',
       content: <Alignment 
         pipeline={loadedPipeline}
-        onFormSubmit={async (params) => {
-          const alignedResults = await loadedPipeline.align(params)
-          console.log(alignedResults)
-        }}
+        onFormSubmit={async (params) => submitTab(() => loadedPipeline.align(params), 'model-training')}
       />,
     },
     {
-      label: 'Data Preparation',
-      content: <div>Coming soon...</div>
-    },
-    {
+      id: 'model-training',
       label: 'Model Training',
-      content: <div>Coming soon...</div>
+      content: <Preparation 
+        pipeline={loadedPipeline}
+        onFormSubmit={async (params) => submitTab(async () => {
+            // await loadedPipeline.create_trainset(params) // Create the trainset
+            // await loadedPipeline.train() // Train the model
+            await loadedPipeline.evaluate() // Evaluate the model
+          }, 'evaluation')}
+      />
     },
     {
+      id: 'evaluation',
       label: 'Evaluation',
-      content: <div>Coming soon...</div>
+      content: <Evaluation 
+        pipeline={loadedPipeline}
+      />
     },
     {
+      id: 'segmentation',
       label: 'Segmentation',
-      content: <div>Coming soon...</div>
+      content: <Segmentation 
+        pipeline={loadedPipeline}
+        onFormSubmit={async () => submitTab(async () => {
+            await loadedPipeline.segment() // Run pose segmentation
+          })}
+      />
     },
     {
+      id: 'quantification',
       label: 'Quantification',
-      content: <div>Coming soon...</div>
+      content: <Quantification />
     },
   ];
 
 
- 
-  return (
+   return (
     <div>
       <ProjectHeader>
         <h2>{loadedPipeline.configuration.Project}</h2>
@@ -115,7 +151,10 @@ const Project: React.FC = () => {
           <ProjectInformationCapsule><small><b>Project Location</b> <small>{loadedPipeline.configuration.project_path}</small></small></ProjectInformationCapsule>
         </ProjectInformation>
       </ProjectHeader>
-      <Tabs tabs={tabs} />
+      <Tabs 
+        tabs={tabs} 
+        selected={selectedTab}
+      />
 
     </div>
   );

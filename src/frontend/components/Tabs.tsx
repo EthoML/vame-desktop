@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 const TabsContainer = styled.div`
@@ -46,21 +46,25 @@ const TabPane = styled.div`
   display: ${(props) => (props.active ? 'block' : 'none')};
 `;
 
-const Tabs = ({ tabs }) => {
-  const [activeTab, setActiveTab] = useState(tabs[0].label);
+const Tabs = ({ 
+  tabs,
+  selected = tabs[0].id,
+}) => {
+  
+  const [ activeTab, setActiveTab ] = useState(selected);
 
-  const handleTabClick = (label) => {
-    setActiveTab(label);
-  };
+  useEffect(() => { setActiveTab(selected) }, [ selected ]);
+
+  const handleTabClick = (id) => setActiveTab(id);
 
   return (
     <TabsContainer>
       <TabList>
         {tabs.map((tab) => (
           <TabButton
-            key={tab.label}
-            active={tab.label === activeTab ? 1  : 0}
-            onClick={() => handleTabClick(tab.label)}
+            key={tab.id}
+            active={tab.id === activeTab ? 1  : 0}
+            onClick={() => handleTabClick(tab.id)}
           >
             {tab.label}
           </TabButton>
@@ -68,7 +72,7 @@ const Tabs = ({ tabs }) => {
       </TabList>
       <TabContent>
         {tabs.map((tab) => (
-          <TabPane key={tab.label} active={tab.label === activeTab ? 1 : 0}>
+          <TabPane key={tab.id} active={tab.id === activeTab ? 1 : 0}>
             {tab.content}
           </TabPane>
         ))}

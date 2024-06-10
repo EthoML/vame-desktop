@@ -1,0 +1,11 @@
+{
+    "title": "Evaluate Model Parameters", 
+    "properties": {
+        "use_snapshots": {
+            "type": "boolean",
+            "title": "Use Snapshots",
+            "description": "Whether to plot for all snapshots or only the best model.",
+            "default": false
+        }
+    }
+}
