@@ -1,0 +1,10 @@
+{
+    "title": "Settings",
+    "properties": {
+        "interacted": {
+            "type": "boolean",
+            "title": "Interact with Me",
+            "description": "This is an arbitrary interaction to add a global setting"
+        }
+    }
+}

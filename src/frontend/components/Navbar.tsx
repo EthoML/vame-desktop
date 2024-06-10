@@ -19,7 +19,7 @@ const NavbarContainer = styled.nav`
   justify-content: space-between;
   gap: 20px;
   font-size: 20px;
-  padding: 20px 30px;
+  padding: 20px 20px;
   background: whitesmoke;
 `;
 
@@ -99,7 +99,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link to="/settings">
                     <Tippy content={<span>Edit global settings</span>}>
-                        <ControlButton disabled>
+                        <ControlButton>
                             <FontAwesomeIcon icon={faGear} />
                         </ControlButton>
                     </Tippy>

@@ -17,7 +17,7 @@ import Evaluation from '../tabs/Evaluation';
 
 
 const ProjectHeader = styled.header`
-  padding: 20px;
+  padding: 20px 30px;
 `
 
 const ProjectInformation = styled.div`

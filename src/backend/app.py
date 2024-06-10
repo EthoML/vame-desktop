@@ -13,6 +13,9 @@ matplotlib.use('Agg')  # Non-interactive matplotlib backend
 
 VAME_APP_DIRECTORY = Path.home() / 'vame-desktop'
 
+GLOBAL_SETTINGS_FILE = VAME_APP_DIRECTORY / 'settings.json'
+GLOBAL_STATES_FILE = VAME_APP_DIRECTORY / 'states.json'
+
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -83,6 +86,19 @@ class Preload(Resource):
         import vame
         return { "payload": True }
     
+@api.route('/settings')
+class Settings(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def get(self):
+        with open(GLOBAL_SETTINGS_FILE, "r") as file:
+            return json.load(file)
+        
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def post(self):
+        data = json.loads(request.data) if request.data else {}
+        with open(GLOBAL_SETTINGS_FILE, "w") as file:
+            json.dump(data, file)
+        return jsonify(data)
 
 @api.route('/files/<path:project>/<path:path>')
 class Files(Resource):
@@ -100,12 +116,46 @@ class FileExists(Resource):
         return jsonify(dict(exists=full_path.exists()))
     
     
-@api.route('/pipelines')
-class Files(Resource):
+@api.route('/projects')
+class Projects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        pipelines = [str(pipeline) for pipeline in VAME_APP_DIRECTORY.glob('*') if pipeline.is_dir()]
-        return jsonify(pipelines)
+        projects = [str(project) for project in VAME_APP_DIRECTORY.glob('*') if project.is_dir()]
+        return jsonify(projects)
+    
+@api.route('/projects/recent')
+class RecentProjects(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def get(self):
+        states = json.load(open(GLOBAL_STATES_FILE, "r"))
+        return jsonify(states.get("recent_projects", []))
+    
+@api.route('/project/register')
+class RegisterProject(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def post(self):
+        states = json.load(open(GLOBAL_STATES_FILE, "r"))
+        recent_projects = states.get("recent_projects", [])
+
+        _, project_path = resolve_request_data(request)
+
+        project_path = str(project_path)
+
+        if project_path in recent_projects:
+            recent_projects.remove(project_path)
+
+        recent_projects.append(project_path)
+
+        if len(recent_projects) > 5:
+            recent_projects = recent_projects[-5:]
+
+        with open(GLOBAL_STATES_FILE, "w") as file:
+            json.dump({
+                **states,
+                "recent_projects": recent_projects
+            }, file)
+
+        return jsonify(recent_projects)
 
 
 @api.route('/load')
@@ -385,5 +435,17 @@ if __name__ == "__main__":
     env_port = os.getenv('PORT')
     PORT = int(env_port) if env_port else 8080
     HOST = os.getenv('HOST') or 'localhost'
+
+    
+    VAME_APP_DIRECTORY.mkdir(exist_ok=True, parents=True) # Create the VAME_APP_DIRECTORY if it doesn't exist
+    
+    # Create the global files if they don't exist
+    global_files = [GLOBAL_STATES_FILE, GLOBAL_SETTINGS_FILE]
+    for file in global_files:
+        if not file.exists():
+            with open(file, "w") as f:
+                json.dump({}, f)
+    
+    # Run the app
     print(f"Running on {HOST}:{PORT}")
     app.run(host=HOST, port = PORT)

@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import createSchema from '../../schema/create.schema.json';
 
 const PaddedContainer = styled.div`
-  padding: 20px;
+  padding: 25px 50px;
 `;
 
 

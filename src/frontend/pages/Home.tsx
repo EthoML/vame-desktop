@@ -1,116 +1,94 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { onConnected } from '../commoners';
-import { get } from '../utils/requests';
+import { get, post } from '../utils/requests';
 import Pipeline from '../Pipeline';
 import { useNavigate } from 'react-router-dom';
-import { CenteredFullscreenDiv } from '../components/divs';
+import PipelineList from '../components/PipelineList';
 
 export const PaddedContainer = styled.div`
-  padding: 20px;
+  padding: 25px 50px;
   overflow-y: auto !important;
 
   h2 {
-    margin-bottom: 20px;
+    margin: 20px 0px;
   }
 `;
 
-const List = styled.ul`
-  list-style: none;
-  padding: 0;
-`;
 
-const ListItem = styled.li`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 10px;
+const loadPipelines = async (paths) => {
 
-  h3 {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0;
-  }
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const Button = styled.button`
-  font-size: 14px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background: #181c24;
-  color: white;
-  cursor: pointer;
-`;
+   return await Promise.all(paths.map(async (path: any) => {
+        const pipeline = new Pipeline(path)
+        await pipeline.load()
+        return pipeline
+    }))
+}
 
 const Home: React.FC = () => {
 
   const navigate = useNavigate()
 
-  const [ pipelines, setPipelines ] = useState(null);
+  const [ allPipelines, setAllPipelines ] = useState(null);
+  const [ recentPipelines, setRecentPipelines ] = useState(null);
 
   // Load the pipeline configuration when the server is ready
   useEffect(() => {
     onConnected(async () => {
-      const pipelinePaths = await get('/pipelines')
 
-      const pipelines = await Promise.all(pipelinePaths.map(async (pipelinePath: any) => {
-        const pipeline = new Pipeline(pipelinePath)
-        await pipeline.load()
-        return pipeline
-      }))
+      get('projects').then(async (paths) => setAllPipelines(await loadPipelines(paths)))
 
-      setPipelines(pipelines)
+      get('projects/recent').then(async (paths) => setRecentPipelines((await loadPipelines(paths)).reverse()))
     })
    }, [])
 
 
+   console.log('Recent Pipelines:', recentPipelines)
+
+   const onEdit = async (pipeline) => {
+    await post('project/register', { project: pipeline.path })
+
+    navigate({ 
+      pathname: "/project",
+      search: `?project=${pipeline.path}`
+    });
+  }
+
+  const onDelete = (pipeline) => {
+    const newAllPipelines = allPipelines.filter((p: any) => p.path !== pipeline.path)
+    const newRecentPipelines = recentPipelines.filter((p: any) => p.path !== pipeline.path)
+    setAllPipelines(newAllPipelines)
+    setRecentPipelines(newRecentPipelines)
+  }
+
+
+  const loadingMessage = <p>Loading...</p>
+
   return (
     <PaddedContainer>
 
-      <h2>My Projects</h2>
+      <h2>Recent Projects</h2>
 
-      {pipelines ? (pipelines?.length > 0 ? (
-        <List>
-          {
-          pipelines.sort((a: any, b: any) => a.creationDate > b.creationDate ? -1 : 1) // Sort the pipelines by creation date
-          .map((pipeline: any) => (
-            <ListItem key={pipeline.path}>
-              <div>
-                <h3>{pipeline.configuration.Project}</h3>
-                <small>{pipeline.path}</small>
-              </div>
-              <ButtonContainer>
-                <Button onClick={() => {
-                  navigate({ 
-                    pathname: "/project",
-                    search: `?project=${pipeline.path}`
-                  });
-                }}>Edit</Button>
-                <Button onClick={() => {
-
-                  // Check to make sure user wants to delete the project
-                  if (!window.confirm(`Are you sure you want to delete project "${pipeline.configuration.Project}"?`)) return
-
-                  // Delete the project
-                  pipeline.delete()
-                  setPipelines(pipelines.filter((p: any) => p.path !== pipeline.path))
-                }}>Delete</Button>
-              </ButtonContainer>
-            </ListItem>
-          ))}
-        </List>
+      {recentPipelines ? (recentPipelines?.length > 0 ? (
+        <PipelineList 
+          pipelines={recentPipelines} 
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ) : (
-        <p>No projects found.</p>
-      )) : <p>Loading...</p>}
+        <p>No recent projects.</p>
+      )) : loadingMessage}
+
+      <h2>All Projects</h2>
+      {allPipelines ? (allPipelines?.length > 0 ? (
+        <PipelineList 
+          pipelines={allPipelines.sort((a: any, b: any) => a.creationDate > b.creationDate ? -1 : 1)} 
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ) : (
+        <p>No projects found in the VAME Desktop output directory.</p>
+      )) : loadingMessage}
     </PaddedContainer>
   );
 };
