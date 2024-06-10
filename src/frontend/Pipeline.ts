@@ -87,6 +87,12 @@ class Pipeline {
         return this.#path
     }
 
+    get creationDate() {
+        if (!this.configuration) return null
+        const pipelineCreationDateString = this.configuration.project_path.split(`${this.configuration.Project}-`)[1]
+        return new Date(pipelineCreationDateString)
+    }
+
     // Load the pipeline information
     load = async () => {
         const result = await post('load', { project: this.path })

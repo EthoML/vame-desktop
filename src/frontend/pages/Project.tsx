@@ -9,12 +9,8 @@ import DynamicForm from '../components/DynamicForm';
 import ProjectConfiguration from '../tabs/ProjectConfiguration';
 import { CenteredFullscreenDiv } from '../components/divs';
 
+import projectConfigSchema from '../../schema/config.schema.json'
 
-const immutableConfigProperties = [
-  'Project', 
-  'project_path',
-  "video_sets"
-]
 
 const ProjectHeader = styled.header`
   padding: 20px;
@@ -60,24 +56,18 @@ const Project: React.FC = () => {
       </div>
     </CenteredFullscreenDiv>
 
-   const pipelineName = pipeline.configuration.Project
-   const pipelineCreationDateString = pipeline.configuration.project_path.split(`${pipelineName}-`)[1]
-   const pipelineCreationDate = new Date(pipelineCreationDateString)
-
   const handleFormSubmit = (formData) => {
     console.log('Form Data:', formData);
   };
 
-
-  const editableConfig = Object.entries(pipeline.configuration).reduce((acc, [key, value]) => {
-    if (!immutableConfigProperties.includes(key)) acc[key] = value;
-    return acc;
-  }, {})
-
   const tabs = [
     {
       label: 'Project Configuration',
-      content: <ProjectConfiguration configuration={editableConfig} onFormSubmit={handleFormSubmit} />
+      content: <ProjectConfiguration 
+        configuration={pipeline.configuration} 
+        schema={projectConfigSchema}
+        onFormSubmit={handleFormSubmit} 
+      />
     },
     {
       label: 'Data Alignment',
@@ -112,7 +102,7 @@ const Project: React.FC = () => {
       <ProjectHeader>
         <h2>{pipeline.configuration.Project}</h2>
         <ProjectInformation>
-          <ProjectInformationCapsule><small><b>Creation Date</b> <small>{pipelineCreationDate.toLocaleDateString()}</small></small></ProjectInformationCapsule>
+          <ProjectInformationCapsule><small><b>Creation Date</b> <small>{pipeline.creationDate.toLocaleDateString()}</small></small></ProjectInformationCapsule>
           <ProjectInformationCapsule><small><b>Project Location</b> <small>{pipeline.configuration.project_path}</small></small></ProjectInformationCapsule>
         </ProjectInformation>
       </ProjectHeader>

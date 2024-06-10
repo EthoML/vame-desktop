@@ -81,7 +81,10 @@ const Home: React.FC = () => {
     </CenteredFullscreenDiv>
 
 
-   console.log(pipelines)
+  // Sort the pipelines by creation date
+  pipelines.sort((a: any, b: any) => {
+    return a.creationDate > b.creationDate ? -1 : 1
+  })
 
   return (
     <PaddedContainer>

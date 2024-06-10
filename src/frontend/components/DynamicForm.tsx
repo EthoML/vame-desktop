@@ -60,7 +60,6 @@ const DynamicForm = ({
         [name]: Array.from(files)
       });
       return;
-
     }
 
 
@@ -82,17 +81,27 @@ const DynamicForm = ({
     if (onFormSubmit) onFormSubmit({ ...formState }); // Copy the form state to prevent mutation
   };
 
-  const inferInputType = (value) => {
+  const inferType = (value) => {
     if (typeof value === 'string') return 'text';
     if (typeof value === 'number') return 'number';
-    if (typeof value === 'boolean') return 'checkbox';
+    if (typeof value === 'boolean') return 'boolean';
     if (value instanceof File) return 'file';
     return 'text';
   };
 
   const renderInput = (key, value, property, additionalInfo = {}) => {
-    const type = property?.type || inferInputType(value);
+    const type = property?.type || inferType(value);
 
+    const isArray = type === 'array';
+
+    const isReadOnly = property?.readOnly || false;
+    if (isReadOnly) {
+      if (isArray) {
+        return <ol>{value.map((item) => <li key={item}>{item}</li>)}</ol>;
+      }
+
+      return <span>{value}</span>;
+    }
 
     if (property?.enum) {
       return (
@@ -106,13 +115,12 @@ const DynamicForm = ({
       );
     }
 
-    if (type === 'array') return renderInput(key, value?.[0], property.items, { multiple: true });
+    if (isArray) return renderInput(key, value?.[0], property.items, { multiple: true });
 
-
-    if (type === 'checkbox') {
+    if (type === 'boolean') {
       return (
         <input
-          type={type}
+          type='checkbox'
           name={key}
           checked={formState[key] || false}
           onChange={handleChange}
@@ -133,6 +141,21 @@ const DynamicForm = ({
       );
     }
 
+    const isInteger = type === 'integer'
+    const isNumber = type === 'number' || isInteger
+
+    if (isNumber) {
+      return (
+        <input
+          type="number"
+          name={ key }
+          step={ isInteger ? 1 : 0.01 }
+          value={ formState[key] || '' }
+          onChange={ handleChange }
+        />
+      );
+    }
+
     return (
       <input
         type={type}
@@ -147,6 +170,7 @@ const DynamicForm = ({
     if (schema) {
       return Object.keys(schema.properties).map((key) => {
         const property = schema.properties[key];
+
         return (
           <InputGroup key={key}>
             <label>{header(key)}</label>
