@@ -131,14 +131,15 @@ const Project: React.FC = () => {
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
             await loadedPipeline.segment() // Run pose segmentation
+            // await loadedPipeline.motif_videos() // Creating motif videos. NOTE: Will need additional consultation for how to proceed
           })}
       />
-    },
-    {
-      id: 'quantification',
-      label: 'Quantification',
-      content: <Quantification />
-    },
+    }
+    // {
+    //   id: 'quantification',
+    //   label: 'Quantification',
+    //   content: <Quantification />
+    // },
   ];
 
 

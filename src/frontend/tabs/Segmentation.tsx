@@ -1,9 +1,10 @@
+import { useState } from "react"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
 import Pipeline from "../Pipeline"
 
 const Segmentation = ({
-    pipeline,
+pipeline,
     onFormSubmit
 }: {
     pipeline: Pipeline
@@ -11,8 +12,13 @@ const Segmentation = ({
 
 }) => {
 
+    const [ isSegmented, setIsSegmented ] = useState(null)
+
+    if (isSegmented == null) pipeline.exists('results/hmm_trained.pkl').then((exists) => setIsSegmented(exists))
+
     return (
         <>
+            {isSegmented && <p>Pose segmentation has already been completed successfully.</p>}
             <DynamicForm 
                 initialValues={{}} 
                 submitText="Run Pose Segmentation"

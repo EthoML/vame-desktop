@@ -66,7 +66,7 @@ def resolve_request_data(request):
 def get_evaluation_images(project_path):
     evaluation_output = project_path / 'model' / 'evaluate'
     png_files = list(evaluation_output.glob('*.png'))
-    return [ str(png_file.relative_to(VAME_APP_DIRECTORY)) for png_file in png_files ]
+    return [ str(png_file.relative_to(project_path)) for png_file in png_files ]
 
 
 @api.route('/connected')
@@ -90,6 +90,15 @@ class Files(Resource):
     def get(self, project, path):
         from flask import send_from_directory
         return send_from_directory(VAME_APP_DIRECTORY, Path(project) / path)
+    
+
+@api.route('/exists/<path:project>/<path:path>')
+class FileExists(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def get(self, project, path):
+        full_path = VAME_APP_DIRECTORY / project / path
+        return jsonify(dict(exists=full_path.exists()))
+    
     
 @api.route('/pipelines')
 class Files(Resource):

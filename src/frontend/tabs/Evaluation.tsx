@@ -23,7 +23,7 @@ const Evaluation = ({
     return (
         <FlexDiv>
             {pipeline.images.evaluation.map((imgPath => {
-                return <Image src={(new URL(`./files/${imgPath}`, baseUrl)).href} alt="evaluation" />
+                return <Image src={pipeline.getAssetPath(imgPath)} alt={ imgPath } />
             }))}
         </FlexDiv>
     )

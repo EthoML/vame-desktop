@@ -1,4 +1,4 @@
-import { post } from "./utils/requests";
+import { baseUrl, get, post } from "./utils/requests";
 
 const FILE_PROPERTIES = [ "videos", "csvs" ]
 
@@ -182,6 +182,20 @@ class Pipeline {
     visualization = (options?: PipelineMethodOptions["visualization"]) => this.#request('visualization', options)
     generative_model = (options?: PipelineMethodOptions["generative_model"]) => this.#request('generative_model', options)
     gif = (options?: PipelineMethodOptions["gif"]) => this.#request('gif', options, { pose_ref_index: this.#defaults.pose_ref_index })
+
+
+    exists = async (path) => get(this.getAssetPath(path, 'exists'))
+    
+    getAsset = async (path) => {
+        const fullAssetPath = this.getAssetPath(path)
+        return get(fullAssetPath)
+    }
+
+    getAssetPath = (path: string, basePath = 'files') => {
+        const { Project, project_path } = this.configuration
+        const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
+        return new URL(`${basePath}/${fullProjectDirectory}/${path}`, baseUrl).href
+    }
 
     run = async (
         options: PipelineMethodOptions = {},
