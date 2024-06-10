@@ -1,34 +1,30 @@
-# VAME Desktop
-A desktop application for the Variational Animal Motion Encoding (VAME) project.
+# React + TypeScript + Vite
 
-> **NOTE:** Before you begin, make sure you [download the demo video](https://drive.google.com/file/d/1w6OW9cN_-S30B7rOANvSaR9c3O5KeF0c/view) to `data`.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Development
-### Installation
-#### Python
-Create the Conda environment for the project by running the following command:
+Currently, two official plugins are available:
 
-```bash
-conda env create -f environment.yml 
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname,
+  },
+}
 ```
 
-This will install all the necessary Python dependencies for the project!
-
-To activate the environment, run the following command:
-```bash
-conda activate vame-desktop
-```
-
-#### [Node.js](https://nodejs.org/en)
-Install Node.js and project dependencies by running the following command:
-```bash
-npm install
-```
-
-### Running the App
-To run the app, you will need to run the following command:
-```bash
-npm run start
-```
-
-This will start the Electron app and open the main window.
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

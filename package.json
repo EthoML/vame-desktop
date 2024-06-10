@@ -19,12 +19,32 @@
     "services": "commoners share",
     "build": "commoners build --target desktop",
     "build:services": "commoners build --target services",
-    "launch": "commoners launch  --desktop"
+    "launch": "commoners launch  --desktop",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@tippyjs/react": "^4.2.6",
+    "bootstrap": "^5.3.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.1",
+    "styled-components": "^6.1.11"
   },
   "devDependencies": {
-    "@capacitor/cli": "^5.3.0",
-    "@capacitor/core": "^5.3.0",
-    "commoners": "0.0.46"
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "commoners": "0.0.46",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
   },
   "main": "/Users/garrettflynn/Documents/GitHub/vame-desktop/.commoners/.temp/main.js"
 }

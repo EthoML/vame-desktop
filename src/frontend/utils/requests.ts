@@ -21,7 +21,7 @@ export const request = async (
 
     return new Promise((resolve, reject) => {
 
-        console.warn(`Request (${pathname}):`, payload)
+        // console.warn(`Request (${pathname}):`, payload)
 
         fetch(url, payload ? { 
             method: 'POST', 
@@ -31,7 +31,7 @@ export const request = async (
         
         .then(async res => {
             const json  = await res.json()
-            console.warn(`Response (${pathname}):`, json)
+            // console.warn(`Response (${pathname}):`, json)
             if (!res.ok) throw new Error(json.message)
             resolve(json)
         })

@@ -84,6 +84,14 @@ class Files(Resource):
     def get(self, path):
         from flask import send_from_directory
         return send_from_directory(VAME_APP_DIRECTORY, path)
+    
+@api.route('/pipelines')
+class Files(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def get(self):
+        pipelines = [str(pipeline) for pipeline in VAME_APP_DIRECTORY.glob('*') if pipeline.is_dir()]
+        return jsonify(pipelines)
+
 
 @api.route('/load')
 class Load(Resource):

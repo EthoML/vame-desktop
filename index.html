@@ -1,79 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kanit">
-    <link rel="stylesheet" href="/src/frontend/styles.css" />
-
-    <!-- Disable double-click zoom and pinching outside of HTML tag -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
-    <title>VAME</title>
-    <script type="module" src="/src/frontend/main.ts" defer></script>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VAME Desktop</title>
   </head>
-
   <body>
-      <nav>
-        <div>
-          <img src="./logo.png" height="50" alt="VAME Logo" />
-          <div>
-            <h1>VAME</h1>
-            <small>Variational Animal Motion Embedding</small>
-          </div>
-        </div>
-        <div id="controls">
-          <button id="load-button">Load Project</button>
-          <button id="edit-button">Edit Project</button>
-          <button id="create-button">Create Project</button>
-          <button id="dev-button">Dev Mode</button>
-        </div>
-        <div>
-        </div>
-      </nav>
-      <main>
-        <section id="edit">
-          <button id="run-pipeline">Run Pipeline</button>
-          <div class="console" style="min-height: 200px;"></div>
-          <div>
-            <div class="image-render"></div>
-          </div>
-          <div style="padding: 15px; padding-top: 0;">
-            <h2 style="margin-bottom: 20px;">Configuration Options</h2>
-            <form>
-              <i>Pipeline not loaded</i>
-            </form>
-          </div>
-        </section>
-        <section id="create">
-          <form>
-            <h2>Create New Project</h2>
-            <div>
-              <label for="name">Project Name</label>
-              <input type="text" id="name" name="name" />
-            </div>
-            <div>
-              <label for="videos">Video Files</label>
-              <input type="file" id="videos" name="videos" accept="video/*" multiple />
-            </div>
-            <div>
-              <label for="csvs">CSV Files</label>
-              <input type="file" id="csvs" name="csvs" accept=".csv" multiple />
-            </div>
-            <div>
-              <label for="videotype">Video Type</label>
-              <select id="videotype" name="videotype">
-                <option value="mp4">MP4</option>
-                <option value="mov">MOV</option>
-              </select>
-            </div>
-            <div>
-              <button id="create-project">Create Project</button>
-            </div>
-          </form>
-        </section>
-        <section id="dev">
-          <div id="buttons"></div>
-          <div id="console" class="console"></div>
-        </section>
-      </main>
+    <div id="root"></div>
+    <script type="module" src="/src/frontend/main.tsx"></script>
   </body>
 </html>

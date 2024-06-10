@@ -16,9 +16,10 @@ export default defineConfig({
     icon: './logo.png', 
 
     electron: {
-        splash: './splash.html',
         window: {
-            width: 1200 // Adjust default width
+            width: 1200, // Adjust default width
+            height: 800, // Adjust default height
+            minHeight: 600, // Adjust minimum height
         }
     },
 
@@ -36,5 +37,6 @@ export default defineConfig({
                 }
             }
         }
+        
     }
 })
