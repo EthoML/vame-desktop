@@ -12,7 +12,7 @@ export type DynamicFormProps = {
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
 `;
 
 const InputGroup = styled.div`
@@ -20,6 +20,13 @@ const InputGroup = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+`;
+
+const InputLabel = styled.label`
+  small {
+    font-size: 12px;
+    color: #666;
+  }
 `;
 
 const Button = styled.button`
@@ -89,7 +96,13 @@ const DynamicForm = ({
     return 'text';
   };
 
-  const renderInput = (key, value, property, additionalInfo = {}) => {
+  const renderInput = (
+    key, 
+    value, 
+    property, 
+    additionalInfo = {}
+  ) => {
+
     const type = property?.type || inferType(value);
 
     const required = schema?.required?.includes(key) || false;
@@ -176,19 +189,24 @@ const DynamicForm = ({
   };
 
   const renderFormFields = () => {
+
+    // Schema-based generation
     if (schema) {
       return Object.keys(schema.properties).map((key) => {
         const property = schema.properties[key];
 
+        const title = property.title || key;
+
         return (
           <InputGroup key={key}>
-            <label>{header(key)}</label>
+              <InputLabel>{header(title)}<br/>{property.description && <small>{property.description}</small>}</InputLabel>
             {renderInput(key, initialValues[key], property)}
           </InputGroup>
         );
       });
     }
 
+    // Infer from initial values
     return Object.keys(initialValues).map((key) => (
       <InputGroup key={key}>
         <label>{header(key)}</label>

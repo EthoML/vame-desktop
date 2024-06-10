@@ -5,26 +5,32 @@
     "properties": {
       "Project": {
         "type": "string",
+        "description": "The name of your project",
         "readOnly": true
       },
       "model_name": {
         "type": "string",
+        "description": "The name of the model",
         "default": "VAME"
       },
       "n_cluster": {
         "type": "integer",
+        "description": "The number of clusters",
         "default": 15
       },
       "pose_confidence": {
         "type": "number",
+        "description": "The confidence threshold for the pose estimation",
         "default": 0.99
       },
       "project_path": {
         "type": "string",
+        "description": "The path to the project",
         "readOnly": true
       },
       "video_sets": {
         "type": "array",
+        "description": "The list of video sets",
         "items": {
           "type": "string"
         },
@@ -32,10 +38,12 @@
       },
       "all_data": {
         "type": "boolean",
+        "description": "Use all data for training",
         "default": true
       },
       "egocentric_data": {
         "type": "boolean",
+        "description": "Whether the data is egocentric or not",
         "default": false
       },
       "robust": {
