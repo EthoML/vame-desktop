@@ -4,8 +4,6 @@ const serviceName = 'vame'
 const serviceBuildRoot = `./build/python`
 const pythonSrc = './src/backend/app.py'
 
-const toCollect = [ 'numpy' ]
-
 export default defineConfig({
 
     name: "VAME",
@@ -30,7 +28,7 @@ export default defineConfig({
             description: 'A simple Python service for VAME',
             src: pythonSrc,
             publish: {
-                build: `python -m PyInstaller --name ${serviceName} --onedir --clean ${pythonSrc} --distpath ${serviceBuildRoot} ${toCollect.map(pkg => `--collect-all ${pkg}`).join(' ')}`,
+                build: `python -m PyInstaller --name ${serviceName} --onedir --clean ${pythonSrc} --distpath ${serviceBuildRoot}`,
                 local: {
                     src: serviceName,
                     base: `${serviceBuildRoot}/${serviceName}`, // Will be copied
