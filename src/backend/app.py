@@ -72,6 +72,39 @@ def get_evaluation_images(project_path):
     return [ str(png_file.relative_to(project_path)) for png_file in png_files ]
 
 
+# NOTE: Current version of VAME does not save visualization images as .png files (6/11/24)
+def get_visualization_images(project_path):
+    # visualization_output = project_path / 'path' / 'to'
+    # png_files = list(visualization_output.glob('*.png'))
+    # return [ str(png_file.relative_to(project_path)) for png_file in png_files ]
+    return []
+
+def get_videos(project_path, subfolder = 'cluster_videos'):
+
+    output_videos = dict()
+
+    motif_output = project_path / 'results'
+    config = yaml.safe_load(open(project_path / 'config.yaml', "r"))
+
+    video_sets = config["video_sets"]
+    model_name = config["model_name"]
+
+    for video_set in video_sets:
+        videos_path = motif_output / video_set / model_name / 'hmm-15' / subfolder
+        if videos_path.exists():
+            output_videos[video_set] = [ str(video.relative_to(project_path)) for video in videos_path.glob('*.avi') ]
+        else:
+            output_videos[video_set] = []
+
+    return output_videos
+
+def get_motif_videos(project_path):
+    return get_videos(project_path, 'cluster_videos')
+
+def get_community_videos(project_path):
+    return get_videos(project_path, 'community')
+
+
 @api.route('/connected')
 class Connected(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
@@ -173,13 +206,20 @@ class Load(Resource):
                 symlink.symlink_to(project_path)
 
         images = dict(
-            evaluation=get_evaluation_images(project_path)
+            evaluation=get_evaluation_images(project_path),
+            visualization=get_visualization_images(project_path)
+        )
+
+        videos = dict(
+            motif=get_motif_videos(project_path),
+            community=get_community_videos(project_path)
         )
 
         return jsonify(dict(
             project=str(config_path.parent),
             config=yaml.safe_load(open(config_path, "r")) if config_path.exists() else None,
-            images=images
+            images=images,
+            videos=videos
         ))
 
 @api.route('/create', methods=['POST'])
@@ -399,8 +439,8 @@ class Visualization(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.visualization(**data)
-            return dict(result=result)
+            vame.visualization(**data)
+            return dict(result=get_visualization_images(project_path))
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))

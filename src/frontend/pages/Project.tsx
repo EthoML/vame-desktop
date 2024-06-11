@@ -12,8 +12,11 @@ import ProjectConfiguration from '../tabs/ProjectConfiguration';
 import Alignment from '../tabs/Alignment';
 import Preparation from '../tabs/Preparation';
 import Segmentation from '../tabs/Segmentation';
-import Quantification from '../tabs/Quantification';
+import UMAPVisualization from '../tabs/UMAPVisualization';
 import Evaluation from '../tabs/Evaluation';
+import MotifVideos from '../tabs/MotifVideos';
+import CommunityAnalysis from '../tabs/CommunityAnalysis';
+import { post } from '../utils/requests';
 
 
 const ProjectHeader = styled.header`
@@ -64,6 +67,9 @@ const Project: React.FC = () => {
 
 
    const loadedPipeline = pipeline as Pipeline
+
+   post('project/register', { project: loadedPipeline.path }) // Register project access
+
 
   const submitTab = async (
     callback,
@@ -116,27 +122,52 @@ const Project: React.FC = () => {
     },
     {
       id: 'evaluation',
-      label: 'Evaluation',
+      label: 'Model Evaluation',
       content: <Evaluation 
         pipeline={loadedPipeline}
       />
     },
     {
       id: 'segmentation',
-      label: 'Segmentation',
+      label: 'Pose Segmentation',
       content: <Segmentation 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
             await loadedPipeline.segment() // Run pose segmentation
-            // await loadedPipeline.motif_videos() // Creating motif videos. NOTE: Will need additional consultation for how to proceed
           })}
       />
-    }
-    // {
-    //   id: 'quantification',
-    //   label: 'Quantification',
-    //   content: <Quantification />
-    // },
+    },
+    {
+      id: 'motifs',
+      label: 'Motif Videos',
+      content: <MotifVideos 
+        pipeline={loadedPipeline}
+        onFormSubmit={async () => submitTab(async () => {
+            await loadedPipeline.motif_videos() // Creating motif videos. NOTE: Will need additional consultation for how to proceed
+          })}
+      />
+    },
+    {
+      id: 'community',
+      label: 'Community Analysis',
+      content: <CommunityAnalysis 
+        pipeline={loadedPipeline}
+        onFormSubmit={async () => submitTab(async () => {
+            await loadedPipeline.community() // Run community analysis
+            // await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
+          })}
+      />
+    },
+    {
+      id: 'umap',
+      label: 'UMAP Visualization',
+      content: <UMAPVisualization
+        pipeline={loadedPipeline}
+        onFormSubmit={async () => submitTab(async () => {
+            await loadedPipeline.visualization() // Create visualization
+          })}
+      />
+    },
   ];
 
 

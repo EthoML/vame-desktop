@@ -2,6 +2,7 @@ import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
 import preparationSchema from '../../schema/prepare.schema.json'
 import Pipeline from "../Pipeline"
+import { PaddedTab } from "../components/divs"
 
 const Preparation = ({
     pipeline,
@@ -13,12 +14,14 @@ const Preparation = ({
 }) => {
 
     return (
-        <DynamicForm 
-            initialValues={{}} 
-            schema={preparationSchema}
-            submitText="Train Model"
-            onFormSubmit={onFormSubmit} 
-        />
+        <PaddedTab>
+            <DynamicForm 
+                initialValues={{}} 
+                schema={preparationSchema}
+                submitText="Train Model"
+                onFormSubmit={onFormSubmit} 
+            />
+        </PaddedTab>
     )
 }
 

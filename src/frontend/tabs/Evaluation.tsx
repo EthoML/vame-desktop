@@ -2,7 +2,7 @@ import styled from "styled-components"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
 import Pipeline from "../Pipeline"
-import { baseUrl } from "../utils/requests"
+import { PaddedTab } from "../components/divs"
 
 const FlexDiv = styled.div`
     display: flex;
@@ -20,12 +20,20 @@ const Evaluation = ({
 
 }) => {
 
+    const { images } = pipeline.assets
+
+    const evaluationImages = images?.evaluation ?? []
+
+    if (evaluationImages.length === 0) return <p>No evaluation images have been generated yet.</p>
+
     return (
-        <FlexDiv>
-            {pipeline.images.evaluation.map((imgPath => {
-                return <Image src={pipeline.getAssetPath(imgPath)} alt={ imgPath } />
-            }))}
-        </FlexDiv>
+        <PaddedTab>
+            <FlexDiv>
+                {pipeline.assets.images.evaluation.map((imgPath => {
+                    return <Image src={pipeline.getAssetPath(imgPath)} alt={ imgPath } key={ imgPath } />
+                }))}
+            </FlexDiv>
+        </PaddedTab>
     )
 }
 

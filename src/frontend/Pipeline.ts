@@ -68,6 +68,17 @@ class Pipeline {
         pose_ref_index: [ 0, 5 ]
     }
 
+    assets = {
+        images: {
+            evaluation: [],
+            visualization: []
+        },
+        videos: {
+            community: {},
+            motif: {}
+        }
+    }
+
     constructor(absPath?: string) {
         this.path = absPath ?? ''
     }
@@ -84,7 +95,7 @@ class Pipeline {
 
     get creationDate() {
         if (!this.configuration) return null
-        
+
         const { Project, project_path } = this.configuration
         const pipelineCreationDateString = project_path.split(`${Project}-`)[1]
         return new Date(pipelineCreationDateString)
@@ -94,7 +105,11 @@ class Pipeline {
     load = async () => {
         const result = await post('load', { project: this.path })
         this.configuration = result.config
-        this.images = result.images
+        this.assets = {
+            images: result.images,
+            videos: result.videos
+        }
+
         return result
     }
 

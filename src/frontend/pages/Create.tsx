@@ -26,7 +26,6 @@ const Create: React.FC = () => {
     const pipeline = new Pipeline()
     await pipeline.create(formData)
 
-
     navigate({ 
       pathname: "/project",
       search: `?project=${pipeline.path}`
@@ -38,8 +37,6 @@ const Create: React.FC = () => {
   return (
     <PaddedContainer>
       <h2>Create a New Project</h2>
-      <p>Provide all the details related to your project</p>
-
       <DynamicForm 
         submitText='Create Project'
         schema={createSchema} 

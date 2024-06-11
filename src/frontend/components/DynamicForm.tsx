@@ -2,6 +2,22 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { header } from '../utils/text';
 
+/*
+
+Custom Behaviors
+----------------------
+type: file OR folder
+  - Accepts a file or a folder
+  - If type is file, the user can only select files
+  - If type is folder, the user can only select folders
+  - The accepted files can be specified using the `accept` attribute
+
+allow-spaces: boolean
+  - Blocks the user from entering spaces in the input field if set to false
+
+
+*/
+
 export type DynamicFormProps = {
   submitText?: string,
   initialValues: Record<string, any>,
@@ -187,6 +203,9 @@ const DynamicForm = ({
         name={key}
         required={required}
         value={formState[key] || ''}
+        onKeyPress={(e) => {
+          if (property['allow-spaces'] === false && e.key === ' ') e.preventDefault()
+        }}
         onChange={handleChange}
       />
     );

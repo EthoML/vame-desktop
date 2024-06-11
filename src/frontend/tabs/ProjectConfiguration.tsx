@@ -2,6 +2,7 @@ import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
 import projectConfigSchema from '../../schema/config.schema.json'
 import Pipeline from "../Pipeline"
+import { PaddedTab } from "../components/divs"
 
 
 const ProjectConfiguration = ({
@@ -12,12 +13,14 @@ const ProjectConfiguration = ({
     onFormSubmit?: DynamicFormProps['onFormSubmit']
 }) => {
     return (
-        <DynamicForm 
-            initialValues={pipeline.configuration} 
-            schema={projectConfigSchema}
-            submitText="Save Configuration"
-            onFormSubmit={onFormSubmit} 
-        />
+        <PaddedTab>
+            <DynamicForm 
+                initialValues={pipeline.configuration} 
+                schema={projectConfigSchema}
+                submitText="Save Configuration"
+                onFormSubmit={onFormSubmit} 
+            />
+        </PaddedTab>
     )
 }
 

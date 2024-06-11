@@ -3,7 +3,9 @@ import styled from 'styled-components';
 
 const TabsContainer = styled.div`
   width: 100%;
+  height: 100%;
   display: grid;
+  grid-template-rows: auto 1fr;
   overflow: hidden;
 `;
 
@@ -38,12 +40,15 @@ const TabButton = styled.button`
 `;
 
 const TabContent = styled.div`
+  display: flex;
+  position: relative;
   overflow: auto;
-  padding: 20px;
 `;
 
 const TabPane = styled.div`
   display: ${(props) => (props.active ? 'block' : 'none')};
+  width: 100%;
+  height: 100%;
 `;
 
 const Tabs = ({ 

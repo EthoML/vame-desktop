@@ -2,7 +2,8 @@
     "properties": {
         "name": {
             "type": "string",
-            "title": "Project Name"
+            "title": "Project Name",
+            "allow-spaces": false
         },
         "videos": {
             "type": "array",

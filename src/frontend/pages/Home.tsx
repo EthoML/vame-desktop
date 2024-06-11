@@ -44,8 +44,7 @@ const Home: React.FC = () => {
 
 
    const onEdit = async (pipeline) => {
-    await post('project/register', { project: pipeline.path })
-
+    
     navigate({ 
       pathname: "/project",
       search: `?project=${pipeline.path}`
