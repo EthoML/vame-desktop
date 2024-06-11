@@ -76,7 +76,10 @@ const Project: React.FC = () => {
     tab?: string
   ) => {
 
-    const result = await callback().catch(e => window.alert(e))
+    const result = await callback().catch(e => {
+      window.alert(e)
+      throw e
+    })
 
     // Reload the pipeline
     const pipeline = new Pipeline(projectPath)

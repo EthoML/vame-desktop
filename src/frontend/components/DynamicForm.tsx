@@ -116,6 +116,14 @@ const DynamicForm = ({
   const handleChange = (e, index = null, arrayKey = null) => {
     const { name, value, type, checked, files } = e.target;
 
+    if (arrayKey !== null) {
+      const newArray = [...formState[arrayKey]];
+      const resolvedValue = type === 'number' ? Number(value) : value;
+      newArray[index] = resolvedValue;
+      setFormState({ ...formState, [arrayKey]: newArray });
+      return;
+    }
+
     if (type === 'file') {
       if (files.length === 0) return;
       setFormState({
@@ -132,13 +140,6 @@ const DynamicForm = ({
 
     if (type === 'number') {
       setFormState({ ...formState, [name]: Number(value) });
-      return;
-    }
-
-    if (arrayKey !== null) {
-      const newArray = [...formState[arrayKey]];
-      newArray[index] = value;
-      setFormState({ ...formState, [arrayKey]: newArray });
       return;
     }
 
@@ -212,7 +213,8 @@ const DynamicForm = ({
     // Handle editable arrays
     if (isArray) {
 
-      if (!isArrayValue) console.warn(`The value of ${key} is not an array`, value)
+      if (!isArrayValue && value) console.warn(`The value of ${key} is not an array`, value)
+
       let arrayValue = isArrayValue ? value : [];
 
       const itemType = property?.items?.type || inferType(arrayValue[0]);
