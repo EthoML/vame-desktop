@@ -1,3 +1,5 @@
+import * as logForwardingPlugin from './src/plugins/log-forwarding'
+
 const defineConfig = (o) => o 
 
 const serviceName = 'vame'
@@ -9,7 +11,10 @@ export default defineConfig({
     name: "VAME",
     target: 'desktop',
     appId: 'com.gladstoneinstitutes.vame',
-    
+
+    plugins: {
+        log: logForwardingPlugin
+    },
     
     icon: './logo.png', 
 

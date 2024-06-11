@@ -118,6 +118,9 @@ const Project: React.FC = () => {
         pipeline={loadedPipeline}
         onFormSubmit={async (params) => submitTab(async () => {
             await loadedPipeline.create_trainset(params) // Create the trainset
+
+            // NOTE: Allow users to inspect the quality of the trainset
+            
             await loadedPipeline.train() // Train the model
             await loadedPipeline.evaluate() // Evaluate the model
           }, 'evaluation')}

@@ -10,18 +10,15 @@
       },
       "model_name": {
         "type": "string",
-        "description": "The name of the model",
-        "default": "VAME"
+        "description": "The name of the model"
       },
       "n_cluster": {
         "type": "integer",
-        "description": "The number of clusters",
-        "default": 15
+        "description": "The number of clusters"
       },
       "pose_confidence": {
         "type": "number",
-        "description": "The confidence threshold for the pose estimation",
-        "default": 0.99
+        "description": "The confidence threshold for the pose estimation"
       },
       "project_path": {
         "type": "string",
@@ -36,236 +33,172 @@
         },
         "readOnly": true
       },
-      "all_data": {
-        "type": "boolean",
-        "description": "Use all data for training",
-        "default": true
-      },
       "egocentric_data": {
         "type": "boolean",
-        "description": "Whether the data is egocentric or not",
-        "default": false
+        "description": "Whether the data is egocentric or not"
       },
       "robust": {
-        "type": "boolean",
-        "default": true
+        "type": "boolean"
       },
       "iqr_factor": {
-        "type": "number",
-        "default": 4
+        "type": "number"
       },
-      "axis": {
-        "type": "object",
-        "properties": {
-          "savgol_filter": {
-            "type": "boolean",
-            "default": true
-          },
-          "savgol_length": {
-            "type": "integer",
-            "default": 5
-          },
-          "savgol_order": {
-            "type": "integer",
-            "default": 2
-          }
-        },
-        "required": ["savgol_filter", "savgol_length", "savgol_order"]
+      "savgol_filter": {
+        "type": "boolean"
+      },
+      "savgol_length": {
+        "type": "integer"
+      },
+      "savgol_order": {
+        "type": "integer",
+        "default": 2
       },
       "test_fraction": {
-        "type": "number",
-        "default": 0.1
+        "type": "number"
       },
       "pretrained_model": {
-        "type": "string",
-        "default": "None"
+        "type": "string"
       },
       "pretrained_weights": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "num_features": {
-        "type": "integer",
-        "default": 12
+        "type": "integer"
       },
       "batch_size": {
-        "type": "integer",
-        "default": 256
+        "type": "integer"
       },
       "max_epochs": {
-        "type": "integer",
-        "default": 500
+        "type": "integer"
       },
       "model_snapshot": {
-        "type": "integer",
-        "default": 50
+        "type": "integer"
       },
       "model_convergence": {
-        "type": "integer",
-        "default": 50
+        "type": "integer"
       },
       "transition_function": {
-        "type": "string",
-        "default": "GRU"
+        "type": "string"
       },
       "beta": {
-        "type": "number",
-        "default": 1
+        "type": "number"
       },
       "beta_norm": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "zdims": {
-        "type": "integer",
-        "default": 30
+        "type": "integer"
       },
       "learning_rate": {
-        "type": "number",
-        "default": 0.0005
+        "type": "number"
       },
       "time_window": {
-        "type": "integer",
-        "default": 30
+        "type": "integer"
       },
       "prediction_decoder": {
-        "type": "integer",
-        "default": 1
+        "type": "integer"
       },
       "prediction_steps": {
-        "type": "integer",
-        "default": 15
+        "type": "integer"
       },
       "noise": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "scheduler": {
-        "type": "integer",
-        "default": 1
+        "type": "integer"
       },
       "scheduler_step_size": {
-        "type": "integer",
-        "default": 100
+        "type": "integer"
       },
       "scheduler_gamma": {
-        "type": "number",
-        "default": 0.2
+        "type": "number"
       },
       "scheduler_threshold": {
         "type": "string"
       },
       "softplus": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "parameterization": {
-        "type": "string",
-        "default": "hmm"
+        "type": "string"
       },
       "hmm_trained": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "load_data": {
-        "type": "string",
-        "default": "-PE-seq-clean"
+        "type": "string"
       },
       "individual_parameterization": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       },
       "random_state_kmeans": {
-        "type": "integer",
-        "default": 42
+        "type": "integer"
       },
       "n_init_kmeans": {
-        "type": "integer",
-        "default": 15
+        "type": "integer"
       },
       "length_of_motif_video": {
-        "type": "integer",
-        "default": 1000
+        "type": "integer"
       },
       "min_dist": {
-        "type": "number",
-        "default": 0.1
+        "type": "number"
       },
       "n_neighbors": {
-        "type": "integer",
-        "default": 200
+        "type": "integer"
       },
       "random_state": {
-        "type": "integer",
-        "default": 42
+        "type": "integer"
       },
       "num_points": {
-        "type": "integer",
-        "default": 30000
+        "type": "integer"
       },
       "hidden_size_layer_1": {
-        "type": "integer",
-        "default": 256
+        "type": "integer"
       },
       "hidden_size_layer_2": {
-        "type": "integer",
-        "default": 256
+        "type": "integer"
       },
       "dropout_encoder": {
-        "type": "number",
-        "default": 0
+        "type": "number"
       },
       "hidden_size_rec": {
-        "type": "integer",
-        "default": 256
+        "type": "integer"
       },
       "dropout_rec": {
-        "type": "number",
-        "default": 0
+        "type": "number"
       },
       "n_layers": {
-        "type": "integer",
-        "default": 1
+        "type": "integer"
       },
       "hidden_size_pred": {
-        "type": "integer",
-        "default": 256
+        "type": "integer"
       },
       "dropout_pred": {
-        "type": "number",
-        "default": 0
+        "type": "number"
       },
       "mse_reconstruction_reduction": {
-        "type": "string",
-        "default": "sum"
+        "type": "string"
       },
       "mse_prediction_reduction": {
-        "type": "string",
-        "default": "sum"
+        "type": "string"
       },
       "kmeans_loss": {
-        "type": "number",
-        "default": 30
+        "type": "number"
       },
       "kmeans_lambda": {
-        "type": "number",
-        "default": 0.1
+        "type": "number"
       },
       "anneal_function": {
-        "type": "string",
-        "default": "linear"
+        "type": "string"
       },
       "kl_start": {
-        "type": "number",
-        "default": 2
+        "type": "number"
       },
       "annealtime": {
-        "type": "number",
-        "default": 4
+        "type": "number"
       },
       "legacy": {
-        "type": "boolean",
-        "default": false
+        "type": "boolean"
       }
     },
     "required": [

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileCirclePlus, faFileImport, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faFileCirclePlus, faFileImport, faGear, faTerminal } from '@fortawesome/free-solid-svg-icons';
 
 import Tippy from '@tippyjs/react';
 
@@ -101,6 +101,13 @@ const Navbar: React.FC = () => {
                     <Tippy content={<span>Edit global settings</span>}>
                         <ControlButton>
                             <FontAwesomeIcon icon={faGear} />
+                        </ControlButton>
+                    </Tippy>
+                </Link>
+                <Link to="/terminal">
+                    <Tippy content={<span>Open terminal view</span>}>
+                        <ControlButton>
+                            <FontAwesomeIcon icon={faTerminal} />
                         </ControlButton>
                     </Tippy>
                 </Link>

@@ -123,8 +123,8 @@ class Preload(Resource):
 class Settings(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        with open(GLOBAL_SETTINGS_FILE, "r") as file:
-            return json.loads(file)
+        return json.loads(open(GLOBAL_SETTINGS_FILE, "r").read())
+
         
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):

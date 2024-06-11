@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import Home from './pages/Home';
 import Create from './pages/Create';
 import Project from './pages/Project';
+import Terminal from './pages/Terminal';
 
 const App: React.FC = () => {
 
@@ -17,6 +18,7 @@ const App: React.FC = () => {
           <Route path="/create" element={<Create />} />
           <Route path="/project" element={<Project />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/terminal" element={<Terminal />} />
         </Routes>
       </Dashboard>
   );

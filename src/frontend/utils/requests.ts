@@ -20,8 +20,6 @@ export const request = async (
 
     return new Promise((resolve, reject) => {
 
-        // console.warn(`Request (${pathname}):`, payload)
-
         fetch(url, payload ? { 
             method: 'POST', 
             body: JSON.stringify(payload),
