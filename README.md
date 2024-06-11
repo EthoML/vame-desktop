@@ -35,4 +35,4 @@ This will start the Electron app and open the main window.
 
 
 ## Important Design Decisions
-1. External projects are symlinked to the `~/vame-desktop` directory, which allows for easy access to the data and models. However, there is very little done to handle when the symlink is broken.
+1. External projects are symlinked to the `~/vame-desktop` directory, which allows for easy access to the data and models. However, nothing is done to handle when the symlink is broken.

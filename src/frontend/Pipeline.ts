@@ -1,10 +1,5 @@
 import { baseUrl, get, post } from "./utils/requests";
 
-const FILE_PROPERTIES = [ "videos", "csvs" ]
-
-
-import { Logger } from "./Logger";
-
 type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> | boolean : T[P];
 };
@@ -89,7 +84,9 @@ class Pipeline {
 
     get creationDate() {
         if (!this.configuration) return null
-        const pipelineCreationDateString = this.configuration.project_path.split(`${this.configuration.Project}-`)[1]
+        
+        const { Project, project_path } = this.configuration
+        const pipelineCreationDateString = project_path.split(`${Project}-`)[1]
         return new Date(pipelineCreationDateString)
     }
 
@@ -104,16 +101,6 @@ class Pipeline {
     create = async (props: PipelineInputs) => {
 
         const propsCopy = { ...props }
-
-        // Transform file objects to paths
-        FILE_PROPERTIES.forEach(prop => {
-            if (!Array.isArray(propsCopy[prop])) propsCopy[prop] = [ propsCopy[prop] ]
-            propsCopy[prop] = propsCopy[prop].map((file, i) => {
-                if (typeof file === 'string') return file
-                else return file.path
-            })
-        })
-
 
         const { name, videos, csvs, videotype, ...globalDefaults } = propsCopy
 
@@ -184,58 +171,14 @@ class Pipeline {
     gif = (options?: PipelineMethodOptions["gif"]) => this.#request('gif', options, { pose_ref_index: this.#defaults.pose_ref_index })
 
 
-    exists = async (path) => get(this.getAssetPath(path, 'exists'))
+    exists = (path) => get(this.getAssetPath(path, 'exists'))
     
-    getAsset = async (path) => {
-        const fullAssetPath = this.getAssetPath(path)
-        return get(fullAssetPath)
-    }
+    getAsset = (path) => get(this.getAssetPath(path))
 
     getAssetPath = (path: string, basePath = 'files') => {
         const { Project, project_path } = this.configuration
         const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
         return new URL(`${basePath}/${fullProjectDirectory}/${path}`, baseUrl).href
-    }
-
-    run = async (
-        options: PipelineMethodOptions = {},
-        configuration?: PipelineConfiguration,
-        logger?: Logger
-    ) => {
-
-        if (configuration) await this.#run('configure', configuration, logger)
-
-        console.log('Running pipeline', options)
-        //if (this.configuration.egocentric_data) await this.#run('align', options.align, logger)
-        await this.#run('align', options.align, logger)
-        await this.#run('create_trainset', options.create_trainset, logger)
-        await this.#run('train', options.train, logger)
-        await this.#run('evaluate', options.evaluate, logger)
-        await this.#run('segment', options.segment, logger)
-        await this.#run('motif_videos', options.motif_videos, logger)
-        await this.#run('community', options.community, logger)
-        await this.#run('community_videos', options.community_videos, logger)
-        await this.#run('visualization', options.visualization, logger)
-        await this.#run('generative_model', options.generative_model, logger)
-        await this.#run('gif', options.gif, logger)
-
-    }
-
-    #run = async (
-        method: string,
-        input: any,
-        logger?: Logger
-    ) => {
-
-        if (logger) logger.request(method)
-
-        const result = await this[method](input).catch(e => {
-            if (logger) logger.error(method, e)
-            throw e
-        })
-
-        if (logger) logger.success(method, result)
-
     }
 }
 

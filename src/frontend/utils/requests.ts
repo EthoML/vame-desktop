@@ -4,7 +4,6 @@ type PayloadType = Record<string, any>
 const service = commoners.services.vame
 export const baseUrl = new URL(service.url)
 
-
 // This function ensures that errors are thrown when the response is not ok
 export const request = async (
     pathname: PathType,

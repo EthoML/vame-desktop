@@ -43,8 +43,6 @@ const Home: React.FC = () => {
    }, [])
 
 
-   console.log('Recent Pipelines:', recentPipelines)
-
    const onEdit = async (pipeline) => {
     await post('project/register', { project: pipeline.path })
 

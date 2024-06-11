@@ -85,9 +85,6 @@ const Project: React.FC = () => {
 
   }
 
-
-  console.log(pipeline)
-
   const tabs = [
     {
       id: 'project-configuration',
