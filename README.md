@@ -25,6 +25,8 @@ Install Node.js and project dependencies by running the following command:
 npm install
 ```
 
+This only needs to be run once at project initialization and when the `package.json` dependencies are updated.
+
 ### Running the App
 To run the app, you will need to run the following command:
 ```bash
