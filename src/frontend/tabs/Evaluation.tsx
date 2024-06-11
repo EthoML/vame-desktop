@@ -24,7 +24,7 @@ const Evaluation = ({
 
     const evaluationImages = images?.evaluation ?? []
 
-    if (evaluationImages.length === 0) return <p>No evaluation images have been generated yet.</p>
+    if (evaluationImages.length === 0) return <PaddedTab><p>No evaluation images have been generated yet.</p></PaddedTab>
 
     return (
         <PaddedTab>

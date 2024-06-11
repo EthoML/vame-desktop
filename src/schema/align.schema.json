@@ -6,14 +6,20 @@
             "description": "Indices of the reference points in the pose vector.",
             "items": {
                 "type": "integer"
-            }
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "default": [5,6]
         },
         "crop_size": {
             "type": "array",
             "description": "Size to crop the video.",
             "items": {
                 "type": "integer"
-            }
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "default": [300, 300]
         },
         "use_video": {
             "type": "boolean",

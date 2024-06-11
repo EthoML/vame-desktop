@@ -160,14 +160,20 @@ class Projects(Resource):
 class RecentProjects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        states = json.load(open(GLOBAL_STATES_FILE, "r"))
+        file = open(GLOBAL_STATES_FILE, "r")
+        states = json.load(file)
         return jsonify(states.get("recent_projects", []))
     
 @api.route('/project/register')
 class RegisterProject(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
-        states = json.load(open(GLOBAL_STATES_FILE, "r"))
+        file = open(GLOBAL_STATES_FILE, "r")
+        states = json.load(file)
+        
+        # Log text to the console
+        print(states)
+
         recent_projects = states.get("recent_projects", [])
 
         _, project_path = resolve_request_data(request)

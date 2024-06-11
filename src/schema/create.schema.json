@@ -6,20 +6,16 @@
             "allow-spaces": false
         },
         "videos": {
-            "type": "array",
             "title": "Videos",
-            "items": {
-                "type": "file",
-                "accept": "video/*"
-            }
+            "type": "file",
+            "accept": "video/*",
+            "multiple": true
         },
         "csvs": {
-            "type": "array",
+            "type": "file",
             "title": "CSV Files",
-            "items": {
-                "type": "file",
-                "accept": [".csv"]
-            }
+            "accept": [".csv"],
+            "multiple": true
         },
         "videotype": {
             "type": "string",

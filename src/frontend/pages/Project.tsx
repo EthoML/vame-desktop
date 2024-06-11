@@ -114,8 +114,8 @@ const Project: React.FC = () => {
       content: <Preparation 
         pipeline={loadedPipeline}
         onFormSubmit={async (params) => submitTab(async () => {
-            // await loadedPipeline.create_trainset(params) // Create the trainset
-            // await loadedPipeline.train() // Train the model
+            await loadedPipeline.create_trainset(params) // Create the trainset
+            await loadedPipeline.train() // Train the model
             await loadedPipeline.evaluate() // Evaluate the model
           }, 'evaluation')}
       />
@@ -143,7 +143,7 @@ const Project: React.FC = () => {
       content: <MotifVideos 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
-            await loadedPipeline.motif_videos() // Creating motif videos. NOTE: Will need additional consultation for how to proceed
+            await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
           })}
       />
     },
@@ -154,7 +154,7 @@ const Project: React.FC = () => {
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
             await loadedPipeline.community() // Run community analysis
-            // await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
+            await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
           })}
       />
     },
