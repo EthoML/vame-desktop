@@ -13,8 +13,8 @@ permissions:
 
 jobs:
   deploy-on-mac:
-    runs-on: macos-latest
-
+    runs-on: macos-13
+    
     defaults:
       run:
         shell: bash -l {0}
