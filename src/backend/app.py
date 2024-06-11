@@ -1,3 +1,4 @@
+import sys
 import os
 import yaml
 import json
@@ -8,11 +9,74 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_restx import Api, Resource
 
+# Logging dependencies
+import queue
+import threading
+from datetime import datetime
+
+# Plotting configuration
 import matplotlib
 matplotlib.use('Agg')  # Non-interactive matplotlib backend
 
-VAME_APP_DIRECTORY = Path.home() / 'vame-desktop'
+def create_log_file(log_file):
 
+    # Queue to hold stdout messages
+    log_queue = queue.Queue()
+
+    # Save the original stdout
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+
+    # Custom stream handler to put stdout into the queue and print to console
+    class QueueStream:
+        def __init__(self, q, stream):
+            self.q = q
+            self.stream = stream
+
+        def write(self, msg):
+            if isinstance(msg, bytes):
+                msg = msg.decode('utf-8')  # Decode bytes to string if necessary
+            if msg.strip():  # Avoid writing empty messages
+                self.q.put(msg)
+                self.stream.write(msg)  # Print to console
+
+        def flush(self):
+            self.stream.flush()
+
+    # Logging thread function
+    def log_writer(q, log_file):
+        with open(log_file, 'a') as f:
+            while True:
+                msg = q.get()
+                if msg == 'STOP':  # Stop signal for the thread
+                    break
+                f.write(msg)
+                f.flush()
+
+    # Redirect stdout to the queue and console
+    sys.stdout = QueueStream(log_queue, original_stdout)
+    sys.stderr = QueueStream(log_queue, original_stderr)
+
+    # Start the logging thread
+    log_thread = threading.Thread(target=log_writer, args=(log_queue, log_file))
+    log_thread.start()
+
+    def close():
+        # Stop the logging thread
+        log_queue.put('STOP')
+        log_thread.join()
+
+        # Reset stdout and stderr
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+
+    return dict(
+        close=close
+    )
+
+VAME_APP_DIRECTORY = Path.home() / 'vame-desktop'
+VAME_PROJECTS_DIRECTORY = VAME_APP_DIRECTORY / 'projects'
+VAME_LOG_DIRECTORY = VAME_APP_DIRECTORY / 'logs'
 GLOBAL_SETTINGS_FILE = VAME_APP_DIRECTORY / 'settings.json'
 GLOBAL_STATES_FILE = VAME_APP_DIRECTORY / 'states.json'
 
@@ -44,13 +108,12 @@ def get_project_path(
         working_directory: str = None
     ):
 
-    from datetime import datetime as dt
-    date = dt.today()
+    date = datetime.today()
     month = date.strftime("%B")
     day = date.day
     year = date.year
     d = str(month[0:3]+str(day))
-    date = dt.today().strftime('%Y-%m-%d')
+    date = datetime.today().strftime('%Y-%m-%d')
 
     if working_directory == None:
         working_directory = '.'
@@ -138,14 +201,14 @@ class Files(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self, project, path):
         from flask import send_from_directory
-        return send_from_directory(VAME_APP_DIRECTORY, Path(project) / path)
+        return send_from_directory(VAME_PROJECTS_DIRECTORY, Path(project) / path)
     
 
 @api.route('/exists/<path:project>/<path:path>')
 class FileExists(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self, project, path):
-        full_path = VAME_APP_DIRECTORY / project / path
+        full_path = VAME_PROJECTS_DIRECTORY / project / path
         return jsonify(dict(exists=full_path.exists()))
     
     
@@ -153,7 +216,7 @@ class FileExists(Resource):
 class Projects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        projects = [str(project) for project in VAME_APP_DIRECTORY.glob('*') if project.is_dir()]
+        projects = [str(project) for project in VAME_PROJECTS_DIRECTORY.glob('*') if project.is_dir()]
         return jsonify(projects)
     
 @api.route('/projects/recent')
@@ -161,7 +224,15 @@ class RecentProjects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
         states = json.loads(open(GLOBAL_STATES_FILE, "r").read())
-        return jsonify(states.get("recent_projects", []))
+        recent_projects = states.get("recent_projects", [])
+
+        # Filter those that no longer exist
+        recent_projects = [str(project) for project in recent_projects if (VAME_PROJECTS_DIRECTORY / project).exists()]
+        states["recent_projects"] = recent_projects
+        with open(GLOBAL_STATES_FILE, "w") as file:
+            json.dump(states, file)
+
+        return jsonify(recent_projects)
     
 @api.route('/project/register')
 class RegisterProject(Resource):
@@ -200,9 +271,9 @@ class Load(Resource):
         _, project_path = resolve_request_data(request)
         config_path = project_path / "config.yaml"
 
-        # Create a symlink to the project directory if it isn't in the VAME_APP_DIRECTORY
-        if project_path.parent != VAME_APP_DIRECTORY:
-            symlink = VAME_APP_DIRECTORY / project_path.name
+        # Create a symlink to the project directory if it isn't in the VAME_PROJECTS_DIRECTORY
+        if project_path.parent != VAME_PROJECTS_DIRECTORY:
+            symlink = VAME_PROJECTS_DIRECTORY / project_path.name
             if not symlink.exists():
                 symlink.symlink_to(project_path)
 
@@ -232,12 +303,12 @@ class Create(Resource):
 
             data = json.loads(request.data) if request.data else {}
 
-            project_path = get_project_path(data["project"], VAME_APP_DIRECTORY)
+            project_path = get_project_path(data["project"], VAME_PROJECTS_DIRECTORY)
 
             created = not project_path.exists()
 
             config_path = Path(vame.init_new_project(
-                working_directory=VAME_APP_DIRECTORY,
+                working_directory=VAME_PROJECTS_DIRECTORY,
                 **data
             ))
 
@@ -476,10 +547,14 @@ if __name__ == "__main__":
     env_port = os.getenv('PORT')
     PORT = int(env_port) if env_port else 8080
     HOST = os.getenv('HOST') or 'localhost'
+    
+    VAME_PROJECTS_DIRECTORY.mkdir(exist_ok=True, parents=True) # Create the VAME_PROJECTS_DIRECTORY if it doesn't exist
+    VAME_LOG_DIRECTORY.mkdir(exist_ok=True, parents=True)  # Create the VAME_LOG_DIRECTORY if it doesn't exist
 
-    
-    VAME_APP_DIRECTORY.mkdir(exist_ok=True, parents=True) # Create the VAME_APP_DIRECTORY if it doesn't exist
-    
+    # Create a unique log file name based on the current date and time
+    log_file = VAME_LOG_DIRECTORY / f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+    logger = create_log_file(log_file)
+
     # Create the global files if they don't exist
     global_files = [GLOBAL_STATES_FILE, GLOBAL_SETTINGS_FILE]
     for file in global_files:
@@ -488,5 +563,11 @@ if __name__ == "__main__":
                 json.dump({}, f)
     
     # Run the app
-    print(f"Running on {HOST}:{PORT}")
-    app.run(host=HOST, port = PORT)
+    try:
+        print(f"Running on {HOST}:{PORT}")
+        app.run(host=HOST, port = PORT)
+
+    except Exception as e:
+        print(f"An error occurred that closed the server: {e}")
+        logger.close()
+        raise e
