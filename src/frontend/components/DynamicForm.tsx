@@ -229,7 +229,7 @@ const DynamicForm = ({
 
       // Set to the minimum number of items if the length is locked
       const lockedLength = property?.minItems === property?.maxItems;
-      if (lockedLength) arrayValue = formState[key] = Array.from({ length: property.minItems }).map((_, index) => arrayValue[index] ?? fillerValue);
+      if (lockedLength) arrayValue = Array.from({ length: property.minItems }).map((_, index) => arrayValue[index] ?? fillerValue);
 
       // Check if the user can add or remove items
       const canAdd = !property?.maxItems || arrayValue.length < property.maxItems;
