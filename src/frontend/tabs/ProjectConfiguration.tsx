@@ -17,7 +17,7 @@ const ProjectConfiguration = ({
             <DynamicForm 
                 initialValues={pipeline.configuration} 
                 schema={projectConfigSchema}
-                submitText="Save Configuration"
+                submitText="Finalize Configuration"
                 onFormSubmit={onFormSubmit} 
             />
         </PaddedTab>

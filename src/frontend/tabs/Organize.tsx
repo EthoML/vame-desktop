@@ -1,10 +1,10 @@
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
-import alignmentSchema from '../../schema/align.schema.json'
+import organizeSchema from '../../schema/organize.schema.json'
 import Pipeline from "../Pipeline"
 import { PaddedTab } from "../components/divs"
 
-const Alignment = ({
+const Organize = ({
     pipeline,
     onFormSubmit
 }: {
@@ -12,6 +12,13 @@ const Alignment = ({
     onFormSubmit?: DynamicFormProps['onFormSubmit']
 
 }) => {
+
+    const isOrganized = pipeline.workflow.organized
+
+    if (isOrganized) return <PaddedTab><p>Data has already been organized</p></PaddedTab>
+
+    const operations = ["Create Training Set"]
+    if (!pipeline.configuration.egocentric_data) operations.unshift("Align Data")
 
     return (
         <PaddedTab>
@@ -22,12 +29,12 @@ const Alignment = ({
             
             <DynamicForm 
                 initialValues={{}} 
-                schema={pipeline.configuration.egocentric_data ? undefined : alignmentSchema }
-                submitText="Align Data"
+                schema={pipeline.configuration.egocentric_data ? undefined : organizeSchema }
+                submitText={operations.join(" + ")}
                 onFormSubmit={onFormSubmit} 
             />
         </PaddedTab>
     )
 }
 
-export default Alignment
+export default Organize

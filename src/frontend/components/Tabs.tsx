@@ -62,6 +62,7 @@ const Tabs = ({
 
   const handleTabClick = (id) => setActiveTab(id);
 
+
   return (
     <TabsContainer>
       <TabList>

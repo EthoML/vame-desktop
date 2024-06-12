@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Pipeline from '../Pipeline';
 
@@ -9,11 +9,10 @@ import Tabs from '../components/Tabs';
 import { CenteredFullscreenDiv } from '../components/divs';
 
 import ProjectConfiguration from '../tabs/ProjectConfiguration';
-import Alignment from '../tabs/Alignment';
-import Preparation from '../tabs/Preparation';
+import Organize from '../tabs/Organize';
+import Model from '../tabs/Model';
 import Segmentation from '../tabs/Segmentation';
 import UMAPVisualization from '../tabs/UMAPVisualization';
-import Evaluation from '../tabs/Evaluation';
 import MotifVideos from '../tabs/MotifVideos';
 import CommunityAnalysis from '../tabs/CommunityAnalysis';
 import { post } from '../utils/requests';
@@ -39,6 +38,8 @@ const ProjectInformationCapsule = styled.div`
   border-radius: 10px
 `;
 
+
+
 const Project: React.FC = () => {
 
   const [ searchParams ] = useSearchParams();
@@ -55,6 +56,7 @@ const Project: React.FC = () => {
       const pipeline = new Pipeline(projectPath)
       pipeline.load().then(() => setPipeline(pipeline))
     })
+    
    }, [])
 
    if (!pipeline) return <CenteredFullscreenDiv>
@@ -86,7 +88,6 @@ const Project: React.FC = () => {
     // Set the selected tab if provided
     if (tab) setSelectedTab(tab)
 
-
     return result
 
   }
@@ -97,39 +98,48 @@ const Project: React.FC = () => {
       label: '1. Project Configuration',
       content: <ProjectConfiguration 
         pipeline={loadedPipeline} 
-        onFormSubmit={async (updatedConfiguration) => submitTab(() => loadedPipeline.configure(updatedConfiguration), 'data-alignment')} 
+        onFormSubmit={async (updatedConfiguration) => submitTab(() => loadedPipeline.configure(updatedConfiguration), 'data-organization')} 
       />
     },
     {
-      id: 'data-alignment',
-      label: '2. Data Alignment',
-      content: <Alignment 
+      id: 'data-organization',
+      label: '2. Data Organization',
+      content: <Organize 
         pipeline={loadedPipeline}
-        onFormSubmit={async (params) => submitTab(() => loadedPipeline.align(params), 'model-training')}
+        onFormSubmit={async (params) => submitTab(async () => {
+          const { check_parameter, ...alignmentParams } = params
+          await loadedPipeline.align(alignmentParams)
+
+          // Create the trainset
+          await loadedPipeline.create_trainset({
+            pose_ref_index: alignmentParams.pose_ref_index,
+            check_parameter
+          }) 
+
+          // NOTE: Allow users to inspect the quality of the trainset here
+
+
+        }, 'model-creation')}
       />,
     },
     {
-      id: 'model-training',
-      label: '3. Model Training',
-      content: <Preparation 
+      id: 'model-creation',
+      label: '3. Model Creation',
+      content: <Model 
         pipeline={loadedPipeline}
-        onFormSubmit={async (params) => submitTab(async () => {
-            await loadedPipeline.create_trainset(params) // Create the trainset
+        onFormSubmit={async ({ train, evaluate } = {
+          train: true,
+          evaluate: true
+        }) => {
+          const runAll = train && evaluate
+          return submitTab(async () => {
+            if (train) await loadedPipeline.train() // Train the model
+            if (evaluate) await loadedPipeline.evaluate() // Evaluate the model
+          }, runAll ? 'segmentation' : 'model-creation')
+        }}
+      />
+    },
 
-            // NOTE: Allow users to inspect the quality of the trainset
-            
-            await loadedPipeline.train() // Train the model
-            await loadedPipeline.evaluate() // Evaluate the model
-          }, 'evaluation')}
-      />
-    },
-    {
-      id: 'evaluation',
-      label: '3a. Model Evaluation',
-      content: <Evaluation 
-        pipeline={loadedPipeline}
-      />
-    },
     {
       id: 'segmentation',
       label: '4. Pose Segmentation',

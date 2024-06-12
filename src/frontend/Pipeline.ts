@@ -80,6 +80,11 @@ class Pipeline {
         }
     }
 
+    workflow = {
+        organized: false,
+        model: false
+    }
+
     constructor(absPath?: string) {
         this.path = absPath ?? ''
     }
@@ -110,6 +115,8 @@ class Pipeline {
             images: result.images,
             videos: result.videos
         }
+
+        this.workflow = result.workflow
 
         return result
     }
@@ -176,15 +183,20 @@ class Pipeline {
         modalHeader.appendChild(headerText)
         document.body.appendChild(modalElement)
 
+        let locked = true
         const subscription = commoners.plugins.log.subscribe(({ method, args }) => {
             const messageEl = document.createElement('span')
             const message = args.join(' ')
             messageEl.innerText = message.replace('[vame]:', '')
             messageEl.classList.add(method)
             modalContent.appendChild(messageEl)
+
+            modalContent.onscroll = () => {
+                locked = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight
+            }
             
             // Scroll to bottom
-            modalContent.scrollTop = modalContent.scrollHeight
+            if (locked) modalContent.scrollTop = modalContent.scrollHeight
         })
 
         // Wait to show the modal
@@ -197,12 +209,13 @@ class Pipeline {
             modalElement.remove()
         })
         .catch((e) => {
-            modalFooter.classList.add('error')
 
             // Inside the modalContent element, find the message text and render it red
             const errorMessage = document.createElement('span')
             errorMessage.innerHTML = `<b>Error:</b> ${e.message}`
             modalFooter.append(errorMessage)
+
+            console.log(modalFooter)
 
             const closeButton = document.createElement('button')
             closeButton.innerText = 'Close'

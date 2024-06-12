@@ -287,11 +287,19 @@ class Load(Resource):
             community=get_community_videos(project_path)
         )
 
+        # Provide project workflow status
+        workflow = dict(
+            organized = (project_path / 'data' / 'train').exists(),
+            model = len(images["evaluation"]) > 0,
+
+        )
+
         return jsonify(dict(
             project=str(config_path.parent),
             config=yaml.safe_load(open(config_path, "r")) if config_path.exists() else None,
             images=images,
-            videos=videos
+            videos=videos,
+            workflow=workflow
         ))
 
 @api.route('/create', methods=['POST'])
