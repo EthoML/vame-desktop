@@ -15,7 +15,8 @@ pipeline,
 
     const [ isSegmented, setIsSegmented ] = useState(null)
 
-    if (isSegmented == null) pipeline.exists('results/hmm_trained.pkl').then((exists) => setIsSegmented(exists))
+    // NOTE: What indicates that pose segmentation has been completed?
+    // if (isSegmented == null) pipeline.exists('results/hmm_trained.pkl').then((exists) => setIsSegmented(exists))
 
     return (
         <PaddedTab>
