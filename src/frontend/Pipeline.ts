@@ -1,4 +1,5 @@
 import { baseUrl, get, post } from "./utils/requests";
+import { header } from "./utils/text";
 
 type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> | boolean : T[P];
@@ -103,7 +104,7 @@ class Pipeline {
 
     // Load the pipeline information
     load = async () => {
-        const result = await post('load', { project: this.path })
+        const result = await this.#post('load')
         this.configuration = result.config
         this.assets = {
             images: result.images,
@@ -119,7 +120,7 @@ class Pipeline {
 
         const { name, videos, csvs, videotype, ...globalDefaults } = propsCopy
 
-        const result = await post('create', {
+        const result = await this.#post('create', {
             project: name,
             videos: videos,
             poses_estimations: csvs,
@@ -139,12 +140,12 @@ class Pipeline {
     }
 
     configure = async (configUpdate: Record<string, any> = {}) => {
-        const result = await post('configure', { project: this.path, config: configUpdate }) as { config: PipelineConfiguration }
+        const result = await this.#post('configure', { config: configUpdate }) as { config: PipelineConfiguration }
         return this.configuration = result.config
     }
 
     delete = () => {
-        return post('delete_project', { project: this.path })
+        return this.#post('delete_project')
     }
 
     align = (options?: PipelineMethodOptions["align"]) => this.#request('align', options, { pose_ref_index: this.#defaults.pose_ref_index, egocentric_data: this.configuration.egocentric_data})
@@ -156,6 +157,64 @@ class Pipeline {
     evaluate = (options?: PipelineMethodOptions["evaluate"]) => this.#request('evaluate', options)
 
     segment = (options?: PipelineMethodOptions["segment"]) => this.#request('segment', options)
+
+    #post = async (
+        endpoint: string, 
+        options: Record<string, any> = {}
+    ) => {
+        if (!('project' in options)) options.project = this.path
+
+        const promise = post(endpoint, { ...options })
+
+        const modalElement = document.createElement('dialog')
+        const modalHeader = document.createElement('header')
+        const modalContent = document.createElement('section')
+        const modalFooter = document.createElement('footer')
+        modalElement.append(modalHeader, modalContent, modalFooter)
+        const headerText = document.createElement('span')
+        headerText.innerText = `Output for ${header(endpoint)}`
+        modalHeader.appendChild(headerText)
+        document.body.appendChild(modalElement)
+
+        const subscription = commoners.plugins.log.subscribe(({ method, args }) => {
+            const messageEl = document.createElement('span')
+            const message = args.join(' ')
+            messageEl.innerText = message.replace('[vame]:', '')
+            messageEl.classList.add(method)
+            modalContent.appendChild(messageEl)
+            
+            // Scroll to bottom
+            modalContent.scrollTop = modalContent.scrollHeight
+        })
+
+        // Wait to show the modal
+        setTimeout(() => {
+            if (modalElement.parentNode) modalElement.showModal()
+        }, 500)
+
+        promise
+        .then(() => {
+            modalElement.remove()
+        })
+        .catch((e) => {
+            modalFooter.classList.add('error')
+
+            // Inside the modalContent element, find the message text and render it red
+            const errorMessage = document.createElement('span')
+            errorMessage.innerHTML = `<b>Error:</b> ${e.message}`
+            modalFooter.append(errorMessage)
+
+            const closeButton = document.createElement('button')
+            closeButton.innerText = 'Close'
+            closeButton.onclick = () => modalElement.remove()
+            modalHeader.append(closeButton)
+        })
+        .finally(() => {
+            commoners.plugins.log.unsubscribe(subscription)
+        })
+
+        return promise
+    }
 
     #request = async (
         endpoint: string,
@@ -170,11 +229,9 @@ class Pipeline {
             options = {}
         }
 
-        return post(endpoint, {
+        return this.#post(endpoint, {
             ...defaultOptions,
             ...options,
-            project: this.path,
-
         })
     }
 

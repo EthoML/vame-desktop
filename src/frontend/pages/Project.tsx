@@ -76,10 +76,7 @@ const Project: React.FC = () => {
     tab?: string
   ) => {
 
-    const result = await callback().catch(e => {
-      window.alert(e)
-      throw e
-    })
+    const result = await callback()
 
     // Reload the pipeline
     const pipeline = new Pipeline(projectPath)
@@ -97,7 +94,7 @@ const Project: React.FC = () => {
   const tabs = [
     {
       id: 'project-configuration',
-      label: 'Project Configuration',
+      label: '1. Project Configuration',
       content: <ProjectConfiguration 
         pipeline={loadedPipeline} 
         onFormSubmit={async (updatedConfiguration) => submitTab(() => loadedPipeline.configure(updatedConfiguration), 'data-alignment')} 
@@ -105,7 +102,7 @@ const Project: React.FC = () => {
     },
     {
       id: 'data-alignment',
-      label: 'Data Alignment',
+      label: '2. Data Alignment',
       content: <Alignment 
         pipeline={loadedPipeline}
         onFormSubmit={async (params) => submitTab(() => loadedPipeline.align(params), 'model-training')}
@@ -113,7 +110,7 @@ const Project: React.FC = () => {
     },
     {
       id: 'model-training',
-      label: 'Model Training',
+      label: '3. Model Training',
       content: <Preparation 
         pipeline={loadedPipeline}
         onFormSubmit={async (params) => submitTab(async () => {
@@ -128,14 +125,14 @@ const Project: React.FC = () => {
     },
     {
       id: 'evaluation',
-      label: 'Model Evaluation',
+      label: '3a. Model Evaluation',
       content: <Evaluation 
         pipeline={loadedPipeline}
       />
     },
     {
       id: 'segmentation',
-      label: 'Pose Segmentation',
+      label: '4. Pose Segmentation',
       content: <Segmentation 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
@@ -145,7 +142,7 @@ const Project: React.FC = () => {
     },
     {
       id: 'motifs',
-      label: 'Motif Videos',
+      label: '5. Motif Videos',
       content: <MotifVideos 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
@@ -155,7 +152,7 @@ const Project: React.FC = () => {
     },
     {
       id: 'community',
-      label: 'Community Analysis',
+      label: '6. Community Analysis',
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
@@ -166,7 +163,7 @@ const Project: React.FC = () => {
     },
     {
       id: 'umap',
-      label: 'UMAP Visualization',
+      label: '7. UMAP Visualization',
       content: <UMAPVisualization
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {

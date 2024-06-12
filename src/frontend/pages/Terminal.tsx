@@ -19,16 +19,26 @@ const TerminalDiv = styled.ul`
   
 `;
 
-const customConfigFunctionSymbol = Symbol('customConfigFunction')
-const logPluginOutput = Symbol('logPluginOutput')
+const commonersLogPluginOutput = Symbol('logPluginOutput')
 
 const logFunctions = ["log", "warn", "error"]
 
 const messages = [];
 
+const ogMethods = {}
+logFunctions.forEach((method) => {
+  ogMethods[method] = console[method]
+
+  console[method] = (...args) => {
+    if (args[0] === commonersLogPluginOutput) return
+      else ogMethods[method](...args)
+  }
+
+})
+
 commoners.ready.then(() => {
   commoners.plugins.log.subscribe(({ method, args }) => {
-    console[method](logPluginOutput, ...args)
+    console[method](commonersLogPluginOutput, ...args)
   })
 })
 
@@ -42,18 +52,16 @@ const Terminal: React.FC = () => {
 
   logFunctions.forEach((method) => {
 
-    const ogMethod = console[method]
-
     console[method] = (...args) => {
 
       // Intercept log from Electron
-      if (args[0] === logPluginOutput) {
+      if (args[0] === commonersLogPluginOutput) {
         messages.push({ method, args: args.slice(1) })
         setCurrentMessages([...messages])
       } 
       
       // Normal log
-      else ogMethod(...args)
+      else ogMethods[method](...args)
     }
 
   })

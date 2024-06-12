@@ -34,3 +34,61 @@ h2 {
   margin-bottom: 20px;
   border-bottom: 1px solid rgba(210, 210, 210);
 }
+
+dialog {
+  background-color: rgba(10, 10, 10, 0.80);
+  border: none;
+  border-radius: 5px;
+  width: 80vw;
+  height: 80vh;
+  padding: 0;
+  display: grid;
+  grid-template-rows: min-content 1fr min-content;
+  font-size: 13px;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog > header {
+  background: black;
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+dialog > section {
+  padding: 20px;
+  overflow-y: auto !important;
+  color: white;
+
+  font-family: monospace;
+  font-size: 12px;
+}
+
+dialog > section > * { 
+  padding: 5px;
+}
+
+dialog > footer {
+  background: black;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+dialog > header > button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
