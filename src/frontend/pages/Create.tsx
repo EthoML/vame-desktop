@@ -39,7 +39,9 @@ const Create: React.FC = () => {
   const handleFormSubmit = async (formData) => {
 
     const pipeline = new Pipeline()
-    await pipeline.create(formData)
+    const result = await pipeline.create(formData)
+
+    if (!result.created) return alert('A project with this name already exists!')
 
     navigate({ 
       pathname: "/project",
