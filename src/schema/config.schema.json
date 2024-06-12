@@ -3,31 +3,6 @@
     "title": "VAME Project Configuration",
     "type": "object",
     "properties": {
-      "Project": {
-        "type": "string",
-        "description": "The name of your project",
-        "readOnly": true
-      },
-      "model_name": {
-        "type": "string",
-        "description": "The name of the model",
-        "default": "VAME"
-      },
-      "n_cluster": {
-        "type": "integer",
-        "description": "The number of clusters",
-        "default": 15
-      },
-      "pose_confidence": {
-        "type": "number",
-        "description": "The confidence threshold for the pose estimation",
-        "default": 0.99
-      },
-      "project_path": {
-        "type": "string",
-        "description": "The path to the project",
-        "readOnly": true
-      },
       "video_sets": {
         "type": "array",
         "description": "The list of video sets",
@@ -36,24 +11,57 @@
         },
         "readOnly": true
       },
-      "all_data": {
-        "type": "boolean",
-        "description": "Use all data for training",
-        "default": true
-      },
+	  
       "egocentric_data": {
         "type": "boolean",
-        "description": "Whether the data is egocentric or not",
+        "description": "Check this box if the input data is ALREADY egocentrically aligned",
         "default": false
       },
-      "robust": {
-        "type": "boolean",
-        "default": true
-      },
-      "iqr_factor": {
+	  "pose_confidence": {
         "type": "number",
+        "description": "The confidence threshold for the data cleaning",
+        "default": 0.99
+      },
+	  "iqr_factor": {
+        "type": "number",
+		"description": "Used for data cleaning before egocentric alignment",
         "default": 4
       },
+	  "robust": {
+        "type": "boolean",
+		"description": "Used for data cleaning",
+        "default": true
+      },
+	  "n_cluster": {
+        "type": "integer",
+        "description": "The number of motifs",
+        "default": 30
+      },
+	  "num_features": {
+        "type": "integer",
+        "description": "Please set to number of annotation points * 2"
+      },
+	  "time_window": {
+        "type": "integer",
+		"description": "Please set to 1/2 of video fps. Value should be even, round up if needed"
+      },
+      
+	  "parameterization": {
+        "type": "string",
+		"description": "Motif clustering method",
+        "default": "hmm"
+      },
+	  "max_epochs": {
+        "type": "integer",
+		"description": "Maximum epochs for model training",
+        "default": 500
+      },
+      "zdims": {
+        "type": "integer",
+		"description": "Dimensions of the latent space",
+        "default": 30
+      },
+	  
       "axis": {
         "type": "object",
         "properties": {
@@ -84,17 +92,9 @@
         "type": "boolean",
         "default": false
       },
-      "num_features": {
-        "type": "integer",
-        "default": 12
-      },
       "batch_size": {
         "type": "integer",
         "default": 256
-      },
-      "max_epochs": {
-        "type": "integer",
-        "default": 500
       },
       "model_snapshot": {
         "type": "integer",
@@ -116,17 +116,10 @@
         "type": "boolean",
         "default": false
       },
-      "zdims": {
-        "type": "integer",
-        "default": 30
-      },
+      
       "learning_rate": {
         "type": "number",
         "default": 0.0005
-      },
-      "time_window": {
-        "type": "integer",
-        "default": 30
       },
       "prediction_decoder": {
         "type": "integer",
@@ -138,6 +131,7 @@
       },
       "noise": {
         "type": "boolean",
+		"description": "Used for data cleaning",
         "default": false
       },
       "scheduler": {
@@ -158,10 +152,6 @@
       "softplus": {
         "type": "boolean",
         "default": false
-      },
-      "parameterization": {
-        "type": "string",
-        "default": "hmm"
       },
       "hmm_trained": {
         "type": "boolean",
@@ -262,6 +252,12 @@
       "annealtime": {
         "type": "number",
         "default": 4
+      },
+	  "model_name": {
+        "type": "string",
+        "description": "The name of the model",
+        "default": "VAME",
+		"readOnly": true
       },
       "legacy": {
         "type": "boolean",

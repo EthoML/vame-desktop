@@ -2,11 +2,13 @@
     "properties": {
         "name": {
             "type": "string",
-            "title": "Project Name"
+            "title": "Project Name",
+			"description": "Please do not have any spaces in the name"
         },
         "videos": {
             "type": "array",
             "title": "Videos",
+			"description": "Load labeled videos, NOTE: video file name needs to match CSV file name",
             "items": {
                 "type": "file",
                 "accept": "video/*"
@@ -15,6 +17,7 @@
         "csvs": {
             "type": "array",
             "title": "CSV Files",
+			"description": "Load pose estimation data, NOTE: csv file name needs to match video file name",
             "items": {
                 "type": "file",
                 "accept": [".csv"]
@@ -22,7 +25,8 @@
         },
         "videotype": {
             "type": "string",
-            "title": "Video Type"
+            "title": "Video Type",
+			"description": "mp4, avi, etc."
         }
     },
     "required": [ "name", "videos", "csvs", "videotype" ]
