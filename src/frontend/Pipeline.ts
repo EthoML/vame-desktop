@@ -104,15 +104,14 @@ class Pipeline {
 
     get creationDate() {
         if (!this.configuration) return null
-
         const { Project, project_path } = this.configuration
-        const pipelineCreationDateString = project_path.split(`${Project}-`)[1]
-        return new Date(pipelineCreationDateString)
+        return new Date( project_path.split(`${Project}-`)[1])
     }
 
     // Load the pipeline information
     load = async () => {
         const result = await this.#post('load')
+
         this.configuration = result.config
         this.assets = {
             images: result.images,

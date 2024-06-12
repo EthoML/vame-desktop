@@ -33,7 +33,7 @@ export default defineConfig({
             description: 'A simple Python service for VAME',
             src: pythonSrc,
             publish: {
-                build: `python -m PyInstaller --name ${serviceName} --onedir --clean ${pythonSrc} --distpath ${serviceBuildRoot} --hidden-import=numpy`,
+                build: `python -m PyInstaller --name ${serviceName} --onedir --clean ${pythonSrc} -y --distpath ${serviceBuildRoot} --hidden-import=numpy`,
                 local: {
                     src: serviceName,
                     base: `${serviceBuildRoot}/${serviceName}`, // Will be copied

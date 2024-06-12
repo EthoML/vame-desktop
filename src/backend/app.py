@@ -221,7 +221,7 @@ class FileExists(Resource):
 class Projects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        projects = [str(project) for project in VAME_PROJECTS_DIRECTORY.glob('*') if project.is_dir()]
+        projects = [ str(project) for project in VAME_PROJECTS_DIRECTORY.glob('*') if project.is_dir() ]
         return jsonify(projects)
     
 @api.route('/projects/recent')
@@ -232,7 +232,7 @@ class RecentProjects(Resource):
         recent_projects = states.get("recent_projects", [])
 
         # Filter those that no longer exist
-        recent_projects = [str(project) for project in recent_projects if (VAME_PROJECTS_DIRECTORY / project).exists()]
+        recent_projects = [ str(project) for project in recent_projects if (VAME_PROJECTS_DIRECTORY / project).exists() ]
         states["recent_projects"] = recent_projects
         with open(GLOBAL_STATES_FILE, "w") as file:
             json.dump(states, file)
