@@ -11,15 +11,11 @@ const MotifVideos = ({
     onFormSubmit?: DynamicFormProps['onFormSubmit']
 }) => {
 
-    const { videos } = pipeline.assets
 
-    const motifVideos = videos?.motif ?? {}
+    const hasMotifVideos = pipeline.workflow.motifs_created
 
-    const hasAny = Object.values(motifVideos).some((v) => v.length > 0)
-
-    if (!hasAny) return (
+    if (!hasMotifVideos) return (
         <PaddedTab>
-            <p>No evaluation images have been generated yet.</p>
             <DynamicForm
                 initialValues={{}} 
                 submitText="Generate Motif Videos"
@@ -28,6 +24,8 @@ const MotifVideos = ({
         </PaddedTab>
     )
 
+    const { videos } = pipeline.assets
+    const motifVideos = videos?.motif ?? {}
 
     const organizedVideos = Object.entries(motifVideos).reduce((acc, [ label, videos ]) => {
         acc[label] = videos.map((videoPath: string) =>{

@@ -92,12 +92,13 @@ const Project: React.FC = () => {
 
   }
 
-  const { organized, modeled, segmented } = loadedPipeline.workflow
+  const { organized, modeled, segmented, motifs_created } = loadedPipeline.workflow
 
   const tabs = [
     {
       id: 'project-configuration',
       label: '1. Project Configuration',
+      complete: organized,
       content: <ProjectConfiguration 
         pipeline={loadedPipeline} 
         onFormSubmit={async (formData) => submitTab(async () => {
@@ -109,6 +110,7 @@ const Project: React.FC = () => {
     {
       id: 'data-organization',
       label: '2. Data Organization',
+      complete: organized,
       content: <Organize 
         pipeline={loadedPipeline}
         onFormSubmit={async (params) => submitTab(async () => {
@@ -131,6 +133,7 @@ const Project: React.FC = () => {
       id: 'model-creation',
       label: '3. Model Creation',
       disabled: !organized,
+      complete: modeled,
       content: <Model 
         pipeline={loadedPipeline}
         onFormSubmit={async ({ train, evaluate } = {
@@ -150,6 +153,7 @@ const Project: React.FC = () => {
       id: 'segmentation',
       label: '4. Pose Segmentation',
       disabled: !modeled,
+      complete: segmented,
       content: <Segmentation 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
@@ -161,6 +165,7 @@ const Project: React.FC = () => {
       id: 'motifs',
       label: '5. Motif Videos',
       disabled: !segmented,
+      complete: motifs_created,
       content: <MotifVideos 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {

@@ -83,7 +83,8 @@ class Pipeline {
     workflow = {
         organized: false,
         modeled: false,
-        segmented: false
+        segmented: false,
+        motifs_created: false,
     }
 
     constructor(absPath?: string) {
@@ -190,7 +191,8 @@ class Pipeline {
             messageEl.classList.add(method)
             modalContent.appendChild(messageEl)
 
-            modalContent.onscroll = () => {
+            modalContent.onscroll = (ev) => {
+                if (ev.target !== modalContent) return
                 locked = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight
             }
             

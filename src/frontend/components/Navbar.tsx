@@ -68,7 +68,10 @@ const Navbar: React.FC = () => {
 
                                 const files = Array.from(ev.target.files);
                                 const configPath = files.length > 0 ? files.find(file => file.name === 'config.yaml')?.path : null
-                                if (!configPath) return reject()
+                                if (!configPath) {
+                                    window.alert('No config.yaml file found in the selected directory. \n\nPlease select a valid VAME project.')
+                                    return reject()
+                                }
 
                                 // const pipeline = new Pipeline(configPath)
                                 // await pipeline.load()

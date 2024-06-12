@@ -161,6 +161,11 @@ def get_videos(project_path, subfolder = 'cluster_videos'):
 
     return output_videos
 
+
+def get_video_results_path(video, project_path):
+    return project_path / 'results' / video / "VAME" / 'hmm-15'
+
+
 def get_motif_videos(project_path):
     return get_videos(project_path, 'cluster_videos')
 
@@ -277,6 +282,9 @@ class Load(Resource):
             if not symlink.exists():
                 symlink.symlink_to(project_path)
 
+
+        config = yaml.safe_load(open(config_path, "r")) if config_path.exists() else None
+
         images = dict(
             evaluation=get_evaluation_images(project_path),
             visualization=get_visualization_images(project_path)
@@ -287,16 +295,21 @@ class Load(Resource):
             community=get_community_videos(project_path)
         )
 
+        has_latent_vector_files = False
+        if config:
+            has_latent_vector_files = all(map(lambda video: (get_video_results_path(video, project_path) / f"latent_vector_{video}.npy").exists(), config["video_sets"]))
+
         # Provide project workflow status
         workflow = dict(
             organized = (project_path / 'data' / 'train').exists(),
             modeled = len(images["evaluation"]) > 0,
-            segmented = False
+            segmented = has_latent_vector_files,
+            motifs_created = all(map(lambda videos: len(videos) > 0, videos["motif"].values()))
         )
 
         return jsonify(dict(
             project=str(config_path.parent),
-            config=yaml.safe_load(open(config_path, "r")) if config_path.exists() else None,
+            config=config,
             images=images,
             videos=videos,
             workflow=workflow

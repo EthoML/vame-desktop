@@ -13,19 +13,15 @@ pipeline,
 
 }) => {
 
-    const [ isSegmented, setIsSegmented ] = useState(null)
-
-    // NOTE: What indicates that pose segmentation has been completed?
-    // if (isSegmented == null) pipeline.exists('results/hmm_trained.pkl').then((exists) => setIsSegmented(exists))
+    const isSegmented = pipeline.workflow.segmented
 
     return (
         <PaddedTab>
-            {isSegmented && <p>Pose segmentation has already been completed successfully.</p>}
-            <DynamicForm 
+            {isSegmented ? <p>Pose segmentation has been completed successfully!</p> : <DynamicForm 
                 initialValues={{}} 
                 submitText="Run Pose Segmentation"
                 onFormSubmit={onFormSubmit} 
-             />
+             />}
         </PaddedTab>
     )
 }

@@ -6,6 +6,7 @@ type Tab = {
   label: string;
   content: React.ReactNode;
   disabled?: boolean;
+  complete?: boolean;
 }
 
 type TabProps = {
@@ -43,6 +44,7 @@ const TabButton = styled.button`
   transition: background-color 0.3s;
   border-bottom: ${(props) => (props.active ? '2px solid #007bff' : 'none')};
   font-weight: ${(props) => (props.active ? 'bold' : 'normal')};
+
   flex-shrink: 0;
   flex-grow: 1;
 
@@ -54,6 +56,13 @@ const TabButton = styled.button`
     opacity: 0.5;
     pointer-events: none;
   }
+
+  ${(props) => (props.complete ? `&:after {
+    margin-left: 10px;
+    content: '✓';
+    color: #28a745;
+  }` : '')}
+
 `;
 
 const TabContent = styled.div`
@@ -83,16 +92,18 @@ const Tabs = ({
   return (
     <TabsContainer>
       <TabList>
-        {tabs.map((tab) => (
-          <TabButton
-            key={tab.id}
-            active={tab.id === activeTab ? 1  : 0}
-            disabled={tab.disabled ? 1 : 0}
-            onClick={() => handleTabClick(tab.id)}
+        {tabs.map((tab) => {
+          const { id, label, complete, disabled } = tab;
+          return <TabButton
+            key={id}
+            active={id === activeTab ? 1  : 0}
+            disabled={disabled ? 1 : 0}
+            complete={complete ? 1 : 0}
+            onClick={() => handleTabClick(id)}
           >
-            {tab.label}
+            {label}
           </TabButton>
-        ))}
+      })}
       </TabList>
       <TabContent>
         {tabs.map((tab) => (

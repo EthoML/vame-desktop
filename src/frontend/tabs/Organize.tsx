@@ -13,23 +13,24 @@ const Organize = ({
 
 }) => {
 
+    const schema = structuredClone(organizeSchema)
+
     const isOrganized = pipeline.workflow.organized
 
-    if (isOrganized) return <PaddedTab><p>Data has already been organized</p><p><small><b>Note:</b> This will later include a visualization of the training data.</small></p></PaddedTab>
-
     const operations = ["Create Training Set"]
+
     if (!pipeline.configuration.egocentric_data) operations.unshift("Align Data")
+
+    if (isOrganized) {
+        if (pipeline.configuration.egocentric_data) return <PaddedTab><p>Project data has been organized successfully!</p></PaddedTab>
+        Object.values(schema.properties).forEach(v => v.readOnly = true)
+    }
 
     return (
         <PaddedTab>
-            {pipeline.configuration.egocentric_data &&
-            <div>
-                <p>Data is already aligned</p> 
-            </div>}
-            
             <DynamicForm 
                 initialValues={{}} 
-                schema={pipeline.configuration.egocentric_data ? undefined : organizeSchema }
+                schema={pipeline.configuration.egocentric_data ? undefined : schema }
                 submitText={operations.join(" + ")}
                 onFormSubmit={onFormSubmit} 
             />
