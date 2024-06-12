@@ -39,14 +39,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # - uses: apple-actions/import-codesign-certs@v1
-      #   with:
-      #     p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
-      #     p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+      - uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
+          p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
 
       - name: Build and deploy on Mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          appleId: ${{ secrets.APPLE_ID }}
-          appleIdPassword: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
         run: npm run build -- --publish

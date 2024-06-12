@@ -16,6 +16,7 @@ import UMAPVisualization from '../tabs/UMAPVisualization';
 import MotifVideos from '../tabs/MotifVideos';
 import CommunityAnalysis from '../tabs/CommunityAnalysis';
 import { post } from '../utils/requests';
+import { showTerminalWhileRunning } from '../popups';
 
 
 const ProjectHeader = styled.header`
@@ -101,9 +102,13 @@ const Project: React.FC = () => {
       complete: organized,
       content: <ProjectConfiguration 
         pipeline={loadedPipeline} 
-        onFormSubmit={async (formData) => submitTab(async () => {
-          const { advanced_options, ...mainProperties } = formData
-          await loadedPipeline.configure({...mainProperties, ...advanced_options})
+        onFormSubmit={async (formData) => submitTab(() => {
+          return showTerminalWhileRunning(async () => {
+
+            const { advanced_options, ...mainProperties } = formData
+            await loadedPipeline.configure({...mainProperties, ...advanced_options})
+
+          }, "Configuring your project")
         }, 'data-organization')}
       />
     },
@@ -113,18 +118,22 @@ const Project: React.FC = () => {
       complete: organized,
       content: <Organize 
         pipeline={loadedPipeline}
-        onFormSubmit={async (params) => submitTab(async () => {
-          const { check_parameter, ...alignmentParams } = params
-          await loadedPipeline.align(alignmentParams)
+        onFormSubmit={async (params) => submitTab(() => {
 
-          // Create the trainset
-          await loadedPipeline.create_trainset({
-            pose_ref_index: alignmentParams.pose_ref_index,
-            check_parameter
-          }) 
+          return showTerminalWhileRunning(async () => {
+            
+            const { check_parameter, ...alignmentParams } = params
+            await loadedPipeline.align(alignmentParams)
 
-          // NOTE: Allow users to inspect the quality of the trainset here
+            // Create the trainset
+            await loadedPipeline.create_trainset({
+              pose_ref_index: alignmentParams.pose_ref_index,
+              check_parameter
+            }) 
 
+            // NOTE: Allow users to inspect the quality of the trainset here
+
+          }, 'Organizing your data for model creation')
 
         }, 'model-creation')}
       />,
@@ -142,8 +151,12 @@ const Project: React.FC = () => {
         }) => {
           const runAll = train && evaluate
           return submitTab(async () => {
-            if (train) await loadedPipeline.train() // Train the model
-            if (evaluate) await loadedPipeline.evaluate() // Evaluate the model
+            return showTerminalWhileRunning(async () => {
+
+              if (train) await loadedPipeline.train() // Train the model
+              if (evaluate) await loadedPipeline.evaluate() // Evaluate the model
+
+            }, `Running ${ runAll ? 'model training and evaluation' : train ? 'model training' : 'model evaluation' }`)
           }, runAll ? 'segmentation' : 'model-creation')
         }}
       />
@@ -156,8 +169,10 @@ const Project: React.FC = () => {
       complete: segmented,
       content: <Segmentation 
         pipeline={loadedPipeline}
-        onFormSubmit={async () => submitTab(async () => {
-            await loadedPipeline.segment() // Run pose segmentation
+        onFormSubmit={() => submitTab(() => {
+            return showTerminalWhileRunning(async () => {
+              await loadedPipeline.segment() // Run pose segmentation
+            }, 'Running pose segmentation')
           })}
       />
     },
@@ -168,8 +183,10 @@ const Project: React.FC = () => {
       complete: motifs_created,
       content: <MotifVideos 
         pipeline={loadedPipeline}
-        onFormSubmit={async () => submitTab(async () => {
-            await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
+        onFormSubmit={async () => submitTab(() => {
+            return showTerminalWhileRunning(async () => {
+              await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
+            }, 'Creating motif videos')
           })}
       />
     },
@@ -179,9 +196,13 @@ const Project: React.FC = () => {
       disabled: !segmented,
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
-        onFormSubmit={async () => submitTab(async () => {
-            await loadedPipeline.community() // Run community analysis
-            await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
+        onFormSubmit={() => submitTab(() => {
+            return showTerminalWhileRunning(async () => {
+
+              await loadedPipeline.community() // Run community analysis
+              await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
+              
+            }, 'Running community analysis + generating community videos')
           })}
       />
     },
@@ -191,8 +212,10 @@ const Project: React.FC = () => {
       disabled: !segmented,
       content: <UMAPVisualization
         pipeline={loadedPipeline}
-        onFormSubmit={async () => submitTab(async () => {
-            await loadedPipeline.visualization() // Create visualization
+        onFormSubmit={async () => submitTab(() => {
+            return showTerminalWhileRunning(async () => {
+              await loadedPipeline.visualization() // Create visualization
+            }, 'Creating UMAP visualization')
           })}
       />
     },
