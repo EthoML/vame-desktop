@@ -4,6 +4,24 @@ import { header } from '../utils/text';
 import { faPlusCircle, faTrash, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+/*
+
+Custom Behaviors
+----------------------
+format: file OR folder (type: string)
+NOTE: Will always output as an array of file paths (though it would be more correct to require an array is specified in the schema)
+  - Accepts a file or a folder
+  - If type is file, the user can only select files
+  - If type is folder, the user can only select folders
+  - The accepted files can be specified using the `accept` attribute
+  - The user can select multiple files using the `multiple` attribute
+
+allow-spaces: boolean
+  - Blocks the user from entering spaces in the input field if set to false
+
+
+*/
+
 const checkIfObject = (value) => value && value instanceof Object && !Array.isArray(value)
     
 // Accordion Component
@@ -83,31 +101,78 @@ const ArrayItemWrapper = styled.div`
   gap: 10px;
 `;
 
-const ArrayButtons = styled.div`
-  display: flex;
-  gap: 5px;
+// const ArrayButtons = styled.div`
+//   display: flex;
+//   gap: 5px;
+// `;
+
+// const ArrayButton = styled.button`
+//   color: black;
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+// `;
+
+// const AddButton = styled.button`
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   margin-top: 10px;
+//   padding: 10px;
+//   background-color: #007bff;
+//   width: 100%;
+//   color: white;
+//   border: none;
+//   border-radius: 3px;
+//   cursor: pointer;
+// `;
+
+
+const FileList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
 `;
 
-const ArrayButton = styled.button`
-  color: black;
-  background: none;
-  border: none;
-  cursor: pointer;
-`;
-
-const AddButton = styled.button`
+const FileListItem = styled.li`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #007bff;
-  width: 100%;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
+  padding: 5px 0;
 `;
+
+const getFilePath = (file) => file.path || file;
+
+const FileSelector = ({ name, value, onChange, multiple, accept, webkitdirectory }) => {
+  
+  // Ensure value is an array
+  value = value !== undefined ? (Array.isArray(value) ? value : [ value ]) : value
+    
+  return (
+    
+    <>
+      <input
+        type="file"
+        name={name}
+        accept={accept}
+        multiple={multiple}
+        onChange={(e) => onChange(e)}
+        webkitdirectory={webkitdirectory}
+      />
+      <FileList>
+        {value && value.map((file, index) => {
+          const label = getFilePath(file);
+
+         return <FileListItem key={index}>
+            <span>{label}</span>
+          </FileListItem>
+      })}
+      </FileList>
+    </>
+  );
+};
+
 
 const DynamicForm = ({ 
   initialValues, 
@@ -151,7 +216,7 @@ const DynamicForm = ({
       if (files.length === 0) return;
       setFormState({
         ...formState,
-        [name]: Array.from(files)
+        [name]: Array.from(files).map((file) =>  file.path) // Convert to full file path in form
       });
       return;
     }
@@ -164,18 +229,18 @@ const DynamicForm = ({
     setFormState({ ...formState, [name]: resolvedValue });
 };
 
-  const handleAddArrayItem = (key) => {
-    setFormState({
-      ...formState,
-      [key]: [...(formState[key] || []), '']
-    });
-  };
+  // const handleAddArrayItem = (key) => {
+  //   setFormState({
+  //     ...formState,
+  //     [key]: [...(formState[key] || []), '']
+  //   });
+  // };
 
-  const handleRemoveArrayItem = (key, index) => {
-    const newArray = [...formState[key]];
-    newArray.splice(index, 1);
-    setFormState({ ...formState, [key]: newArray });
-  };
+  // const handleRemoveArrayItem = (key, index) => {
+  //   const newArray = [...formState[key]];
+  //   newArray.splice(index, 1);
+  //   setFormState({ ...formState, [key]: newArray });
+  // };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -198,6 +263,7 @@ const DynamicForm = ({
   ) => {
 
     const type = property?.type || inferType(value);
+    const format = property?.format
     const required = schema?.required?.includes(key) || false;
     const isReadOnly = property?.readOnly || false;
 
@@ -213,18 +279,17 @@ const DynamicForm = ({
     }
 
     // Handle Files First
-    if (type === 'file' || type === 'folder') {
-      return (
-        <input
-          type="file"
-          name={key}
-          accept={property.accept}
-          required={required}
-          multiple={property.multiple}
-          onChange={handleChange}
-          webkitdirectory={type === 'folder' ? 'true' : null}
-        />
-      );
+    if (type === 'string' && (format === 'file' || format === 'folder')) {
+        return (
+          <FileSelector
+            name={key}
+            value={formState[key] || []}
+            onChange={handleChange}
+            webkitdirectory={type === 'folder' ? 'true' : null}
+            multiple={property.multiple}
+            accept={property.accept}
+          />
+        );
     }
 
     // Handle editable arrays
@@ -263,13 +328,14 @@ const DynamicForm = ({
                   defaultValue={item}
                   onChange={(e) => handleChange(e, index, key)}
                 />
-                <ArrayButtons>
+                {/* <ArrayButtons>
                   { canRemove && <ArrayButton type="button" onClick={() => handleRemoveArrayItem(key, index)}><FontAwesomeIcon icon={faTrash} /></ArrayButton> }
-                </ArrayButtons>
+                </ArrayButtons> */}
               </ArrayItemWrapper>
             })}
           </ArrayItems>
-          { canAdd && <AddButton type="button" onClick={() => handleAddArrayItem(key)}><FontAwesomeIcon icon={faPlusCircle} /></AddButton> }
+          { (canAdd || canRemove) && <small><b>Note:</b> Array sizes cannot yet be edited. Please specify minItems and maxItems as the same value in the schema.</small>}
+          {/* { canAdd && <AddButton type="button" onClick={() => handleAddArrayItem(key)}><FontAwesomeIcon icon={faPlusCircle} /></AddButton> } */}
         </div>
       );
     }

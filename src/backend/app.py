@@ -18,6 +18,13 @@ from datetime import datetime
 import matplotlib
 matplotlib.use('Agg')  # Non-interactive matplotlib backend
 
+FILES_TO_IGNORE = [ '.DS_Store' ]
+
+def get_files(folder_to_search):
+    folder_to_search = Path(folder_to_search)
+    ignore_glob = set(FILES_TO_IGNORE)
+    return [ file for file in folder_to_search.glob('*') if file.is_file() and file.name not in ignore_glob ] 
+
 def create_log_file(log_file):
 
     # Queue to hold stdout messages
@@ -307,11 +314,22 @@ class Load(Resource):
             motifs_created = all(map(lambda videos: len(videos) > 0, videos["motif"].values()))
         )
 
+        original_videos_location = project_path / 'videos'
+        original_csvs_location = original_videos_location / 'pose_estimation'
+
+        # Get all files in the original data directory
+        original_videos = list(map(lambda file: str(file), get_files(original_videos_location)))
+        original_csvs = list(map(lambda file: str(file), get_files(original_csvs_location)))
+
         return jsonify(dict(
             project=str(config_path.parent),
             config=config,
-            images=images,
-            videos=videos,
+            assets=dict(
+                images=images,
+                videos=videos
+            ),
+            videos=original_videos,
+            csvs=original_csvs,
             workflow=workflow
         ))
 

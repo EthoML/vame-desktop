@@ -53,7 +53,6 @@ const TabButton = styled.button`
   }
 
   &:disabled {
-    opacity: 0.5;
     pointer-events: none;
   }
 

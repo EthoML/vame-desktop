@@ -7,12 +7,14 @@
         },
         "videos": {
             "title": "Videos",
-            "type": "file",
+            "type": "string",
+            "format": "file",
             "accept": "video/*",
             "multiple": true
         },
         "csvs": {
-            "type": "file",
+            "type": "string",
+            "format": "file",
             "title": "CSV Files",
             "accept": [".csv"],
             "multiple": true

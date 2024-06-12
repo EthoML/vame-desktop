@@ -81,6 +81,12 @@ class Pipeline {
         }
     }
 
+    // Original data
+    data = {
+        videos: [],
+        csvs: []
+    }
+
     workflow = {
         organized: false,
         modeled: false,
@@ -113,9 +119,11 @@ class Pipeline {
         const result = await this.#post('load')
 
         this.configuration = result.config
-        this.assets = {
-            images: result.images,
-            videos: result.videos
+        this.assets = result.assets
+
+        this.data = {
+            videos: result.videos,
+            csvs: result.csvs
         }
 
         this.workflow = result.workflow

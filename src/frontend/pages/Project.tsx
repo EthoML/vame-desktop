@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Pipeline from '../Pipeline';
 
 import styled from 'styled-components';
 import { onReady } from '../commoners';
 import Tabs from '../components/Tabs';
 
-import { CenteredFullscreenDiv } from '../components/divs';
+import { CenteredFullscreenDiv, StyledHeaderDiv } from '../components/divs';
 
 import ProjectConfiguration from '../tabs/ProjectConfiguration';
 import Organize from '../tabs/Organize';
@@ -40,6 +40,16 @@ const ProjectInformationCapsule = styled.div`
 `;
 
 
+const HeaderButton = styled.button`
+  font-size: 14px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background: #181c24;
+  color: white;
+  cursor: pointer;
+`;
+
 
 const Project: React.FC = () => {
 
@@ -48,6 +58,8 @@ const Project: React.FC = () => {
   const [ pipeline, setPipeline ] = useState();
 
   const [ selectedTab, setSelectedTab ] = useState();
+
+  const navigate = useNavigate()
 
   const projectPath = searchParams.get("project")
 
@@ -225,7 +237,15 @@ const Project: React.FC = () => {
    return (
     <div>
       <ProjectHeader>
-        <h2>{loadedPipeline.configuration.Project}</h2>
+        <StyledHeaderDiv>
+          <h2>{loadedPipeline.configuration.Project}</h2>
+          <HeaderButton onClick={() => {
+            navigate({
+              pathname: '/create',
+              search: `?project=${loadedPipeline.path}`
+            })
+          }}>Remix Project Data</HeaderButton>
+        </StyledHeaderDiv>
         <ProjectInformation>
           <ProjectInformationCapsule><small><b>Creation Date</b> <small>{loadedPipeline.creationDate.toLocaleDateString()}</small></small></ProjectInformationCapsule>
           <ProjectInformationCapsule><small><b>Project Location</b> <small>{loadedPipeline.configuration.project_path}</small></small></ProjectInformationCapsule>

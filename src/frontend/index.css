@@ -25,16 +25,6 @@ html, body, #root {
   overflow: hidden;
 }
 
-h2 {
-  font-size: 30px;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(210, 210, 210);
-}
-
 dialog {
   background-color: rgba(10, 10, 10, 0.80);
   border: none;
