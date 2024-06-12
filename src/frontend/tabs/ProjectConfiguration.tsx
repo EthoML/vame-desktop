@@ -1,5 +1,4 @@
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
-
 import projectConfigSchema from '../../schema/config.schema.json'
 import Pipeline from "../Pipeline"
 import { PaddedTab } from "../components/divs"
@@ -19,10 +18,32 @@ const ProjectConfiguration = ({
 
     if (pipeline.workflow.organized) Object.values(schema.properties).forEach(v => v.readOnly = true)
 
+    const { 
+        Project, 
+        n_clusters,
+        pose_confidence,
+        egocentric_data,
+        num_features,
+        time_window,
+        max_epochs,
+        ...advanced_options 
+    } = pipeline.configuration
+
+    const toEdit = {
+        Project,
+        n_clusters, 
+        egocentric_data,
+        pose_confidence,
+        num_features,
+        time_window,
+        max_epochs,
+        advanced_options
+    }
+
     return (
         <PaddedTab>
             <DynamicForm 
-                initialValues={pipeline.configuration} 
+                initialValues={toEdit} 
                 schema={schema}
                 submitText="Finalize Configuration"
                 onFormSubmit={onFormSubmit} 

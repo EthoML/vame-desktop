@@ -22,9 +22,9 @@ const Model = ({
 
 }) => {
 
-    const hasModel = pipeline.workflow.model
+    const isModeled = pipeline.workflow.modeled
 
-    if (hasModel) {
+    if (isModeled) {
 
         const { images } = pipeline.assets
 

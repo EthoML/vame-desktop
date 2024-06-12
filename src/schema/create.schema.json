@@ -16,11 +16,7 @@
             "title": "CSV Files",
             "accept": [".csv"],
             "multiple": true
-        },
-        "videotype": {
-            "type": "string",
-            "title": "Video Type"
         }
     },
-    "required": [ "name", "videos", "csvs", "videotype" ]
+    "required": [ "name", "videos", "csvs" ]
 }

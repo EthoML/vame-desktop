@@ -82,7 +82,8 @@ class Pipeline {
 
     workflow = {
         organized: false,
-        model: false
+        modeled: false,
+        segmented: false
     }
 
     constructor(absPath?: string) {
@@ -125,19 +126,17 @@ class Pipeline {
 
         const propsCopy = { ...props }
 
-        const { name, videos, csvs, videotype, ...globalDefaults } = propsCopy
+        const { name, videos, csvs } = propsCopy
 
         const result = await this.#post('create', {
             project: name,
             videos: videos,
             poses_estimations: csvs,
-            videotype: videotype,
+            // videotype: videotype, // NOTE: Not allowing folders
         }) as {
             config: PipelineConfiguration,
             project: string
         }
-
-        Object.assign(this.#defaults, globalDefaults)
 
         this.configuration = result.config
 
@@ -155,7 +154,7 @@ class Pipeline {
         return this.#post('delete_project')
     }
 
-    align = (options?: PipelineMethodOptions["align"]) => this.#request('align', options, { pose_ref_index: this.#defaults.pose_ref_index, egocentric_data: this.configuration.egocentric_data})
+    align = (options?: PipelineMethodOptions["align"]) => this.#request('align', options, { egocentric_data: this.configuration.egocentric_data})
 
     create_trainset = (options?: PipelineMethodOptions["create_trainset"]) => this.#request('create_trainset', options)
 
@@ -253,7 +252,7 @@ class Pipeline {
     community_videos = (options?: PipelineMethodOptions["community_videos"]) => this.#request('community_videos', options)
     visualization = (options?: PipelineMethodOptions["visualization"]) => this.#request('visualization', options)
     generative_model = (options?: PipelineMethodOptions["generative_model"]) => this.#request('generative_model', options)
-    gif = (options?: PipelineMethodOptions["gif"]) => this.#request('gif', options, { pose_ref_index: this.#defaults.pose_ref_index })
+    gif = (options?: PipelineMethodOptions["gif"]) => this.#request('gif', options)
 
 
     exists = (path) => get(this.getAssetPath(path, 'exists'))

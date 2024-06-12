@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+type Tab = {
+  id: string;
+  label: string;
+  content: React.ReactNode;
+  disabled?: boolean;
+}
+
+type TabProps = {
+  tabs: Tab[];
+  selected?: string;
+}
+
 const TabsContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -37,6 +49,11 @@ const TabButton = styled.button`
   &:hover {
     background-color: #f0f0f0;
   }
+
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 `;
 
 const TabContent = styled.div`
@@ -54,7 +71,7 @@ const TabPane = styled.div`
 const Tabs = ({ 
   tabs,
   selected = tabs[0].id,
-}) => {
+}: TabProps) => {
   
   const [ activeTab, setActiveTab ] = useState(selected);
 
@@ -70,6 +87,7 @@ const Tabs = ({
           <TabButton
             key={tab.id}
             active={tab.id === activeTab ? 1  : 0}
+            disabled={tab.disabled ? 1 : 0}
             onClick={() => handleTabClick(tab.id)}
           >
             {tab.label}

@@ -290,8 +290,8 @@ class Load(Resource):
         # Provide project workflow status
         workflow = dict(
             organized = (project_path / 'data' / 'train').exists(),
-            model = len(images["evaluation"]) > 0,
-
+            modeled = len(images["evaluation"]) > 0,
+            segmented = False
         )
 
         return jsonify(dict(
@@ -408,6 +408,11 @@ class Align(Resource):
             # If your experiment is by design egocentrical (e.g. head-fixed experiment on treadmill etc)
             # you can use the following to convert your .csv to a .npy array, ready to train vame on it
             egocentric_data = data.pop('egocentric_data')
+
+            
+
+
+
             if egocentric_data:
                 vame.csv_to_numpy(project_path / 'config.yaml')
             else:

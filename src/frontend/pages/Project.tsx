@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Pipeline from '../Pipeline';
 
@@ -92,13 +92,18 @@ const Project: React.FC = () => {
 
   }
 
+  const { organized, modeled, segmented } = loadedPipeline.workflow
+
   const tabs = [
     {
       id: 'project-configuration',
       label: '1. Project Configuration',
       content: <ProjectConfiguration 
         pipeline={loadedPipeline} 
-        onFormSubmit={async (updatedConfiguration) => submitTab(() => loadedPipeline.configure(updatedConfiguration), 'data-organization')} 
+        onFormSubmit={async (formData) => submitTab(async () => {
+          const { advanced_options, ...mainProperties } = formData
+          await loadedPipeline.configure({...mainProperties, ...advanced_options})
+        }, 'data-organization')}
       />
     },
     {
@@ -125,6 +130,7 @@ const Project: React.FC = () => {
     {
       id: 'model-creation',
       label: '3. Model Creation',
+      disabled: !organized,
       content: <Model 
         pipeline={loadedPipeline}
         onFormSubmit={async ({ train, evaluate } = {
@@ -143,6 +149,7 @@ const Project: React.FC = () => {
     {
       id: 'segmentation',
       label: '4. Pose Segmentation',
+      disabled: !modeled,
       content: <Segmentation 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
@@ -153,6 +160,7 @@ const Project: React.FC = () => {
     {
       id: 'motifs',
       label: '5. Motif Videos',
+      disabled: !segmented,
       content: <MotifVideos 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
@@ -163,6 +171,7 @@ const Project: React.FC = () => {
     {
       id: 'community',
       label: '6. Community Analysis',
+      disabled: !segmented,
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {
@@ -174,6 +183,7 @@ const Project: React.FC = () => {
     {
       id: 'umap',
       label: '7. UMAP Visualization',
+      disabled: !segmented,
       content: <UMAPVisualization
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(async () => {

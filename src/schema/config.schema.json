@@ -3,215 +3,208 @@
     "title": "VAME Project Configuration",
     "type": "object",
     "properties": {
+
       "Project": {
         "type": "string",
+        "title": "Project Name",
         "description": "The name of your project",
         "readOnly": true
       },
-      "model_name": {
-        "type": "string",
-        "description": "The name of the model"
-      },
       "n_cluster": {
         "type": "integer",
-        "description": "The number of clusters"
+        "title": "Number of Clusters",
+        "description": "The number of clusters to be used in the clustering algorithm"
       },
       "pose_confidence": {
         "type": "number",
         "description": "The confidence threshold for the pose estimation"
       },
-      "project_path": {
-        "type": "string",
-        "description": "The path to the project",
-        "readOnly": true
-      },
-      "video_sets": {
-        "type": "array",
-        "description": "The list of video sets",
-        "items": {
-          "type": "string"
-        },
-        "readOnly": true
-      },
       "egocentric_data": {
         "type": "boolean",
         "description": "Whether the data is egocentric or not"
       },
-      "robust": {
-        "type": "boolean"
-      },
-      "iqr_factor": {
-        "type": "number"
-      },
-      "savgol_filter": {
-        "type": "boolean"
-      },
-      "savgol_length": {
-        "type": "integer"
-      },
-      "savgol_order": {
-        "type": "integer",
-        "default": 2
-      },
-      "test_fraction": {
-        "type": "number"
-      },
-      "pretrained_model": {
-        "type": "string"
-      },
-      "pretrained_weights": {
-        "type": "boolean"
-      },
       "num_features": {
-        "type": "integer"
+        "type": "integer",
+        "description": "Please set to # of annotation points * 2"
       },
-      "batch_size": {
-        "type": "integer"
+      "time_window": {
+        "type": "integer",
+        "description": "Please set to 1/2 of video fps"
       },
       "max_epochs": {
         "type": "integer"
       },
-      "model_snapshot": {
-        "type": "integer"
+      "advanced_options": {
+        "type": "object",
+        "properties": {
+        "robust": {
+          "type": "boolean"
+        },
+        "iqr_factor": {
+          "type": "number"
+        },
+        "savgol_filter": {
+          "type": "boolean"
+        },
+        "savgol_length": {
+          "type": "integer"
+        },
+        "savgol_order": {
+          "type": "integer",
+          "default": 2
+        },
+        "test_fraction": {
+          "type": "number"
+        },
+        "pretrained_model": {
+          "type": "string"
+        },
+        "pretrained_weights": {
+          "type": "boolean"
+        },
+        "batch_size": {
+          "type": "integer"
+        },
+        "model_snapshot": {
+          "type": "integer"
+        },
+        "model_convergence": {
+          "type": "integer"
+        },
+        "transition_function": {
+          "type": "string"
+        },
+        "beta": {
+          "type": "number"
+        },
+        "beta_norm": {
+          "type": "boolean"
+        },
+        "zdims": {
+          "type": "integer"
+        },
+        "learning_rate": {
+          "type": "number"
+        },
+        "prediction_decoder": {
+          "type": "integer"
+        },
+        "prediction_steps": {
+          "type": "integer"
+        },
+        "noise": {
+          "type": "boolean"
+        },
+        "scheduler": {
+          "type": "integer"
+        },
+        "scheduler_step_size": {
+          "type": "integer"
+        },
+        "scheduler_gamma": {
+          "type": "number"
+        },
+        "scheduler_threshold": {
+          "type": "string"
+        },
+        "softplus": {
+          "type": "boolean"
+        },
+        "parameterization": {
+          "type": "string"
+        },
+        "hmm_trained": {
+          "type": "boolean"
+        },
+        "load_data": {
+          "type": "string"
+        },
+        "individual_parameterization": {
+          "type": "boolean"
+        },
+        "random_state_kmeans": {
+          "type": "integer"
+        },
+        "n_init_kmeans": {
+          "type": "integer"
+        },
+        "length_of_motif_video": {
+          "type": "integer"
+        },
+        "min_dist": {
+          "type": "number"
+        },
+        "n_neighbors": {
+          "type": "integer"
+        },
+        "random_state": {
+          "type": "integer"
+        },
+        "num_points": {
+          "type": "integer"
+        },
+        "hidden_size_layer_1": {
+          "type": "integer"
+        },
+        "hidden_size_layer_2": {
+          "type": "integer"
+        },
+        "dropout_encoder": {
+          "type": "number"
+        },
+        "hidden_size_rec": {
+          "type": "integer"
+        },
+        "dropout_rec": {
+          "type": "number"
+        },
+        "n_layers": {
+          "type": "integer"
+        },
+        "hidden_size_pred": {
+          "type": "integer"
+        },
+        "dropout_pred": {
+          "type": "number"
+        },
+        "mse_reconstruction_reduction": {
+          "type": "string"
+        },
+        "mse_prediction_reduction": {
+          "type": "string"
+        },
+        "kmeans_loss": {
+          "type": "number"
+        },
+        "kmeans_lambda": {
+          "type": "number"
+        },
+        "anneal_function": {
+          "type": "string"
+        },
+        "kl_start": {
+          "type": "number"
+        },
+        "annealtime": {
+          "type": "number"
+        },
+        "legacy": {
+          "type": "boolean"
+        }
       },
-      "model_convergence": {
-        "type": "integer"
-      },
-      "transition_function": {
-        "type": "string"
-      },
-      "beta": {
-        "type": "number"
-      },
-      "beta_norm": {
-        "type": "boolean"
-      },
-      "zdims": {
-        "type": "integer"
-      },
-      "learning_rate": {
-        "type": "number"
-      },
-      "time_window": {
-        "type": "integer"
-      },
-      "prediction_decoder": {
-        "type": "integer"
-      },
-      "prediction_steps": {
-        "type": "integer"
-      },
-      "noise": {
-        "type": "boolean"
-      },
-      "scheduler": {
-        "type": "integer"
-      },
-      "scheduler_step_size": {
-        "type": "integer"
-      },
-      "scheduler_gamma": {
-        "type": "number"
-      },
-      "scheduler_threshold": {
-        "type": "string"
-      },
-      "softplus": {
-        "type": "boolean"
-      },
-      "parameterization": {
-        "type": "string"
-      },
-      "hmm_trained": {
-        "type": "boolean"
-      },
-      "load_data": {
-        "type": "string"
-      },
-      "individual_parameterization": {
-        "type": "boolean"
-      },
-      "random_state_kmeans": {
-        "type": "integer"
-      },
-      "n_init_kmeans": {
-        "type": "integer"
-      },
-      "length_of_motif_video": {
-        "type": "integer"
-      },
-      "min_dist": {
-        "type": "number"
-      },
-      "n_neighbors": {
-        "type": "integer"
-      },
-      "random_state": {
-        "type": "integer"
-      },
-      "num_points": {
-        "type": "integer"
-      },
-      "hidden_size_layer_1": {
-        "type": "integer"
-      },
-      "hidden_size_layer_2": {
-        "type": "integer"
-      },
-      "dropout_encoder": {
-        "type": "number"
-      },
-      "hidden_size_rec": {
-        "type": "integer"
-      },
-      "dropout_rec": {
-        "type": "number"
-      },
-      "n_layers": {
-        "type": "integer"
-      },
-      "hidden_size_pred": {
-        "type": "integer"
-      },
-      "dropout_pred": {
-        "type": "number"
-      },
-      "mse_reconstruction_reduction": {
-        "type": "string"
-      },
-      "mse_prediction_reduction": {
-        "type": "string"
-      },
-      "kmeans_loss": {
-        "type": "number"
-      },
-      "kmeans_lambda": {
-        "type": "number"
-      },
-      "anneal_function": {
-        "type": "string"
-      },
-      "kl_start": {
-        "type": "number"
-      },
-      "annealtime": {
-        "type": "number"
-      },
-      "legacy": {
-        "type": "boolean"
-      }
+      "required": [
+        "robust", "iqr_factor", "savgol_filter", "savgol_length", "savgol_order", "test_fraction", "pretrained_model",
+        "pretrained_weights", "batch_size", "model_snapshot", "model_convergence", "transition_function", "beta",
+        "beta_norm", "zdims", "learning_rate", "prediction_decoder", "prediction_steps", "noise", "scheduler",
+        "scheduler_step_size", "scheduler_gamma", "scheduler_threshold", "softplus", "parameterization", "hmm_trained",
+        "load_data", "individual_parameterization", "random_state_kmeans", "n_init_kmeans", "length_of_motif_video",
+        "min_dist", "n_neighbors", "random_state", "num_points", "hidden_size_layer_1", "hidden_size_layer_2",
+        "dropout_encoder", "hidden_size_rec", "dropout_rec", "n_layers", "hidden_size_pred", "dropout_pred",
+        "mse_reconstruction_reduction", "mse_prediction_reduction", "kmeans_loss", "kmeans_lambda", "anneal_function",
+        "kl_start", "annealtime", "legacy"
+      ]
+    }
     },
-    "required": [
-      "Project", "model_name", "n_cluster", "pose_confidence", "project_path", "video_sets", "all_data",
-      "egocentric_data", "robust", "iqr_factor", "test_fraction", "pretrained_model", "pretrained_weights",
-      "num_features", "batch_size", "max_epochs", "model_snapshot", "model_convergence", "transition_function", "beta",
-      "beta_norm", "zdims", "learning_rate", "time_window", "prediction_decoder", "prediction_steps", "noise",
-      "scheduler", "scheduler_step_size", "scheduler_gamma", "softplus", 
-      "hmm_trained", "load_data", "individual_parameterization", "random_state_kmeans", "n_init_kmeans",
-      "length_of_motif_video", "min_dist", "n_neighbors", "random_state", "num_points", "hidden_size_layer_1",
-      "hidden_size_layer_2", "hidden_size_rec",  "n_layers", "hidden_size_pred",
-      "mse_reconstruction_reduction", "mse_prediction_reduction", "kmeans_loss", "kmeans_lambda",
-      "anneal_function", "kl_start", "annealtime", "legacy"
-    ]
+    "required": [ "Project", "n_cluster", "pose_confidence", "egocentric_data", "num_features", "time_window", "max_epochs", "advanced_options" ]
   }
   

@@ -1,32 +1,43 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { header } from '../utils/text';
-import { faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlusCircle, faTrash, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Tippy from '@tippyjs/react';
 
-/*
+const checkIfObject = (value) => value && value instanceof Object && !Array.isArray(value)
+    
+// Accordion Component
+const Accordion = styled.div`
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  margin-bottom: 10px;
+`;
 
-Custom Behaviors
-----------------------
-type: file OR folder
-  - Accepts a file or a folder
-  - If type is file, the user can only select files
-  - If type is folder, the user can only select folders
-  - The accepted files can be specified using the `accept` attribute
-  - The user can select multiple files using the `multiple` attribute
+const AccordionHeader = styled.div`
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
-allow-spaces: boolean
-  - Blocks the user from entering spaces in the input field if set to false
-
-
-*/
+const AccordionContent = styled.div`
+  padding: 10px;
+  display: ${props => (props.isOpen ? 'block' : 'none')};
+`;
 
 export type DynamicFormProps = {
-  submitText?: string,
   initialValues: Record<string, any>,
   schema: Record<string, any>,
-  onFormSubmit: (formData: Record<string, any>) => void
+
+  // Change Workflow
+  onChange?: (key: string, value: any) => void,
+
+  // Submit workflow
+  submitText?: string,
+  onFormSubmit?: (formData: Record<string, any>) => void
 };
 
 const Form = styled.form`
@@ -101,10 +112,13 @@ const AddButton = styled.button`
 const DynamicForm = ({ 
   initialValues, 
   schema, 
+  onChange,
   onFormSubmit,
   submitText = 'Submit' 
 }: Partial<DynamicFormProps>) => {
   const [formState, setFormState] = useState({});
+  const [accordionState, setAccordionState] = useState({});
+
 
   useEffect(() => {
     if (initialValues) {
@@ -117,10 +131,14 @@ const DynamicForm = ({
   const handleChange = (e, index = null, arrayKey = null) => {
     const { name, value, type, checked, files } = e.target;
 
+    const resolvedValue = type === 'number' ? Number(value) : value;
+
+
+    if (onChange) onChange(name, resolvedValue);
+
     if (arrayKey !== null) {
       const oldArray = formState[arrayKey]
       const newArray = oldArray ? [...oldArray] : [];
-      const resolvedValue = type === 'number' ? Number(value) : value;
       newArray[index] = resolvedValue;
       setFormState({ ...formState, [arrayKey]: newArray });
       return;
@@ -140,13 +158,8 @@ const DynamicForm = ({
       return;
     }
 
-    if (type === 'number') {
-      setFormState({ ...formState, [name]: Number(value) });
-      return;
-    }
-
-    setFormState({ ...formState, [name]: value });
-  };
+    setFormState({ ...formState, [name]: resolvedValue });
+};
 
   const handleAddArrayItem = (key) => {
     setFormState({
@@ -186,8 +199,7 @@ const DynamicForm = ({
     const isReadOnly = property?.readOnly || false;
 
     const isArrayValue = Array.isArray(value);
-    const isArray = property?.type === 'array' || isArrayValue
-    
+    const isArray = property?.type === 'array' || isArrayValue;
 
     if (isReadOnly) {
       if (isArray) {
@@ -196,7 +208,6 @@ const DynamicForm = ({
       
       return <span>{new String(type === 'boolean' ? !!value : value)}</span>;
     }
-
 
     // Handle Files First
     if (type === 'file' || type === 'folder') {
@@ -253,7 +264,7 @@ const DynamicForm = ({
                   { canRemove && <ArrayButton type="button" onClick={() => handleRemoveArrayItem(key, index)}><FontAwesomeIcon icon={faTrash} /></ArrayButton> }
                 </ArrayButtons>
               </ArrayItemWrapper>
-      })}
+            })}
           </ArrayItems>
           { canAdd && <AddButton type="button" onClick={() => handleAddArrayItem(key)}><FontAwesomeIcon icon={faPlusCircle} /></AddButton> }
         </div>
@@ -327,6 +338,36 @@ const DynamicForm = ({
         const title = property.title || key;
         const value = initialValues[key] || property.default;
         if ('default' in property && !(key in formState)) formState[key] = property.default;
+
+
+        const isObject = property.type === 'object' || property.properties || checkIfObject(value);
+
+        // Handle nested objects
+        if (isObject) {
+
+            const resolvedValue = formState[key] = value || {};
+
+            return (
+                <Accordion>
+                    <AccordionHeader onClick={() => setAccordionState(prevState => ({ ...prevState, [key]: !prevState[key] }))}>
+                    {header(title)}
+                    <FontAwesomeIcon icon={accordionState[key] ? faChevronUp : faChevronDown} />
+                    </AccordionHeader>
+                    <AccordionContent isOpen={accordionState[key] ? 1 : 0}>
+                        <DynamicForm 
+                            initialValues={resolvedValue} 
+                            schema={property} 
+                            onChange={(nested_key, value) => {
+                                resolvedValue[nested_key] = value;
+                                if (onChange) onChange(key, resolvedValue);
+                                // setFormState({ ...formState, [key]: resolvedValue })
+                            }}
+                        />
+                    </AccordionContent>
+                </Accordion>
+            );
+        }
+
         return (
           <InputGroup key={key}>
             <InputLabel>{header(title)}<br/>{property.description && <small>{property.description}</small>}</InputLabel>
@@ -344,13 +385,12 @@ const DynamicForm = ({
     ));
   };
 
-
   const allReadOnly = schema ? Object.values(schema.properties ?? {}).every((property) => property.readOnly) : false;
 
   return (
     <Form onSubmit={handleSubmit}>
       {renderFormFields()}
-      {!allReadOnly && <Button type="submit">{submitText}</Button>}
+      {!allReadOnly && onFormSubmit && <Button type="submit">{submitText}</Button>}
     </Form>
   );
 };
