@@ -49,7 +49,7 @@ const Model = ({
     }
 
     // Show the form to train the model
-    else return (
+    return (
         <PaddedTab>
             <DynamicForm 
                 submitText="Train Model"

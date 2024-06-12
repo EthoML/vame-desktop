@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { header } from '../utils/text';
 import { faPlusCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Tippy from '@tippyjs/react';
 
 /*
 
@@ -192,7 +193,8 @@ const DynamicForm = ({
       if (isArray) {
         return <ol>{isArrayValue ? value.map((item, index) => <li key={index}>{item}</li>) : [] }</ol>;
       }
-      return <span>{value}</span>;
+      
+      return <span>{new String(type === 'boolean' ? !!value : value)}</span>;
     }
 
 
@@ -342,10 +344,13 @@ const DynamicForm = ({
     ));
   };
 
+
+  const allReadOnly = schema ? Object.values(schema.properties ?? {}).every((property) => property.readOnly) : false;
+
   return (
     <Form onSubmit={handleSubmit}>
       {renderFormFields()}
-      <Button type="submit">{submitText}</Button>
+      {!allReadOnly && <Button type="submit">{submitText}</Button>}
     </Form>
   );
 };

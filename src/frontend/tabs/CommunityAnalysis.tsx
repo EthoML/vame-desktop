@@ -56,18 +56,11 @@ const CommunityAnalysis = ({
     }, [])
 
     return (
-        <GridTab>
+        <PaddedTab>
             <Tabs
                 tabs={tabs}
             />
-            <PaddedBottomRow>
-                <DynamicForm
-                    initialValues={{}} 
-                    submitText="Regenerate Community Hierarchy"
-                    onFormSubmit={onFormSubmit}
-                />
-            </PaddedBottomRow>
-        </GridTab>
+        </PaddedTab>
     )
 }
 

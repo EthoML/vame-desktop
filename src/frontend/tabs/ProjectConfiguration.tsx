@@ -12,11 +12,18 @@ const ProjectConfiguration = ({
     pipeline: Pipeline
     onFormSubmit?: DynamicFormProps['onFormSubmit']
 }) => {
+
+    if (pipeline.workflow.organized) Object.values(projectConfigSchema).forEach
+
+    const schema = structuredClone(projectConfigSchema)
+
+    if (pipeline.workflow.organized) Object.values(schema.properties).forEach(v => v.readOnly = true)
+
     return (
         <PaddedTab>
             <DynamicForm 
                 initialValues={pipeline.configuration} 
-                schema={projectConfigSchema}
+                schema={schema}
                 submitText="Finalize Configuration"
                 onFormSubmit={onFormSubmit} 
             />

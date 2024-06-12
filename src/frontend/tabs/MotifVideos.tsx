@@ -54,18 +54,11 @@ const MotifVideos = ({
     }, [])
 
     return (
-        <GridTab>
+        <PaddedTab>
             <Tabs
                 tabs={tabs}
             />
-            <PaddedBottomRow>
-                <DynamicForm
-                    initialValues={{}} 
-                    submitText="Regenerate Motif Videos"
-                    onFormSubmit={onFormSubmit}
-                />
-            </PaddedBottomRow>
-        </GridTab>
+        </PaddedTab>
     )
 }
 

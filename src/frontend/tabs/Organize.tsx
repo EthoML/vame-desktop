@@ -15,7 +15,7 @@ const Organize = ({
 
     const isOrganized = pipeline.workflow.organized
 
-    if (isOrganized) return <PaddedTab><p>Data has already been organized</p></PaddedTab>
+    if (isOrganized) return <PaddedTab><p>Data has already been organized</p><p><small><b>Note:</b> This will later include a visualization of the training data.</small></p></PaddedTab>
 
     const operations = ["Create Training Set"]
     if (!pipeline.configuration.egocentric_data) operations.unshift("Align Data")

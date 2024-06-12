@@ -1,7 +1,9 @@
 # VAME Desktop
 A desktop application for the Variational Animal Motion Encoding (VAME) project.
 
-> **NOTE:** Before you begin, make sure you [download the demo video](https://drive.google.com/file/d/1w6OW9cN_-S30B7rOANvSaR9c3O5KeF0c/view) to `data`.
+## Overview
+VAME Desktop has been designed to run each step of a VAME project **only once**. This is to ensure that the project is reproducible and that the data is not accidentally overwritten.
+
 
 ## Development
 ### Installation
