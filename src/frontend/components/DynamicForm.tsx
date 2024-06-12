@@ -120,6 +120,9 @@ const DynamicForm = ({
   const [accordionState, setAccordionState] = useState({});
 
 
+  schema = structuredClone(schema); // Clone the schema to prevent mutation
+
+
   useEffect(() => {
     if (initialValues) {
       setFormState(structuredClone(initialValues));
@@ -346,6 +349,8 @@ const DynamicForm = ({
         if (isObject) {
 
             const resolvedValue = formState[key] = value || {};
+
+            if (property.readOnly) Object.values(property.properties).forEach((v) => v.readOnly = true)
 
             return (
                 <Accordion>
