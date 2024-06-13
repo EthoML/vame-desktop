@@ -1,3 +1,4 @@
+import Tippy from '@tippyjs/react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -5,7 +6,7 @@ type Tab = {
   id: string;
   label: string;
   content: React.ReactNode;
-  disabled?: boolean;
+  disabled?: boolean | { tooltip: string };
   complete?: boolean;
 }
 
@@ -93,15 +94,25 @@ const Tabs = ({
       <TabList>
         {tabs.map((tab) => {
           const { id, label, complete, disabled } = tab;
-          return <TabButton
-            key={id}
-            active={id === activeTab ? 1  : 0}
-            disabled={disabled ? 1 : 0}
-            complete={complete ? 1 : 0}
-            onClick={() => handleTabClick(id)}
-          >
-            {label}
-          </TabButton>
+          const tooltip = disabled?.tooltip || '';
+
+          const button = <TabButton
+              key={id}
+              active={id === activeTab ? 1  : 0}
+              disabled={disabled ? 1 : 0}
+              complete={complete ? 1 : 0}
+              onClick={() => handleTabClick(id)}
+            >
+              {label}
+            </TabButton>
+
+          if (tooltip) return (
+            <Tippy content={tooltip} key={id} placement='bottom' hideOnClick={false}>
+              <div>{button}</div>
+            </Tippy>
+          )
+
+          return button
       })}
       </TabList>
       <TabContent>
