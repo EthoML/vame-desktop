@@ -10,6 +10,7 @@ dependencies:
     - flask_restx
     - flask-cors
     - pyinstaller==6.8.0
+    - pyinstaller-hooks-contrib == 2024.6
     - vame-py @ git+https://github.com/EthoML/VAME.git@refactor/output-files-structure#vame
 
 prefix: /opt/anaconda3/envs/vame-desktop
