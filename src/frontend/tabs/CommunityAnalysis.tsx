@@ -13,35 +13,25 @@ const CommunityAnalysis = ({
     onFormSubmit?: DynamicFormProps['onFormSubmit']
 }) => {
 
-    const { videos } = pipeline.assets
+    const schema = structuredClone(communitySchema)
 
-    const communityVideos = videos?.community ?? {}
+    const communitiesCreated = pipeline.workflow.communities_created
 
-    const hasAny = Object.values(communityVideos).some((v) => v.length > 0)
+    if (communitiesCreated) {
+        Object.values(schema.properties).forEach(v => v.readOnly = true)
+    }
 
-    if (!hasAny) return (
+    return (
         <PaddedTab>
-            <DynamicForm
+            <DynamicForm 
                 initialValues={{}} 
-                schema={communitySchema}
-                submitText="Run Community Analysis"
-                onFormSubmit={onFormSubmit}
+                schema={schema }
+                submitText={"Create Communities"}
+                onFormSubmit={onFormSubmit} 
             />
         </PaddedTab>
     )
 
-
-    const organizedVideos = Object.entries(communityVideos).reduce((acc, [ label, videos ]) => {
-        acc[label] = videos.map((videoPath: string) =>{
-            const motifNumber = videoPath.split('-').pop()!.split('_').pop().split('.')[0]
-            return { path: videoPath, label: `Motif ${motifNumber}`, idx: motifNumber }
-        }).sort((a, b) => a.idx - b.idx)
-
-        return acc
-    }, {})
-
-    
-    return VideoGrid({ videos: organizedVideos, pipeline })
 }
 
 export default CommunityAnalysis

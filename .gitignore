@@ -4,6 +4,9 @@ venv/*
 demo_output
 data/*.mp4
 
+# Python
+__pycache__
+
 # Commoners Output
 .commoners
 

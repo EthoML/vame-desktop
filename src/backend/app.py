@@ -87,6 +87,10 @@ VAME_LOG_DIRECTORY = VAME_APP_DIRECTORY / 'logs'
 GLOBAL_SETTINGS_FILE = VAME_APP_DIRECTORY / 'settings.json'
 GLOBAL_STATES_FILE = VAME_APP_DIRECTORY / 'states.json'
 
+
+# Create a unique log file name based on the current date and time
+CURRENT_LOG_FILE = VAME_LOG_DIRECTORY / f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -281,6 +285,13 @@ class RegisterProject(Resource):
             pass
 
 
+@api.route('/log')
+class CurrentLog(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def get(self):
+        return open(CURRENT_LOG_FILE, "r").read()
+
+
 @api.route('/load')
 class Load(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
@@ -312,12 +323,19 @@ class Load(Resource):
         if config:
             has_latent_vector_files = all(map(lambda video: (get_video_results_path(video, project_path) / f"latent_vector_{video}.npy").exists(), config["video_sets"]))
 
+        has_community_files = False
+        if config:
+            # has_community_files = all(map(lambda video: (get_video_results_path(video, project_path) / f"community_{video}.npy").exists(), config["video_sets"]))
+            pass
+
         # Provide project workflow status
         workflow = dict(
             organized = (project_path / 'data' / 'train').exists(),
             modeled = len(images["evaluation"]) > 0,
             segmented = has_latent_vector_files,
-            motifs_created = all(map(lambda videos: len(videos) > 0, videos["motif"].values()))
+            motif_videos_created = all(map(lambda videos: len(videos) > 0, videos["motif"].values())),
+            communities_created = has_community_files,
+            community_videos_created = all(map(lambda videos: len(videos) > 0, videos["community"].values())),
         )
 
         original_videos_location = project_path / 'videos'
@@ -632,10 +650,7 @@ if __name__ == "__main__":
     
     VAME_PROJECTS_DIRECTORY.mkdir(exist_ok=True, parents=True) # Create the VAME_PROJECTS_DIRECTORY if it doesn't exist
     VAME_LOG_DIRECTORY.mkdir(exist_ok=True, parents=True)  # Create the VAME_LOG_DIRECTORY if it doesn't exist
-
-    # Create a unique log file name based on the current date and time
-    log_file = VAME_LOG_DIRECTORY / f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
-    logger = create_log_file(log_file)
+    logger = create_log_file(CURRENT_LOG_FILE)
 
     # Create the global files if they don't exist
     global_files = [GLOBAL_STATES_FILE, GLOBAL_SETTINGS_FILE]

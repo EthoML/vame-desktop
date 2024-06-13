@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { onReady } from '../commoners';
+import { get } from '../utils/requests';
 
 const TerminalDiv = styled.ul`
 
@@ -20,27 +22,30 @@ const TerminalDiv = styled.ul`
 `;
 
 
-const Terminal: React.FC = ({
-  text
-}) => {
+const Terminal: React.FC = () => {
 
-  const [currentText, setCurrentText] = useState(text);
+  const [ currentText, setCurrentText ] = useState('');
 
   useEffect(() =>{
-    setCurrentText(text)
+    onReady(() => {
+      get('log', { 'Content-Type': 'text/plain' }).then(text => setCurrentText(text))
+    })
   }, []);
 
-  const messages = currentText.split('\n')
+
+  console.log(currentText)
+
+  if (!currentText) return <TerminalDiv id="terminal"><li><span>Loading log file...</span></li></TerminalDiv>
 
   return (
     <TerminalDiv id="terminal">
-      {messages.map((line, index) => (
+      {currentText.split('\n').map((line, index) => (
         <li key={index}>
           <span>
             {line}
           </span>
         </li>
-      ))}
+    ))}
     </TerminalDiv>
   );
 };

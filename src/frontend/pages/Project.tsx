@@ -17,6 +17,7 @@ import MotifVideos from '../tabs/MotifVideos';
 import CommunityAnalysis from '../tabs/CommunityAnalysis';
 import { post } from '../utils/requests';
 import { showTerminalWhileRunning } from '../popups';
+import CommunityVideos from '../tabs/CommunityVideos';
 
 
 const ProjectHeader = styled.header`
@@ -105,7 +106,14 @@ const Project: React.FC = () => {
 
   }
 
-  const { organized, modeled, segmented, motifs_created } = loadedPipeline.workflow
+  const { 
+    organized, 
+    modeled, 
+    segmented, 
+    motif_videos_created,
+    communities_created,
+    community_videos_created 
+  } = loadedPipeline.workflow
 
   const tabs = [
     {
@@ -151,7 +159,7 @@ const Project: React.FC = () => {
     {
       id: 'model-creation',
       label: '3. Model Creation',
-      disabled: !organized,
+      disabled: !organized ? { tooltip: 'Please organize your data first' } : false,
       complete: modeled,
       content: <Model 
         pipeline={loadedPipeline}
@@ -177,7 +185,7 @@ const Project: React.FC = () => {
     {
       id: 'segmentation',
       label: '4. Pose Segmentation',
-      disabled: !modeled,
+      disabled: !modeled ? { tooltip: 'Please create a model first' } : false,
       complete: segmented,
       content: <Segmentation 
         pipeline={loadedPipeline}
@@ -185,50 +193,62 @@ const Project: React.FC = () => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.segment() // Run pose segmentation
             }, 'Running pose segmentation')
-          })}
+          }, 'segmentation')}
       />
     },
     {
       id: 'motifs',
       label: '5. Motif Videos',
-      disabled: !segmented,
-      complete: motifs_created,
+      disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
+      complete: motif_videos_created,
       content: <MotifVideos 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
             }, 'Creating motif videos')
-          })}
+          }, 'motifs')}
       />
     },
     {
       id: 'community',
-      label: '6. Community Analysis',
-      disabled: !segmented,
+      label: '6a. Community Analysis',
+      disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
+      complete: communities_created,
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
-        onFormSubmit={() => submitTab((props) => {
+        onFormSubmit={(props) => submitTab(() => {
             return showTerminalWhileRunning(async () => {
-
               await loadedPipeline.community(props) // Run community analysis
-              await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
-              
-            }, 'Running community analysis + generating community videos')
-          })}
+            }, 'Running community analysis')
+          }, 'community-videos')}
+      />
+    },
+    {
+      id: 'community-videos',
+      label: '6b. Community Videos',
+      disabled: !communities_created ? { tooltip: 'Please run community analysis first' } : false,
+      complete: community_videos_created,
+      content: <CommunityVideos 
+        pipeline={loadedPipeline}
+        onFormSubmit={async () => submitTab(() => {
+            return showTerminalWhileRunning(async () => {
+              await loadedPipeline.community_videos() // Creating community videos.
+            }, 'Creating community videos')
+          }, 'community-videos')}
       />
     },
     {
       id: 'umap',
       label: '7. UMAP Visualization',
-      disabled: !segmented,
+      disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
       content: <UMAPVisualization
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.visualization() // Create visualization
             }, 'Creating UMAP visualization')
-          })}
+          }, 'umap')}
       />
     },
   ];

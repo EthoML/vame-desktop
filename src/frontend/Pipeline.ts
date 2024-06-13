@@ -91,7 +91,9 @@ class Pipeline {
         organized: false,
         modeled: false,
         segmented: false,
-        motifs_created: false,
+        motif_videos_created: false,
+        communities_created: false,
+        community_videos_created: false
     }
 
     constructor(absPath?: string) {
