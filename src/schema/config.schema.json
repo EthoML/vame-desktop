@@ -26,11 +26,10 @@
       "type": "boolean",
       "description": "Used for data cleaning"
     },
-    "n_clusters": {
+    "n_cluster": {
       "type": "integer",
       "title": "Number of Clusters",
-      "description": "The number of motifs",
-      "default": 15
+      "description": "The number of motifs"
     },
     "num_features": {
       "type": "integer",
@@ -40,20 +39,17 @@
       "type": "integer",
       "description": "Please set to 1/2 of video fps. Value should be even, round up if needed"
     },
-    "parameterization": {
+    "parametrization": {
       "type": "string",
-      "description": "Motif clustering method",
-      "default": "hmm"
+      "description": "Motif clustering method"
     },
     "max_epochs": {
       "type": "integer",
-      "description": "Maximum epochs for model training",
-      "default": 500
+      "description": "Maximum epochs for model training"
     },
     "zdims": {
       "type": "integer",
-      "description": "Dimensions of the latent space",
-      "default": 30
+      "description": "Dimensions of the latent space"
     },
     "advanced_options": {
       "type": "object",
@@ -65,8 +61,7 @@
           "type": "integer"
         },
         "savgol_order": {
-          "type": "integer",
-          "default": 2
+          "type": "integer"
         },
         "test_fraction": {
           "type": "number"
@@ -129,7 +124,7 @@
         "load_data": {
           "type": "string"
         },
-        "individual_parameterization": {
+        "individual_parametrization": {
           "type": "boolean"
         },
         "random_state_kmeans": {
@@ -211,12 +206,12 @@
     "pose_confidence",
     "iqr_factor",
     "robust",
-    "n_clusters",
+    "n_cluster",
     "num_features",
     "time_window",
     "max_epochs",
     "zdims",
-    "parameterization",
+    "parametrization",
     "advanced_options"
   ]
 }

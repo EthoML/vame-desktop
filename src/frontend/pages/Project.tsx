@@ -124,7 +124,6 @@ const Project: React.FC = () => {
         pipeline={loadedPipeline} 
         onFormSubmit={async (formData) => submitTab(() => {
           return showTerminalWhileRunning(async () => {
-
             const { advanced_options, ...mainProperties } = formData
             await loadedPipeline.configure({...mainProperties, ...advanced_options})
 

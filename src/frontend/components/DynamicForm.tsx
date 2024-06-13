@@ -442,8 +442,10 @@ const DynamicForm = ({
         const property = schema.properties[key];
         const title = property.title || key;
         const value = initialValues[key] || property.default;
-        if ('default' in property && !(key in formState)) formState[key] = property.default;
 
+        const formValueDefined = key in formState && formState[key] !== undefined;
+
+        if ('default' in property && !formValueDefined) formState[key] = value
 
         const isObject = property.type === 'object' || property.properties || checkIfObject(value);
 
