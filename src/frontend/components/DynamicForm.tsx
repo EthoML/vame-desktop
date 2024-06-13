@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { header } from '../utils/text';
 import { faPlusCircle, faTrash, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Tippy from '@tippyjs/react';
+import { DisableToggle } from '../types';
 
 /*
 
@@ -54,6 +56,7 @@ export type DynamicFormProps = {
   onChange?: (key: string, value: any) => void,
 
   // Submit workflow
+  blockSubmission?: DisableToggle,
   submitText?: string,
   onFormSubmit?: (formData: Record<string, any>) => void
 };
@@ -93,11 +96,17 @@ const InputLabel = styled.label`
 const Button = styled.button`
   padding: 10px;
   background-color: #007bff;
+  width: 100%;
   color: white;
   border: none;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
+
+  &[disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 `;
 
 const ArrayItems = styled.div`
@@ -149,7 +158,6 @@ const FileSelectorBody = styled.div`
 
   input[type='file'] {
     color: transparent;
-    direction: rtl;
   }
 
   input[type="file"]::-webkit-file-upload-button {
@@ -158,7 +166,6 @@ const FileSelectorBody = styled.div`
     padding: 5px 20px;
     border-radius: 5px;
     border: none;
-    float: right;
   }
 `;
 
@@ -215,6 +222,7 @@ const DynamicForm = ({
   schema, 
   onChange,
   onFormSubmit,
+  blockSubmission = false,
   submitText = 'Submit' 
 }: Partial<DynamicFormProps>) => {
   const [formState, setFormState] = useState({});
@@ -497,10 +505,15 @@ const DynamicForm = ({
 
   const allReadOnly = schema ? Object.values(schema.properties ?? {}).every((property) => property.readOnly) : false;
 
+  const willBlock = !!blockSubmission;
+  const blockTooltip = blockSubmission?.tooltip || '';
+
+  const buttonToRender = !allReadOnly && onFormSubmit && <Button type="submit" disabled={willBlock ? 1 : 0}>{submitText}</Button>;
+  
   return (
     <Form onSubmit={handleSubmit}>
       {renderFormFields()}
-      {!allReadOnly && onFormSubmit && <Button type="submit">{submitText}</Button>}
+      {blockTooltip ? <Tippy content={blockTooltip} hideOnClick={false}><div>{buttonToRender}</div></Tippy> : buttonToRender}
     </Form>
   );
 };

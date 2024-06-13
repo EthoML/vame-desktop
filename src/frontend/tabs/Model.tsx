@@ -3,6 +3,7 @@ import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import Pipeline from "../Pipeline"
 import { PaddedTab } from "../components/elements"
 import styled from "styled-components"
+import { TabProps } from "./types"
 
 const FlexDiv = styled.div`
     display: flex;
@@ -15,12 +16,9 @@ const Image = styled.img`
 
 const Model = ({
     pipeline,
-    onFormSubmit
-}: {
-    pipeline: Pipeline
-    onFormSubmit?: DynamicFormProps['onFormSubmit']
-
-}) => {
+    onFormSubmit,
+    block
+}: TabProps) => {
 
     const isModeled = pipeline.workflow.modeled
 
@@ -42,6 +40,7 @@ const Model = ({
                 <br />
                 <DynamicForm 
                     submitText="Regenerate Images"
+                    blockSubmission={block}
                     onFormSubmit={() => onFormSubmit({ evaluate: true })} 
                 />
             </PaddedTab>
@@ -53,6 +52,7 @@ const Model = ({
         <PaddedTab>
             <DynamicForm 
                 submitText="Train Model"
+                blockSubmission={block}
                 onFormSubmit={() => onFormSubmit()} 
             />
         </PaddedTab>

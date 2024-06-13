@@ -31,7 +31,7 @@ const request = (state: keyof typeof states) => get(state).then(() => resolve(st
 
 
 export const onConnected = (callback: () => void) => on('connected', callback)
-export const onReady = (callback: () => void) => on('ready', callback)
+export const onVAMEReady = (callback: () => void) => on('ready', callback)
 
 
 onActivityDetected(() => {

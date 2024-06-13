@@ -1,17 +1,14 @@
-import Pipeline from "../Pipeline"
-import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
+import DynamicForm from "../components/DynamicForm"
 import { PaddedTab} from "../components/elements"
 
 import communitySchema from '../../schema/community.schema.json'
-import { VideoGrid } from "../components/VideoGrid"
+import { TabProps } from "./types"
 
 const CommunityAnalysis = ({
     pipeline,
-    onFormSubmit
-}: {
-    pipeline: Pipeline
-    onFormSubmit?: DynamicFormProps['onFormSubmit']
-}) => {
+    onFormSubmit,
+    block
+}: TabProps) => {
 
     const schema = structuredClone(communitySchema)
 
@@ -25,7 +22,8 @@ const CommunityAnalysis = ({
         <PaddedTab>
             <DynamicForm 
                 initialValues={{}} 
-                schema={schema }
+                schema={schema}
+                blockSubmission={block}
                 submitText={"Create Communities"}
                 onFormSubmit={onFormSubmit} 
             />

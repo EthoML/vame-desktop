@@ -2,15 +2,14 @@ import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import projectConfigSchema from '../../schema/config.schema.json'
 import Pipeline from "../Pipeline"
 import { PaddedTab } from "../components/elements"
+import { TabProps } from "./types"
 
 
 const ProjectConfiguration = ({
     pipeline,
-    onFormSubmit
-}: {
-    pipeline: Pipeline
-    onFormSubmit?: DynamicFormProps['onFormSubmit']
-}) => {
+    onFormSubmit,
+    block = false
+}: TabProps) => {
 
     if (pipeline.workflow.organized) Object.values(projectConfigSchema).forEach
 
@@ -53,6 +52,7 @@ const ProjectConfiguration = ({
             <DynamicForm 
                 initialValues={toEdit} 
                 schema={schema}
+                blockSubmission={block}
                 submitText="Finalize Configuration"
                 onFormSubmit={onFormSubmit} 
             />

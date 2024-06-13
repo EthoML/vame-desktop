@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { onReady } from '../commoners';
+import { onConnected } from '../commoners';
 import { get } from '../utils/requests';
 
 const TerminalDiv = styled.ul`
@@ -27,7 +27,7 @@ const Terminal: React.FC = () => {
   const [ currentText, setCurrentText ] = useState('');
 
   useEffect(() =>{
-    onReady(() => {
+    onConnected(() => {
       get('log', { 'Content-Type': 'text/plain' }).then(text => setCurrentText(text))
     })
   }, []);

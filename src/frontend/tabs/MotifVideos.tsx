@@ -2,14 +2,13 @@ import Pipeline from "../Pipeline"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import { VideoGrid } from "../components/VideoGrid"
 import { PaddedTab } from "../components/elements"
+import { TabProps } from "./types"
 
 const MotifVideos = ({
     pipeline,
-    onFormSubmit
-}: {
-    pipeline: Pipeline
-    onFormSubmit?: DynamicFormProps['onFormSubmit']
-}) => {
+    onFormSubmit,
+    block
+}: TabProps) => {
 
 
     const hasMotifVideos = pipeline.workflow.motif_videos_created
@@ -18,6 +17,7 @@ const MotifVideos = ({
         <PaddedTab>
             <DynamicForm
                 initialValues={{}} 
+                blockSubmission={block}
                 submitText="Generate Motif Videos"
                 onFormSubmit={onFormSubmit}
             />

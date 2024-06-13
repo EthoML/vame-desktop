@@ -46,7 +46,7 @@ export const request = async (
             else throw new Error(`Unsupported content-type: ${contentType}`)
                 
 
-            // console.warn(`Response (${pathname}):`, json)
+            console.warn(`Response (${pathname}):`, resolved)
             if (!res.ok) throw new Error(resolved?.message ?? resolved)
             resolve(resolved)
         })

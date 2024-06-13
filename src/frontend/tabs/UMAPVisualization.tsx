@@ -1,14 +1,13 @@
 import Pipeline from "../Pipeline"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import { PaddedTab } from "../components/elements"
+import { TabProps } from "./types"
 
 const UMAPVisualization = ({
     pipeline,
-    onFormSubmit
-}: {
-    pipeline: Pipeline
-    onFormSubmit?: DynamicFormProps['onFormSubmit']
-}) => {
+    onFormSubmit,
+    block
+}: TabProps) => {
 
     return (
         <PaddedTab>
@@ -18,6 +17,7 @@ const UMAPVisualization = ({
             <DynamicForm
                 initialValues={{}} 
                 submitText="Create UMAP Visualization"
+                blockSubmission={block}
                 onFormSubmit={onFormSubmit}
             />
         </PaddedTab>

@@ -1,8 +1,7 @@
-import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
-
+import DynamicForm from "../components/DynamicForm"
 import organizeSchema from '../../schema/organize.schema.json'
-import Pipeline from "../Pipeline"
 import { PaddedTab } from "../components/elements"
+import { TabProps } from "./types"
 
 const propertiesForAlignedData = [
     'pose_ref_index',
@@ -10,12 +9,11 @@ const propertiesForAlignedData = [
 
 const Organize = ({
     pipeline,
-    onFormSubmit
-}: {
-    pipeline: Pipeline
-    onFormSubmit?: DynamicFormProps['onFormSubmit']
+    onFormSubmit,
+    block
+}: TabProps) => {
 
-}) => {
+    console.log('block', block)
 
     const schema = structuredClone(organizeSchema)
 
@@ -35,7 +33,8 @@ const Organize = ({
         <PaddedTab>
             <DynamicForm 
                 initialValues={{}} 
-                schema={schema }
+                schema={schema}
+                blockSubmission={block}
                 submitText={operations.join(" + ")}
                 onFormSubmit={onFormSubmit} 
             />
