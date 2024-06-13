@@ -7,6 +7,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import createSchema from '../../schema/create.schema.json';
 import { onReady } from '../commoners';
+import { StyledHeaderDiv } from '../components/divs';
 
 const PaddedContainer = styled.div`
   padding: 25px 50px;
@@ -53,7 +54,9 @@ const Create: React.FC = () => {
 
   return (
     <PaddedContainer>
-      <h2>Create a New Project</h2>
+      <StyledHeaderDiv>
+        <h2>Create a New Project</h2>
+      </StyledHeaderDiv>
       <DynamicForm 
         initialValues={initialValues}
         submitText='Create Project'

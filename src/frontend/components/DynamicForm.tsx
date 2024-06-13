@@ -127,6 +127,24 @@ const ArrayItemWrapper = styled.div`
 //   cursor: pointer;
 // `;
 
+const FileSelectorBody = styled.div`
+  display: grid;
+  gap: 10px;
+
+  input[type='file'] {
+    color: transparent;
+    direction: rtl;
+  }
+
+  input[type="file"]::-webkit-file-upload-button {
+    background-color: black;
+    color: white;
+    padding: 5px 20px;
+    border-radius: 5px;
+    border: none;
+    float: right;
+  }
+`;
 
 const FileList = styled.ul`
   list-style-type: none;
@@ -140,6 +158,7 @@ const FileListItem = styled.li`
   justify-content: space-between;
   align-items: center;
   padding: 5px 0;
+  overflow: auto;
 `;
 
 const getFilePath = (file) => file.path || file;
@@ -151,15 +170,7 @@ const FileSelector = ({ name, value, onChange, multiple, accept, webkitdirectory
     
   return (
     
-    <>
-      <input
-        type="file"
-        name={name}
-        accept={accept}
-        multiple={multiple}
-        onChange={(e) => onChange(e)}
-        webkitdirectory={webkitdirectory}
-      />
+    <FileSelectorBody>
       <FileList>
         {value && value.map((file, index) => {
           const label = getFilePath(file);
@@ -169,7 +180,16 @@ const FileSelector = ({ name, value, onChange, multiple, accept, webkitdirectory
           </FileListItem>
       })}
       </FileList>
-    </>
+      <input
+        type="file"
+        title={`Choose your ${webkitdirectory ? 'folder' : 'file'}${multiple ? 's' : ''}`}
+        name={name}
+        accept={accept}
+        multiple={multiple}
+        onChange={(e) => onChange(e)}
+        webkitdirectory={webkitdirectory}
+      />
+    </FileSelectorBody>
   );
 };
 

@@ -5,6 +5,7 @@ import { get, post } from '../utils/requests';
 import Pipeline from '../Pipeline';
 import { useNavigate } from 'react-router-dom';
 import PipelineList from '../components/PipelineList';
+import { StyledHeaderDiv } from '../components/divs';
 
 export const PaddedContainer = styled.div`
   padding: 25px 50px;
@@ -44,7 +45,7 @@ const Home: React.FC = () => {
 
 
    const onEdit = async (pipeline) => {
-    
+
     navigate({ 
       pathname: "/project",
       search: `?project=${pipeline.path}`
@@ -64,7 +65,9 @@ const Home: React.FC = () => {
   return (
     <PaddedContainer>
 
-      <h2>Recent Projects</h2>
+      <StyledHeaderDiv>
+        <h2>Recent Projects</h2>
+      </StyledHeaderDiv>
 
       {recentPipelines ? (recentPipelines?.length > 0 ? (
         <PipelineList 
@@ -76,7 +79,9 @@ const Home: React.FC = () => {
         <p>No recent projects.</p>
       )) : loadingMessage}
 
-      <h2>All Projects</h2>
+      <StyledHeaderDiv>
+        <h2>All Projects</h2>
+      </StyledHeaderDiv>
       {allPipelines ? (allPipelines?.length > 0 ? (
         <PipelineList 
           pipelines={allPipelines.sort((a: any, b: any) => a.creationDate > b.creationDate ? -1 : 1)} 
