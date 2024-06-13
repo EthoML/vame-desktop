@@ -4,6 +4,11 @@ import organizeSchema from '../../schema/organize.schema.json'
 import Pipeline from "../Pipeline"
 import { PaddedTab } from "../components/elements"
 
+const propertiesForAlignedData = [
+    'pose_ref_index',
+    'check_parameter'
+]
+
 const Organize = ({
     pipeline,
     onFormSubmit
@@ -21,8 +26,13 @@ const Organize = ({
 
     if (!pipeline.configuration.egocentric_data) operations.unshift("Align Data")
 
+    if (pipeline.configuration.egocentric_data) {
+        Object.keys(schema.properties).forEach(k => {
+            if (!propertiesForAlignedData.includes(k)) delete schema.properties[k]
+        })
+    }
+
     if (isOrganized) {
-        if (pipeline.configuration.egocentric_data) return <PaddedTab><p>Project data has been organized successfully!</p></PaddedTab>
         Object.values(schema.properties).forEach(v => v.readOnly = true)
     }
 
@@ -30,7 +40,7 @@ const Organize = ({
         <PaddedTab>
             <DynamicForm 
                 initialValues={{}} 
-                schema={pipeline.configuration.egocentric_data ? undefined : schema }
+                schema={schema }
                 submitText={operations.join(" + ")}
                 onFormSubmit={onFormSubmit} 
             />
