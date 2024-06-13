@@ -440,14 +440,18 @@ class Align(Resource):
             # you can use the following to convert your .csv to a .npy array, ready to train vame on it
             egocentric_data = data.pop('egocentric_data')
 
-            
-
-
 
             if egocentric_data:
-                vame.csv_to_numpy(project_path / 'config.yaml')
+                vame.csv_to_numpy(
+                    project_path / 'config.yaml',
+                    save_logs=True
+                )
+
             else:
-                vame.egocentric_alignment(**data)
+                vame.egocentric_alignment(
+                    **data,
+                    save_logs=True
+                )
 
 
             return jsonify(dict(result='success'))
@@ -464,7 +468,12 @@ class CreateTrainset(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.create_trainset(**data)
+
+            result = vame.create_trainset(
+                **data,
+                save_logs=True
+            )
+
             return dict(result=result)
         except Exception as exception:
             if notBadRequestException(exception):
@@ -477,7 +486,12 @@ class TrainModel(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.train_model(**data)
+
+            result = vame.train_model(
+                **data,
+                save_logs=True
+            )
+
             return dict(result=result)
         except Exception as exception:
             if notBadRequestException(exception):
@@ -490,7 +504,10 @@ class EvaluateModel(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            vame.evaluate_model(**data)
+            vame.evaluate_model(
+                **data,
+                save_logs=True
+            )
             return dict(result=get_evaluation_images(project_path))
         except Exception as exception:
             if notBadRequestException(exception):
@@ -503,7 +520,10 @@ class Segment(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.pose_segmentation(**data)
+            result = vame.pose_segmentation(
+                **data,
+                save_logs=True
+            )
             return dict(result=result)
         except Exception as exception:
             if notBadRequestException(exception):
@@ -516,7 +536,10 @@ class MotifVideos(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.motif_videos(**data)
+            result = vame.motif_videos(
+                **data,
+                save_logs=True
+            )
             return dict(result=result)
         except Exception as exception:
             if notBadRequestException(exception):
@@ -529,7 +552,10 @@ class Community(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.community(**data)
+            result = vame.community(
+                **data,
+                save_logs=True
+            )
             return dict(result=result)
         except Exception as exception:
             if notBadRequestException(exception):
@@ -542,7 +568,10 @@ class CommunityVideos(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            result = vame.community_videos(**data)
+            result = vame.community_videos(
+                **data,
+                save_logs=True
+            )
             return dict(result=result)
         except Exception as exception:
             if notBadRequestException(exception):
@@ -555,7 +584,10 @@ class Visualization(Resource):
         import vame
         try:
             data, project_path = resolve_request_data(request)
-            vame.visualization(**data)
+            vame.visualization(
+                **data,
+                # save_logs=True
+            )
             return dict(result=get_visualization_images(project_path))
         except Exception as exception:
             if notBadRequestException(exception):

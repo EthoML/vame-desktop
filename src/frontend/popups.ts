@@ -20,14 +20,9 @@ export const showTerminalWhileRunning = (callback, label="Terminal Output") => {
         messageEl.classList.add(method)
         modalContent.appendChild(messageEl)
 
-        modalContent.onscroll = (ev) => {
-            if (ev.target !== modalContent) return
-            locked = modalContent.scrollTop + modalContent.clientHeight >= modalContent.scrollHeight
-        }
+        modalContent.onscroll = () => locked = modalContent.scrollTop + modalContent.clientHeight >= modalContent.scrollHeight
 
-        window.onresize = () => {
-            if (locked) modalContent.scrollTop = modalContent.scrollHeight
-        }
+        window.onresize = () => locked ? modalContent.scrollTop = modalContent.scrollHeight : null
         
         // Scroll to bottom
         if (locked) modalContent.scrollTop = modalContent.scrollHeight
