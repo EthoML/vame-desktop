@@ -312,12 +312,19 @@ class Load(Resource):
         if config:
             has_latent_vector_files = all(map(lambda video: (get_video_results_path(video, project_path) / f"latent_vector_{video}.npy").exists(), config["video_sets"]))
 
+        has_community_files = False
+        if config:
+            # has_community_files = all(map(lambda video: (get_video_results_path(video, project_path) / f"community_{video}.npy").exists(), config["video_sets"]))
+            pass
+
         # Provide project workflow status
         workflow = dict(
             organized = (project_path / 'data' / 'train').exists(),
             modeled = len(images["evaluation"]) > 0,
             segmented = has_latent_vector_files,
-            motifs_created = all(map(lambda videos: len(videos) > 0, videos["motif"].values()))
+            motif_videos_created = all(map(lambda videos: len(videos) > 0, videos["motif"].values())),
+            communities_created = has_community_files,
+            community_videos_created = all(map(lambda videos: len(videos) > 0, videos["community"].values())),
         )
 
         original_videos_location = project_path / 'videos'

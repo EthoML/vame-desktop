@@ -17,6 +17,7 @@ import MotifVideos from '../tabs/MotifVideos';
 import CommunityAnalysis from '../tabs/CommunityAnalysis';
 import { post } from '../utils/requests';
 import { showTerminalWhileRunning } from '../popups';
+import CommunityVideos from '../tabs/CommunityVideos';
 
 
 const ProjectHeader = styled.header`
@@ -105,7 +106,14 @@ const Project: React.FC = () => {
 
   }
 
-  const { organized, modeled, segmented, motifs_created } = loadedPipeline.workflow
+  const { 
+    organized, 
+    modeled, 
+    segmented, 
+    motif_videos_created,
+    communities_created,
+    community_videos_created 
+  } = loadedPipeline.workflow
 
   const tabs = [
     {
@@ -189,35 +197,49 @@ const Project: React.FC = () => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.segment() // Run pose segmentation
             }, 'Running pose segmentation')
-          })}
+          }, 'segmentation')}
       />
     },
     {
       id: 'motifs',
       label: '5. Motif Videos',
       disabled: !segmented,
-      complete: motifs_created,
+      complete: motif_videos_created,
       content: <MotifVideos 
         pipeline={loadedPipeline}
         onFormSubmit={async () => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
             }, 'Creating motif videos')
-          })}
+          }, 'motifs')}
       />
     },
     {
       id: 'community',
-      label: '6. Community Analysis',
+      label: '6a. Community Analysis',
       disabled: !segmented,
+      complete: communities_created,
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
         onFormSubmit={(props) => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.community(props) // Run community analysis
-              await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
-            }, 'Running community analysis + generating community videos')
-          })}
+            }, 'Running community analysis')
+          }, 'community-videos')}
+      />
+    },
+    {
+      id: 'community-videos',
+      label: '6b. Community Videos',
+      disabled: !communities_created,
+      complete: community_videos_created,
+      content: <CommunityVideos 
+        pipeline={loadedPipeline}
+        onFormSubmit={async () => submitTab(() => {
+            return showTerminalWhileRunning(async () => {
+              await loadedPipeline.community_videos() // Creating community videos.
+            }, 'Creating community videos')
+          }, 'community-videos')}
       />
     },
     {
@@ -230,7 +252,7 @@ const Project: React.FC = () => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.visualization() // Create visualization
             }, 'Creating UMAP visualization')
-          })}
+          }, 'umap')}
       />
     },
   ];

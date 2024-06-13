@@ -1,9 +1,9 @@
 import Pipeline from "../Pipeline"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
+import { PaddedTab} from "../components/elements"
 import { VideoGrid } from "../components/VideoGrid"
-import { PaddedTab } from "../components/elements"
 
-const MotifVideos = ({
+const CommunityVideos = ({
     pipeline,
     onFormSubmit
 }: {
@@ -11,26 +11,26 @@ const MotifVideos = ({
     onFormSubmit?: DynamicFormProps['onFormSubmit']
 }) => {
 
+    const { videos } = pipeline.assets
 
-    const hasMotifVideos = pipeline.workflow.motif_videos_created
+    const communityVideos = videos?.community ?? {}
 
-    if (!hasMotifVideos) return (
+    const hasAny = Object.values(communityVideos).some((v) => v.length > 0)
+
+    if (!hasAny) return (
         <PaddedTab>
             <DynamicForm
                 initialValues={{}} 
-                submitText="Generate Motif Videos"
+                submitText="Create Community Videos"
                 onFormSubmit={onFormSubmit}
             />
         </PaddedTab>
     )
 
-    const { videos } = pipeline.assets
-    const motifVideos = videos?.motif ?? {}
-
-    const organizedVideos = Object.entries(motifVideos).reduce((acc, [ label, videos ]) => {
+    const organizedVideos = Object.entries(communityVideos).reduce((acc, [ label, videos ]) => {
         acc[label] = videos.map((videoPath: string) =>{
-            const motifNumber = videoPath.split('-').pop()!.split('_').pop().split('.')[0]
-            return { path: videoPath, label: `Motif ${motifNumber}`, idx: motifNumber }
+            const number = videoPath.split('-').pop()!.split('_').pop().split('.')[0]
+            return { path: videoPath, label: `Community ${number}`, idx: number }
         }).sort((a, b) => a.idx - b.idx)
 
         return acc
@@ -40,4 +40,4 @@ const MotifVideos = ({
     return VideoGrid({ videos: organizedVideos, pipeline })
 }
 
-export default MotifVideos
+export default CommunityVideos
