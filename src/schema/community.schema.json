@@ -1,0 +1,21 @@
+{
+    "title": "Community Analysis",
+    "properties": {
+        "cohort": {
+            "type": "boolean",
+            "title": "Cohort Analysis",
+            "description": "Flag indicating cohort analysis.",
+            "default": true
+        },
+        "cut_tree": {
+            "type": "integer",
+            "title": "Cut Line for Tree",
+            "description": "Cut line for tree.",
+            "default": 2
+        }
+    },
+    "required": [
+        "cohort",
+        "cut_tree"
+    ]
+}

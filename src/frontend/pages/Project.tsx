@@ -209,9 +209,9 @@ const Project: React.FC = () => {
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
         onFormSubmit={() => submitTab(() => {
-            return showTerminalWhileRunning(async () => {
+            return showTerminalWhileRunning(async (props) => {
 
-              await loadedPipeline.community() // Run community analysis
+              await loadedPipeline.community(props) // Run community analysis
               await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
               
             }, 'Running community analysis + generating community videos')
