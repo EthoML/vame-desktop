@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.11
   - pip
+  - numpy  # may have x64/arm64 mismatch issues so install from conda-forge
   - pip:
     - flask
     - flask_restx
