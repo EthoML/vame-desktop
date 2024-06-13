@@ -29,7 +29,8 @@
     "n_clusters": {
       "type": "integer",
       "title": "Number of Clusters",
-      "description": "The number of motifs"
+      "description": "The number of motifs",
+      "default": 15
     },
     "num_features": {
       "type": "integer",
@@ -40,10 +41,14 @@
       "description": "Please set to 1/2 of video fps. Value should be even, round up if needed"
     },
     "parameterization": {
-      "type": "string"
+      "type": "string",
+      "description": "Motif clustering method",
+      "default": "hmm"
     },
     "max_epochs": {
-      "type": "integer"
+      "type": "integer",
+      "description": "Maximum epochs for model training",
+      "default": 500
     },
     "zdims": {
       "type": "integer",
