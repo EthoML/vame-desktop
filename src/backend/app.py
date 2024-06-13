@@ -192,10 +192,14 @@ class Connected(Resource):
 
 
 @api.route('/ready')
-class Preload(Resource):
+class VAMEReady(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        import vame
+        try:
+            import vame
+        except Exception as e:
+            raise e
+        
         return { "payload": True }
     
 @api.route('/settings')

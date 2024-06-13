@@ -1,12 +1,13 @@
 import Tippy from '@tippyjs/react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { DisableToggle } from '../types';
 
 type Tab = {
   id: string;
   label: string;
   content: React.ReactNode;
-  disabled?: boolean | { tooltip: string };
+  disabled?: DisableToggle;
   complete?: boolean;
 }
 

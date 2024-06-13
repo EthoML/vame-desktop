@@ -6,8 +6,9 @@ import Pipeline from '../Pipeline';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import createSchema from '../../schema/create.schema.json';
-import { onReady } from '../commoners';
+import { onConnected, onVAMEReady } from '../commoners';
 import { StyledHeaderDiv } from '../components/elements';
+import { vameNotReadyTooltip } from '../globals';
 
 const PaddedContainer = styled.div`
   padding: 25px 50px;
@@ -18,6 +19,7 @@ const Create: React.FC = () => {
 
   const navigate = useNavigate()
 
+  const [ canSubmit, setCanSubmit ] = useState(false)
   const [ pipeline, setPipeline ] = useState(null);
 
   const [ searchParams ] = useSearchParams();
@@ -26,15 +28,17 @@ const Create: React.FC = () => {
 
   // Load the pipeline configuration when the server is ready
   useEffect(() => {
-    onReady(() => {
-      if (!projectPath) return
-      const pipeline = new Pipeline(projectPath)
-      pipeline.load().then(() => setPipeline(pipeline))
+
+    onVAMEReady(() => setCanSubmit(true))
+
+    onConnected(() => {
+      if (projectPath) {
+        const pipeline = new Pipeline(projectPath)
+        pipeline.load().then(() => setPipeline(pipeline))
+      }
     })
     
    }, [])
-
-   console.log(pipeline)
 
 
   const handleFormSubmit = async (formData) => {
@@ -60,6 +64,7 @@ const Create: React.FC = () => {
       <DynamicForm 
         initialValues={initialValues}
         submitText='Create Project'
+        blockSubmission={!canSubmit ? vameNotReadyTooltip : false }
         schema={createSchema} 
         onFormSubmit={handleFormSubmit} 
       />

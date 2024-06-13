@@ -1,15 +1,13 @@
-import Pipeline from "../Pipeline"
-import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
+import DynamicForm from "../components/DynamicForm"
 import { PaddedTab} from "../components/elements"
 import { VideoGrid } from "../components/VideoGrid"
+import { TabProps } from "./types"
 
 const CommunityVideos = ({
     pipeline,
-    onFormSubmit
-}: {
-    pipeline: Pipeline
-    onFormSubmit?: DynamicFormProps['onFormSubmit']
-}) => {
+    onFormSubmit,
+    block
+}: TabProps) => {
 
     const { videos } = pipeline.assets
 
@@ -22,6 +20,7 @@ const CommunityVideos = ({
             <DynamicForm
                 initialValues={{}} 
                 submitText="Create Community Videos"
+                blockSubmission={block}
                 onFormSubmit={onFormSubmit}
             />
         </PaddedTab>

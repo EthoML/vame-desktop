@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Pipeline from '../Pipeline';
 
 import styled from 'styled-components';
-import { onReady } from '../commoners';
+import { onConnected, onVAMEReady } from '../commoners';
 import Tabs from '../components/Tabs';
 
 import { CenteredFullscreenDiv, StyledHeaderDiv } from '../components/elements';
@@ -18,6 +18,7 @@ import CommunityAnalysis from '../tabs/CommunityAnalysis';
 import { post } from '../utils/requests';
 import { showTerminalWhileRunning } from '../popups';
 import CommunityVideos from '../tabs/CommunityVideos';
+import { vameNotReadyTooltip } from '../globals';
 
 
 const ProjectHeader = styled.header`
@@ -56,6 +57,7 @@ const Project: React.FC = () => {
 
   const [ searchParams ] = useSearchParams();
 
+  const [ canSubmit, setCanSubmit ] = useState(false)
   const [ pipeline, setPipeline ] = useState();
 
   const [ selectedTab, setSelectedTab ] = useState();
@@ -66,10 +68,17 @@ const Project: React.FC = () => {
 
   // Load the pipeline configuration when the server is ready
   useEffect(() => {
-    onReady(() => {
-      const pipeline = new Pipeline(projectPath)
-      pipeline.load().then(() => setPipeline(pipeline))
+
+
+    onVAMEReady(() => setCanSubmit(true))
+
+    onConnected(() => {
+      if (projectPath) {
+        const pipeline = new Pipeline(projectPath)
+        pipeline.load().then(() => setPipeline(pipeline))
+      }
     })
+
     
    }, [])
 
@@ -115,6 +124,8 @@ const Project: React.FC = () => {
     community_videos_created 
   } = loadedPipeline.workflow
 
+  const willBlock = canSubmit ? false : vameNotReadyTooltip
+
   const tabs = [
     {
       id: 'project-configuration',
@@ -122,6 +133,7 @@ const Project: React.FC = () => {
       complete: organized,
       content: <ProjectConfiguration 
         pipeline={loadedPipeline} 
+        block={willBlock}
         onFormSubmit={async (formData) => submitTab(() => {
           return showTerminalWhileRunning(async () => {
 
@@ -140,6 +152,7 @@ const Project: React.FC = () => {
       complete: organized,
       content: <Organize 
         pipeline={loadedPipeline}
+        block={willBlock}
         onFormSubmit={async (params) => submitTab(() => {
 
           return showTerminalWhileRunning(async () => {
@@ -167,6 +180,7 @@ const Project: React.FC = () => {
       complete: modeled,
       content: <Model 
         pipeline={loadedPipeline}
+        block={willBlock}
         onFormSubmit={async ({ train, evaluate } = {
           train: true,
           evaluate: true
@@ -193,6 +207,7 @@ const Project: React.FC = () => {
       complete: segmented,
       content: <Segmentation 
         pipeline={loadedPipeline}
+        block={willBlock}
         onFormSubmit={() => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.segment() // Run pose segmentation
@@ -207,6 +222,7 @@ const Project: React.FC = () => {
       complete: motif_videos_created,
       content: <MotifVideos 
         pipeline={loadedPipeline}
+        block={willBlock}
         onFormSubmit={async () => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
@@ -221,6 +237,7 @@ const Project: React.FC = () => {
       complete: communities_created,
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
+        block={willBlock}
         onFormSubmit={(props) => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.community(props) // Run community analysis
@@ -235,6 +252,7 @@ const Project: React.FC = () => {
       complete: community_videos_created,
       content: <CommunityVideos 
         pipeline={loadedPipeline}
+        block={willBlock}
         onFormSubmit={async () => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.community_videos() // Creating community videos.
@@ -248,6 +266,7 @@ const Project: React.FC = () => {
       disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
       content: <UMAPVisualization
         pipeline={loadedPipeline}
+        block={willBlock}
         onFormSubmit={async () => submitTab(() => {
             return showTerminalWhileRunning(async () => {
               await loadedPipeline.visualization() // Create visualization
