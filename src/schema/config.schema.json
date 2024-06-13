@@ -12,30 +12,32 @@
     },
     "egocentric_data": {
       "type": "boolean",
-      "description": "Whether the data is egocentric or not"
+      "description": "Check this box if the input data is ALREADY egocentrically aligned"
     },
     "pose_confidence": {
       "type": "number",
-      "description": "The confidence threshold for the pose estimation"
+      "description": "The confidence threshold for the data cleaning"
     },
     "iqr_factor": {
-      "type": "number"
+      "type": "number",
+      "description": "Used for data cleaning before egocentric alignment"
     },
     "robust": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Used for data cleaning"
     },
     "n_clusters": {
       "type": "integer",
       "title": "Number of Clusters",
-      "description": "The number of clusters to be used in the clustering algorithm"
+      "description": "The number of motifs"
     },
     "num_features": {
       "type": "integer",
-      "description": "Please set to # of annotation points * 2"
+      "description": "Please set to number of annotation points * 2"
     },
     "time_window": {
       "type": "integer",
-      "description": "Please set to 1/2 of video fps"
+      "description": "Please set to 1/2 of video fps. Value should be even, round up if needed"
     },
     "parameterization": {
       "type": "string"
@@ -44,7 +46,9 @@
       "type": "integer"
     },
     "zdims": {
-      "type": "integer"
+      "type": "integer",
+      "description": "Dimensions of the latent space",
+      "default": 30
     },
     "advanced_options": {
       "type": "object",
@@ -96,7 +100,8 @@
           "type": "integer"
         },
         "noise": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Used for data cleaning"
         },
         "scheduler": {
           "type": "integer"
@@ -199,11 +204,14 @@
     "video_sets",
     "egocentric_data",
     "pose_confidence",
+    "iqr_factor",
+    "robust",
     "n_clusters",
     "num_features",
     "time_window",
     "max_epochs",
     "zdims",
+    "parameterization",
     "advanced_options"
   ]
 }

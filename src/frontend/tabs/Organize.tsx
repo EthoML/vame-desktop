@@ -6,7 +6,6 @@ import { PaddedTab } from "../components/elements"
 
 const propertiesForAlignedData = [
     'pose_ref_index',
-    'check_parameter'
 ]
 
 const Organize = ({
@@ -26,11 +25,7 @@ const Organize = ({
 
     if (!pipeline.configuration.egocentric_data) operations.unshift("Align Data")
 
-    if (pipeline.configuration.egocentric_data) {
-        Object.keys(schema.properties).forEach(k => {
-            if (!propertiesForAlignedData.includes(k)) delete schema.properties[k]
-        })
-    }
+    if (pipeline.configuration.egocentric_data) delete schema.properties.advanced_options
 
     if (isOrganized) {
         Object.values(schema.properties).forEach(v => v.readOnly = true)

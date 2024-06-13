@@ -117,8 +117,6 @@ const Project: React.FC = () => {
         onFormSubmit={async (formData) => submitTab(() => {
           return showTerminalWhileRunning(async () => {
 
-            console.log(formData)
-
             const { advanced_options, ...mainProperties } = formData
             await loadedPipeline.configure({...mainProperties, ...advanced_options})
 
@@ -136,14 +134,12 @@ const Project: React.FC = () => {
 
           return showTerminalWhileRunning(async () => {
             
-            const { check_parameter, ...alignmentParams } = params
-            await loadedPipeline.align(alignmentParams)
+            const { pose_ref_index, advanced_options } = params
+
+            await loadedPipeline.align({ pose_ref_index, ...advanced_options })
 
             // Create the trainset
-            await loadedPipeline.create_trainset({
-              pose_ref_index: alignmentParams.pose_ref_index,
-              check_parameter
-            }) 
+            await loadedPipeline.create_trainset({ pose_ref_index }) 
 
             // NOTE: Allow users to inspect the quality of the trainset here
 

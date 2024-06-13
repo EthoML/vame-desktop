@@ -3,11 +3,13 @@
         "name": {
             "type": "string",
             "title": "Project Name",
+            "description": "Name of the project. No spaces allowed.",
             "allow-spaces": false
         },
         "videos": {
             "title": "Videos",
             "type": "string",
+            "description": "A set of labeled videos",
             "format": "file",
             "accept": "video/*",
             "multiple": true
@@ -15,6 +17,7 @@
         "csvs": {
             "type": "string",
             "format": "file",
+            "description": "A set of pose estimation data. NOTE: CSV file name needs to match video file name.",
             "title": "CSV Files",
             "accept": [".csv"],
             "multiple": true

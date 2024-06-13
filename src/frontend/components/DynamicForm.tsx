@@ -72,13 +72,22 @@ const InputGroup = styled.div`
 `;
 
 const InputLabel = styled.label`
-  font-weight: bold;
+
+  span {
+    font-weight: bold;
+  }
 
   small {
     font-size: 12px;
     color: #666;
-    font-weight: normal;
   }
+
+  &[required] span:after {
+    content: '*';
+    color: red;
+    margin-left: 5px;
+  }
+
 `;
 
 const Button = styled.button`
@@ -466,9 +475,11 @@ const DynamicForm = ({
             );
         }
 
+        const inputIsRequired = schema?.required?.includes(key) || false;
+
         return (
           <InputGroup key={key}>
-            <InputLabel>{header(title)}<br/>{property.description && <small>{property.description}</small>}</InputLabel>
+            <InputLabel required={inputIsRequired}><span>{header(title)}</span><br/>{property.description && <small>{property.description}</small>}</InputLabel>
             {renderInput(key, value, property)}
           </InputGroup>
         );
