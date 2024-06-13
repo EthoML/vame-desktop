@@ -40,6 +40,10 @@ export const VideoContainer = styled.div`
     gap: 10px;
 `
 
+export const Video = styled.video`
+    max-height: 200px;
+`
+
 export const StyledHeaderDiv = styled.div`
     padding-bottom: 10px;
     margin-bottom: 20px;

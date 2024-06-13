@@ -2,7 +2,7 @@ import { useState } from "react"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
 import Pipeline from "../Pipeline"
-import { PaddedTab } from "../components/divs"
+import { PaddedTab } from "../components/elements"
 
 const Segmentation = ({
 pipeline,

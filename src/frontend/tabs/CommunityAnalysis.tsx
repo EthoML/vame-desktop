@@ -1,7 +1,7 @@
 import Pipeline from "../Pipeline"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import Tabs from "../components/Tabs"
-import { PaddedTab, GridTab, PaddedBottomRow, Videos, VideoContainer } from "../components/divs"
+import { PaddedTab, GridTab, PaddedBottomRow, Videos, VideoContainer } from "../components/elements"
 
 
 const CommunityAnalysis = ({

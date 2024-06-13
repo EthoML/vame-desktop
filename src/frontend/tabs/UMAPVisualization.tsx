@@ -1,6 +1,6 @@
 import Pipeline from "../Pipeline"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
-import { PaddedTab } from "../components/divs"
+import { PaddedTab } from "../components/elements"
 
 const UMAPVisualization = ({
     pipeline,

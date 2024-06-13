@@ -1,7 +1,7 @@
 import Pipeline from "../Pipeline"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import Tabs from "../components/Tabs"
-import { PaddedTab, GridTab, PaddedBottomRow, Videos, VideoContainer } from "../components/divs"
+import { PaddedTab, GridTab, PaddedBottomRow, Videos, VideoContainer, Video } from "../components/elements"
 
 const MotifVideos = ({
     pipeline,
@@ -43,7 +43,7 @@ const MotifVideos = ({
             id: label,
             label,
             content: <Videos>{videos.map(({ path, number }) =>{
-                return <VideoContainer><video controls src={pipeline.getAssetPath(path)} alt={ path } key={ path } /><label>Motif {number}</label></VideoContainer>
+                return <VideoContainer><Video controls src={pipeline.getAssetPath(path)} type="video/mp4" alt={ path } key={ path } /><label>Motif {number}</label></VideoContainer>
             })}</Videos>
         })
 
@@ -52,11 +52,9 @@ const MotifVideos = ({
     }, [])
 
     return (
-        <PaddedTab>
-            <Tabs
-                tabs={tabs}
-            />
-        </PaddedTab>
+        <Tabs
+            tabs={tabs}
+        />
     )
 }
 

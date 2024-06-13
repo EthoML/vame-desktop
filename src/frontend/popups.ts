@@ -22,7 +22,11 @@ export const showTerminalWhileRunning = (callback, label="Terminal Output") => {
 
         modalContent.onscroll = (ev) => {
             if (ev.target !== modalContent) return
-            locked = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight
+            locked = modalContent.scrollTop + modalContent.clientHeight >= modalContent.scrollHeight
+        }
+
+        window.onresize = () => {
+            if (locked) modalContent.scrollTop = modalContent.scrollHeight
         }
         
         // Scroll to bottom

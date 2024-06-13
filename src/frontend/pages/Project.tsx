@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { onReady } from '../commoners';
 import Tabs from '../components/Tabs';
 
-import { CenteredFullscreenDiv, StyledHeaderDiv } from '../components/divs';
+import { CenteredFullscreenDiv, StyledHeaderDiv } from '../components/elements';
 
 import ProjectConfiguration from '../tabs/ProjectConfiguration';
 import Organize from '../tabs/Organize';

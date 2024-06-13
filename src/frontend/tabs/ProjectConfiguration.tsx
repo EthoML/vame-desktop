@@ -1,7 +1,7 @@
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import projectConfigSchema from '../../schema/config.schema.json'
 import Pipeline from "../Pipeline"
-import { PaddedTab } from "../components/divs"
+import { PaddedTab } from "../components/elements"
 
 
 const ProjectConfiguration = ({

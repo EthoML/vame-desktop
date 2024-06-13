@@ -2,7 +2,7 @@ import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
 import organizeSchema from '../../schema/organize.schema.json'
 import Pipeline from "../Pipeline"
-import { PaddedTab } from "../components/divs"
+import { PaddedTab } from "../components/elements"
 
 const Organize = ({
     pipeline,

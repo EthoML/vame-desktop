@@ -162,7 +162,7 @@ def get_videos(project_path, subfolder = 'cluster_videos'):
     for video_set in video_sets:
         videos_path = motif_output / video_set / model_name / 'hmm-15' / subfolder
         if videos_path.exists():
-            output_videos[video_set] = [ str(video.relative_to(project_path)) for video in videos_path.glob('*.avi') ]
+            output_videos[video_set] = [ str(video.relative_to(project_path)) for video in videos_path.glob('*.mp4') ]
         else:
             output_videos[video_set] = []
 

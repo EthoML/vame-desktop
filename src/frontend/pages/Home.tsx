@@ -5,7 +5,7 @@ import { get, post } from '../utils/requests';
 import Pipeline from '../Pipeline';
 import { useNavigate } from 'react-router-dom';
 import PipelineList from '../components/PipelineList';
-import { StyledHeaderDiv } from '../components/divs';
+import { StyledHeaderDiv } from '../components/elements';
 
 export const PaddedContainer = styled.div`
   padding: 25px 50px;

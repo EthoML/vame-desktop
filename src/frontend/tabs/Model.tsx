@@ -1,7 +1,7 @@
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 
 import Pipeline from "../Pipeline"
-import { PaddedTab } from "../components/divs"
+import { PaddedTab } from "../components/elements"
 import styled from "styled-components"
 
 const FlexDiv = styled.div`

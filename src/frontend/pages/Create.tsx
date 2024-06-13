@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import createSchema from '../../schema/create.schema.json';
 import { onReady } from '../commoners';
-import { StyledHeaderDiv } from '../components/divs';
+import { StyledHeaderDiv } from '../components/elements';
 
 const PaddedContainer = styled.div`
   padding: 25px 50px;
