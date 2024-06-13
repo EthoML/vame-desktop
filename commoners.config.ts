@@ -25,6 +25,26 @@ export default defineConfig({
             width: 1200, // Adjust default width
             height: 800, // Adjust default height
             minHeight: 600, // Adjust minimum height
+        },
+        build: {
+              mac: {
+                target: [
+                    {
+                      target: "dmg",
+                      arch: [
+                        "x64",
+                        "arm64"
+                      ]
+                    },
+                    {
+                      target: "zip",
+                      arch: [
+                        "x64",
+                        "arm64"
+                      ]
+                    }
+                  ]
+              }
         }
     },
 
