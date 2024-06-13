@@ -19,24 +19,32 @@ const ProjectConfiguration = ({
     if (pipeline.workflow.organized) Object.values(schema.properties).forEach(v => v.readOnly = true)
 
     const { 
-        Project, 
-        n_clusters,
-        pose_confidence,
+        video_sets,
         egocentric_data,
+        pose_confidence,
+        iqr_factor,
+        robust,
+        n_clusters,
         num_features,
         time_window,
+        parameterization,
         max_epochs,
+        z_dims,
         ...advanced_options 
     } = pipeline.configuration
 
     const toEdit = {
-        Project,
-        n_clusters, 
+        video_sets,
         egocentric_data,
         pose_confidence,
+        iqr_factor,
+        robust,
+        n_clusters,
         num_features,
         time_window,
+        parameterization,
         max_epochs,
+        z_dims,
         advanced_options
     }
 

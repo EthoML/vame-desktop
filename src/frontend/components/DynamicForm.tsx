@@ -43,7 +43,7 @@ const AccordionHeader = styled.div`
 
 const AccordionContent = styled.div`
   padding: 10px;
-  display: ${props => (props.isOpen ? 'block' : 'none')};
+  display: ${props => (props.isopen ? 'block' : 'none')};
 `;
 
 export type DynamicFormProps = {
@@ -102,6 +102,10 @@ const ArrayItemWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`;
+
+const List = styled.ol`
+  margin: 0;
 `;
 
 // const ArrayButtons = styled.div`
@@ -295,7 +299,7 @@ const DynamicForm = ({
 
     if (isReadOnly) {
       if (isArray) {
-        return <ol>{isArrayValue ? value.map((item, index) => <li key={index}>{item}</li>) : [] }</ol>;
+        return <List>{isArrayValue ? value.map((item, index) => <li key={index}>{item}</li>) : [] }</List>;
       }
       
       return <span>{new String(type === 'boolean' ? !!value : value)}</span>;
@@ -332,7 +336,7 @@ const DynamicForm = ({
       const fillerValue = isText ? '' : isNumber ? 0 : null;
 
       // Set to the minimum number of items if the length is locked
-      const lockedLength = property?.minItems === property?.maxItems;
+      const lockedLength = 'minItems' in property && 'maxItems' in property && property?.minItems === property?.maxItems;
       if (lockedLength) arrayValue = Array.from({ length: property.minItems }).map((_, index) => arrayValue[index] ?? fillerValue);
 
       // Check if the user can add or remove items
@@ -357,7 +361,7 @@ const DynamicForm = ({
               </ArrayItemWrapper>
             })}
           </ArrayItems>
-          { (canAdd || canRemove) && <small><b>Note:</b> Array sizes cannot yet be edited. Please specify minItems and maxItems as the same value in the schema.</small>}
+          { (canAdd || canRemove) && <small style={{color: 'gray', fontSize: '10px'}}><b>Note:</b> Array sizes cannot yet be edited. Please specify minItems and maxItems as the same value in the schema.</small>}
           {/* { canAdd && <AddButton type="button" onClick={() => handleAddArrayItem(key)}><FontAwesomeIcon icon={faPlusCircle} /></AddButton> } */}
         </div>
       );
@@ -447,7 +451,7 @@ const DynamicForm = ({
                     {header(title)}
                     <FontAwesomeIcon icon={accordionState[key] ? faChevronUp : faChevronDown} />
                     </AccordionHeader>
-                    <AccordionContent isOpen={accordionState[key] ? 1 : 0}>
+                    <AccordionContent isopen={accordionState[key] ? 1 : 0}>
                         <DynamicForm 
                             initialValues={resolvedValue} 
                             schema={property} 

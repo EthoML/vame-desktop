@@ -117,6 +117,8 @@ const Project: React.FC = () => {
         onFormSubmit={async (formData) => submitTab(() => {
           return showTerminalWhileRunning(async () => {
 
+            console.log(formData)
+
             const { advanced_options, ...mainProperties } = formData
             await loadedPipeline.configure({...mainProperties, ...advanced_options})
 
@@ -161,6 +163,7 @@ const Project: React.FC = () => {
           train: true,
           evaluate: true
         }) => {
+
           const runAll = train && evaluate
           return submitTab(async () => {
             return showTerminalWhileRunning(async () => {
@@ -170,6 +173,7 @@ const Project: React.FC = () => {
 
             }, `Running ${ runAll ? 'model training and evaluation' : train ? 'model training' : 'model evaluation' }`)
           }, runAll ? 'segmentation' : 'model-creation')
+          
         }}
       />
     },

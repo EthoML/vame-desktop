@@ -19,60 +19,25 @@ const TerminalDiv = styled.ul`
   
 `;
 
-const commonersLogPluginOutput = Symbol('logPluginOutput')
 
-const logFunctions = ["log", "warn", "error"]
+const Terminal: React.FC = ({
+  text
+}) => {
 
-const messages = [];
-
-const ogMethods = {}
-logFunctions.forEach((method) => {
-  ogMethods[method] = console[method]
-
-  console[method] = (...args) => {
-    if (args[0] === commonersLogPluginOutput) return
-      else ogMethods[method](...args)
-  }
-
-})
-
-commoners.ready.then(() => {
-  commoners.plugins.log.subscribe(({ method, args }) => {
-    console[method](commonersLogPluginOutput, ...args)
-  })
-})
-
-const Terminal: React.FC = () => {
-
-  const [currentMessages, setCurrentMessages] = useState(messages);
+  const [currentText, setCurrentText] = useState(text);
 
   useEffect(() =>{
-    setCurrentMessages([...messages])
+    setCurrentText(text)
   }, []);
 
-  logFunctions.forEach((method) => {
-
-    console[method] = (...args) => {
-
-      // Intercept log from Electron
-      if (args[0] === commonersLogPluginOutput) {
-        messages.push({ method, args: args.slice(1) })
-        setCurrentMessages([...messages])
-      } 
-      
-      // Normal log
-      else ogMethods[method](...args)
-    }
-
-  })
-
+  const messages = currentText.split('\n')
 
   return (
     <TerminalDiv id="terminal">
-      {currentMessages.map(({ method, args }, index) => (
+      {messages.map((line, index) => (
         <li key={index}>
-          <span className={method}>
-            {args.join(' ')}
+          <span>
+            {line}
           </span>
         </li>
       ))}

@@ -250,29 +250,35 @@ class RecentProjects(Resource):
 class RegisterProject(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
-        states = json.loads(open(GLOBAL_STATES_FILE, "r").read())
 
-        recent_projects = states.get("recent_projects", [])
+        try:
+            states = json.loads(open(GLOBAL_STATES_FILE, "r").read())
 
-        _, project_path = resolve_request_data(request)
+            recent_projects = states.get("recent_projects", [])
 
-        project_path = str(project_path)
+            _, project_path = resolve_request_data(request)
 
-        if project_path in recent_projects:
-            recent_projects.remove(project_path)
+            project_path = str(project_path)
 
-        recent_projects.append(project_path)
+            if project_path in recent_projects:
+                recent_projects.remove(project_path)
 
-        if len(recent_projects) > 5:
-            recent_projects = recent_projects[-5:]
+            recent_projects.append(project_path)
 
-        with open(GLOBAL_STATES_FILE, "w") as file:
-            json.dump({
-                **states,
-                "recent_projects": recent_projects
-            }, file)
+            if len(recent_projects) > 5:
+                recent_projects = recent_projects[-5:]
 
-        return jsonify(recent_projects)
+            with open(GLOBAL_STATES_FILE, "w") as file:
+                json.dump({
+                    **states,
+                    "recent_projects": recent_projects
+                }, file)
+
+            return jsonify(recent_projects)
+        
+        except Exception as exception:
+            # NOTE: Should lock access to the file
+            pass
 
 
 @api.route('/load')
