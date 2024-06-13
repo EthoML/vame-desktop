@@ -208,8 +208,8 @@ const Project: React.FC = () => {
       disabled: !segmented,
       content: <CommunityAnalysis 
         pipeline={loadedPipeline}
-        onFormSubmit={() => submitTab(() => {
-            return showTerminalWhileRunning(async (props) => {
+        onFormSubmit={() => submitTab((props) => {
+            return showTerminalWhileRunning(async () => {
 
               await loadedPipeline.community(props) // Run community analysis
               await loadedPipeline.community_videos() // Creating community videos. NOTE: Will need additional consultation for how to proceed
@@ -244,7 +244,7 @@ const Project: React.FC = () => {
               pathname: '/create',
               search: `?project=${loadedPipeline.path}`
             })
-          }}>Remix Project Data</HeaderButton>
+          }}>Restart Project</HeaderButton>
         </StyledHeaderDiv>
         <ProjectInformation>
           <ProjectInformationCapsule><small><b>Creation Date</b> <small>{loadedPipeline.creationDate.toLocaleDateString()}</small></small></ProjectInformationCapsule>

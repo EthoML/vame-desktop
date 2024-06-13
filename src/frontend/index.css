@@ -83,3 +83,8 @@ dialog > header > button {
   font-size: 14px;
   font-weight: bold;
 }
+
+
+input[type="checkbox"] {
+  width: min-content;
+}

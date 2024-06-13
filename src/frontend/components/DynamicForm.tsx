@@ -61,20 +61,23 @@ export type DynamicFormProps = {
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 25px;
 `;
 
 const InputGroup = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
 `;
 
 const InputLabel = styled.label`
+  font-weight: bold;
+
   small {
     font-size: 12px;
     color: #666;
+    font-weight: normal;
   }
 `;
 
