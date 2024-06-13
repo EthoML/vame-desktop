@@ -295,7 +295,6 @@ const DynamicForm = ({
     key, 
     value, 
     property, 
-    additionalInfo = {}
   ) => {
 
     const type = property?.type || inferType(value);

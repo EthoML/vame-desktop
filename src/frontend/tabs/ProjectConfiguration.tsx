@@ -29,7 +29,7 @@ const ProjectConfiguration = ({
         time_window,
         parametrization,
         max_epochs,
-        z_dims,
+        zdims,
         ...advanced_options 
     } = pipeline.configuration
 
@@ -44,7 +44,7 @@ const ProjectConfiguration = ({
         time_window,
         parametrization,
         max_epochs,
-        z_dims,
+        zdims,
         advanced_options
     }
 
