@@ -12,32 +12,26 @@
             "maxItems": 2,
             "default": [ 0, 5 ]
         },
-        "crop_size": {
-            "type": "array",
-            "description": "Size to crop the video.",
-            "items": {
-                "type": "integer"
-            },
-            "minItems": 2,
-            "maxItems": 2,
-            "default": [300, 300]
-        },
-        "use_video": {
-            "type": "boolean",
-            "description": "Whether to use video to do the post alignment."
-        },
-        "video_format": {
-            "type": "string",
-            "description": "Format of the video file."
-        },
-        "check_video": {
-            "type": "boolean",
-            "description": "Whether to check the video file."
-        },
-        "check_parameter": {
-            "type": "boolean",
-            "description": "Whether to plot the z-scored data and the filtered data",
-            "default": false
+        "advanced_options": {
+            "type": "object",
+            "properties": {
+                "crop_size": {
+                    "type": "array",
+                    "description": "Size to crop the video.",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "default": [300, 300]
+                },
+                "use_video": {
+                    "type": "boolean",
+                    "description": "Whether to use video to do the pose alignment.",
+                    "default": true
+                }
+            }
         }
-    }
+    },
+    "required": [ "pose_ref_index", "crop_size", "use_video", "video_format", "check_video" ]
 }

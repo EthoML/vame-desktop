@@ -23,12 +23,12 @@ const ProjectConfiguration = ({
         pose_confidence,
         iqr_factor,
         robust,
-        n_clusters,
+        n_cluster,
         num_features,
         time_window,
-        parameterization,
+        parametrization,
         max_epochs,
-        z_dims,
+        zdims,
         ...advanced_options 
     } = pipeline.configuration
 
@@ -38,12 +38,12 @@ const ProjectConfiguration = ({
         pose_confidence,
         iqr_factor,
         robust,
-        n_clusters,
+        n_cluster,
         num_features,
         time_window,
-        parameterization,
+        parametrization,
         max_epochs,
-        z_dims,
+        zdims,
         advanced_options
     }
 

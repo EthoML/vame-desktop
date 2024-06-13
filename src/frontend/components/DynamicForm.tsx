@@ -75,13 +75,22 @@ const InputGroup = styled.div`
 `;
 
 const InputLabel = styled.label`
-  font-weight: bold;
+
+  span {
+    font-weight: bold;
+  }
 
   small {
     font-size: 12px;
     color: #666;
-    font-weight: normal;
   }
+
+  &[required] span:after {
+    content: '*';
+    color: red;
+    margin-left: 5px;
+  }
+
 `;
 
 const Button = styled.button`
@@ -294,7 +303,6 @@ const DynamicForm = ({
     key, 
     value, 
     property, 
-    additionalInfo = {}
   ) => {
 
     const type = property?.type || inferType(value);
@@ -441,8 +449,10 @@ const DynamicForm = ({
         const property = schema.properties[key];
         const title = property.title || key;
         const value = initialValues[key] || property.default;
-        if ('default' in property && !(key in formState)) formState[key] = property.default;
 
+        const formValueDefined = key in formState && formState[key] !== undefined;
+
+        if ('default' in property && !formValueDefined) formState[key] = value
 
         const isObject = property.type === 'object' || property.properties || checkIfObject(value);
 
@@ -474,9 +484,11 @@ const DynamicForm = ({
             );
         }
 
+        const inputIsRequired = schema?.required?.includes(key) || false;
+
         return (
           <InputGroup key={key}>
-            <InputLabel>{header(title)}<br/>{property.description && <small>{property.description}</small>}</InputLabel>
+            <InputLabel required={inputIsRequired}><span>{header(title)}</span><br/>{property.description && <small>{property.description}</small>}</InputLabel>
             {renderInput(key, value, property)}
           </InputGroup>
         );
