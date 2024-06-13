@@ -1,4 +1,5 @@
 import * as logForwardingPlugin from './src/plugins/log-forwarding'
+import * as openFolderPlugin from './src/plugins/open-folder'
 
 const defineConfig = (o) => o 
 
@@ -13,7 +14,8 @@ export default defineConfig({
     appId: 'com.gladstoneinstitutes.vame',
 
     plugins: {
-        log: logForwardingPlugin
+        log: logForwardingPlugin,
+        open: openFolderPlugin
     },
     
     icon: './logo.png', 

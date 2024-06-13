@@ -41,6 +41,11 @@ const ProjectInformationCapsule = styled.div`
   border-radius: 10px
 `;
 
+const HeaderButtonContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
 
 const HeaderButton = styled.button`
   font-size: 14px;
@@ -282,12 +287,18 @@ const Project: React.FC = () => {
       <ProjectHeader>
         <StyledHeaderDiv>
           <h2>{loadedPipeline.configuration.Project}</h2>
-          <HeaderButton onClick={() => {
-            navigate({
-              pathname: '/create',
-              search: `?project=${loadedPipeline.path}`
-            })
-          }}>Restart Project</HeaderButton>
+          <HeaderButtonContainer>
+            <HeaderButton onClick={() => {
+              commoners.plugins.open(loadedPipeline.path)
+
+            }}>Open in File Explorer</HeaderButton>
+             <HeaderButton onClick={() => {
+                navigate({
+                  pathname: '/create',
+                  search: `?project=${loadedPipeline.path}`
+                })
+              }}>Restart Project</HeaderButton>
+          </HeaderButtonContainer>
         </StyledHeaderDiv>
         <ProjectInformation>
           <ProjectInformationCapsule><small><b>Creation Date</b> <small>{loadedPipeline.creationDate.toLocaleDateString()}</small></small></ProjectInformationCapsule>
