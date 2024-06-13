@@ -9,7 +9,7 @@ dependencies:
     - flask
     - flask_restx
     - flask-cors
-    - pyinstaller
+    - pyinstaller==6.8.0
     - vame-py @ git+https://github.com/EthoML/VAME.git@dev#vame
 
 prefix: /opt/anaconda3/envs/vame-desktop
