@@ -3,17 +3,11 @@ import organizeSchema from '../../schema/organize.schema.json'
 import { PaddedTab } from "../components/elements"
 import { TabProps } from "./types"
 
-const propertiesForAlignedData = [
-    'pose_ref_index',
-]
-
 const Organize = ({
     pipeline,
     onFormSubmit,
     block
 }: TabProps) => {
-
-    console.log('block', block)
 
     const schema = structuredClone(organizeSchema)
 
