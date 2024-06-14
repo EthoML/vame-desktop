@@ -93,7 +93,8 @@ class Pipeline {
         segmented: false,
         motif_videos_created: false,
         communities_created: false,
-        community_videos_created: false
+        community_videos_created: false,
+        umaps_created: false
     }
 
     constructor(absPath?: string) {

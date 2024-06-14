@@ -9,13 +9,9 @@ const CommunityVideos = ({
     block
 }: TabProps) => {
 
-    const { videos } = pipeline.assets
+    const hasCommunityVideos = pipeline.workflow.community_videos_created
 
-    const communityVideos = videos?.community ?? {}
-
-    const hasAny = Object.values(communityVideos).some((v) => v.length > 0)
-
-    if (!hasAny) return (
+    if (!hasCommunityVideos) return (
         <PaddedTab>
             <DynamicForm
                 initialValues={{}} 
@@ -25,6 +21,11 @@ const CommunityVideos = ({
             />
         </PaddedTab>
     )
+
+
+    const { videos } = pipeline.assets
+
+    const communityVideos = videos?.community ?? {}
 
     const organizedVideos = Object.entries(communityVideos).reduce((acc, [ label, videos ]) => {
         acc[label] = videos.map((videoPath: string) =>{

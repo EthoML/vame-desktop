@@ -126,10 +126,13 @@ const Project: React.FC = () => {
     segmented, 
     motif_videos_created,
     communities_created,
-    community_videos_created 
+    community_videos_created,
+    umaps_created
   } = loadedPipeline.workflow
 
   const willBlock = canSubmit ? false : vameNotReadyTooltip
+
+  console.log('Pipeline', pipeline)
 
   const tabs = [
     {
@@ -263,6 +266,7 @@ const Project: React.FC = () => {
     {
       id: 'umap',
       label: '7. UMAP Visualization',
+      completed: umaps_created,
       disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
       content: <UMAPVisualization
         pipeline={loadedPipeline}

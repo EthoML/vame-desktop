@@ -9,6 +9,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_restx import Api, Resource
 
+# Type hinting
+from typing import Union
+
 # Logging dependencies
 import queue
 import threading
@@ -148,25 +151,61 @@ def get_evaluation_images(project_path):
 
 # NOTE: Current version of VAME does not save visualization images as .png files (6/11/24)
 def get_visualization_images(project_path):
-    # visualization_output = project_path / 'path' / 'to'
-    # png_files = list(visualization_output.glob('*.png'))
-    # return [ str(png_file.relative_to(project_path)) for png_file in png_files ]
-    return []
+    community_subfolders = get_video_related_asset(
+        project_path, 
+        subpath='community',
+        validate=True
+    )
 
-def get_videos(project_path, subfolder = 'cluster_videos'):
+    visualization_images = dict()
 
-    output_videos = dict()
+    for video_set, community_subfolder in community_subfolders.items():
+        if community_subfolder:
+            visualization_images[video_set] = [ str(image.relative_to(project_path)) for image in community_subfolder.glob('*.png') ]
+        else:
+            visualization_images[video_set] = []
 
-    motif_output = project_path / 'results'
+
+    return visualization_images
+
+
+
+def get_video_related_asset(
+        project_path,
+        subpath: Union[str, callable],
+        return_path = True,
+        validate = False
+    ):
+
+    results_location = project_path / 'results'
     config = yaml.safe_load(open(project_path / 'config.yaml', "r"))
 
     video_sets = config["video_sets"]
     model_name = config["model_name"]
 
+    video_related_assets = dict()
+
     for video_set in video_sets:
-        videos_path = motif_output / video_set / model_name / 'hmm-15' / subfolder
-        if videos_path.exists():
-            output_videos[video_set] = [ str(video.relative_to(project_path)) for video in videos_path.glob('*.mp4') ]
+        video_set_subpath = subpath(video_set) if callable(subpath) else subpath
+        asset_path = results_location / video_set / model_name / 'hmm-15' / video_set_subpath
+        video_related_assets[video_set] = asset_path if return_path else str(asset_path)
+        if validate and not asset_path.exists():
+            video_related_assets[video_set] = None
+
+    return video_related_assets
+
+def get_videos(
+        project_path, 
+        subfolder
+    ):
+
+    video_subfolders = get_video_related_asset(project_path, subfolder)
+
+    output_videos = dict()
+
+    for video_set, video_subfolder in video_subfolders.items():
+        if video_subfolder.exists():
+            output_videos[video_set] = [ str(video.relative_to(project_path)) for video in video_subfolder.glob('*.mp4') ]
         else:
             output_videos[video_set] = []
 
@@ -181,7 +220,7 @@ def get_motif_videos(project_path):
     return get_videos(project_path, 'cluster_videos')
 
 def get_community_videos(project_path):
-    return get_videos(project_path, 'community')
+    return get_videos(project_path, 'community_videos')
 
 
 @api.route('/connected')
@@ -327,10 +366,7 @@ class Load(Resource):
         if config:
             has_latent_vector_files = all(map(lambda video: (get_video_results_path(video, project_path) / f"latent_vector_{video}.npy").exists(), config["video_sets"]))
 
-        has_community_files = False
-        if config:
-            # has_community_files = all(map(lambda video: (get_video_results_path(video, project_path) / f"community_{video}.npy").exists(), config["video_sets"]))
-            pass
+        has_communities = (project_path / 'cohort_community_label.npy').exists()
 
         # Provide project workflow status
         workflow = dict(
@@ -338,8 +374,9 @@ class Load(Resource):
             modeled = len(images["evaluation"]) > 0,
             segmented = has_latent_vector_files,
             motif_videos_created = all(map(lambda videos: len(videos) > 0, videos["motif"].values())),
-            communities_created = has_community_files,
+            communities_created = has_communities,
             community_videos_created = all(map(lambda videos: len(videos) > 0, videos["community"].values())),
+            umaps_created = any(map(lambda videos: len(videos) > 0, images["visualization"].values())),
         )
 
         original_videos_location = project_path / 'videos'
