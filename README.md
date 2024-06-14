@@ -9,21 +9,24 @@ VAME Desktop has been designed to run each step of a VAME project **only once**.
 
 ## Installation
 ### Python
+You will need to have [miniconda](https://docs.conda.io/en/latest/miniconda.html) installed on your machine.
+
 Create the Conda environment for the project by running the following command:
 
 ```bash
 conda env create -f environment.yml 
 ```
+This will install all the necessary Python dependencies for the project.
 
-This will install all the necessary Python dependencies for the project!
-
-To activate the environment, run the following command:
+Once complete, activate the environment by running the following command:
 ```bash
 conda activate vame-desktop
 ```
 
-### [Node.js](https://nodejs.org/en)
-Install Node.js and project dependencies by running the following command:
+### Node.js
+You will need to have [Node.js](https://nodejs.org/en/) installed on your machine.
+
+Install Node modules by running the following command:
 ```bash
 npm install
 ```
