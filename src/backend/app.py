@@ -234,12 +234,8 @@ class Connected(Resource):
 class VAMEReady(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        try:
-            import vame
-        except Exception as e:
-            raise e
-        
-        return { "payload": True }
+        import vame
+        return jsonify({ "payload": True })
     
 @api.route('/settings')
 class Settings(Resource):
