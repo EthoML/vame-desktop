@@ -2,8 +2,8 @@ name: Build and Deploy — Linux
 run-name: ${{ github.actor }} is building a Linux release
 
 on:
-  push:
-    branches: ["latest"]
+  # push:
+  #   branches: ["latest"]
 
   workflow_dispatch:
 
