@@ -4,9 +4,11 @@
         "pose_ref_index": {
             "type": "array",
             "title": "Reference Points",
-            "description": "Indices of the reference points in the pose vector.",
+            "description": "Indices of the reference points in the pose vector. 0-snout, 1-forehand_left, 2-forehand_right, 3-hind_left, 4-hind_right, 5-tail.",
             "items": {
-                "type": "integer"
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 5
             },
             "minItems": 2,
             "maxItems": 2,
