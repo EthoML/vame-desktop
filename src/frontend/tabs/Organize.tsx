@@ -9,7 +9,10 @@ const Organize = ({
     block
 }: TabProps) => {
 
+    const pose_ref_index_extra_description = pipeline.workflow.pose_ref_index_description ?? ""
+
     const schema = structuredClone(organizeSchema)
+    schema.properties.pose_ref_index.description = `${schema.properties.pose_ref_index.description} - ${pose_ref_index_extra_description}`
 
     const isOrganized = pipeline.workflow.organized
 
@@ -33,7 +36,7 @@ const Organize = ({
                 onFormSubmit={onFormSubmit} 
             />
         </PaddedTab>
-    )
+    ) 
 }
 
 export default Organize
