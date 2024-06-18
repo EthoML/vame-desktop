@@ -38,7 +38,7 @@ const ProjectInformationCapsule = styled.div`
   margin: 0;
   background: #f4f4f4;
   padding: 5px 10px;
-  border-radius: 10px
+  border-radius: 10px;
 `;
 
 const HeaderButtonContainer = styled.div`
