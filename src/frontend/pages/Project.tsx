@@ -38,7 +38,7 @@ const ProjectInformationCapsule = styled.div`
   margin: 0;
   background: #f4f4f4;
   padding: 5px 10px;
-  border-radius: 10px
+  border-radius: 10px;
 `;
 
 const HeaderButtonContainer = styled.div`
@@ -60,12 +60,12 @@ const HeaderButton = styled.button`
 
 const Project: React.FC = () => {
 
-  const [ searchParams ] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
-  const [ canSubmit, setCanSubmit ] = useState(false)
-  const [ pipeline, setPipeline ] = useState();
+  const [canSubmit, setCanSubmit] = useState(false)
+  const [pipeline, setPipeline] = useState();
 
-  const [ selectedTab, setSelectedTab ] = useState();
+  const [selectedTab, setSelectedTab] = useState();
 
   const navigate = useNavigate()
 
@@ -84,21 +84,21 @@ const Project: React.FC = () => {
       }
     })
 
-    
-   }, [])
 
-   if (!pipeline) return <CenteredFullscreenDiv>
-      <div>
-        <b>Loading project details...</b>
-        <br/>
-        <small>{projectPath}</small>
-      </div>
-    </CenteredFullscreenDiv>
+  }, [])
+
+  if (!pipeline) return <CenteredFullscreenDiv>
+    <div>
+      <b>Loading project details...</b>
+      <br />
+      <small>{projectPath}</small>
+    </div>
+  </CenteredFullscreenDiv>
 
 
-   const loadedPipeline = pipeline as Pipeline
+  const loadedPipeline = pipeline as Pipeline
 
-   post('project/register', { project: loadedPipeline.path }) // Register project access
+  post('project/register', { project: loadedPipeline.path }) // Register project access
 
 
   const submitTab = async (
@@ -120,10 +120,10 @@ const Project: React.FC = () => {
 
   }
 
-  const { 
-    organized, 
-    modeled, 
-    segmented, 
+  const {
+    organized,
+    modeled,
+    segmented,
     motif_videos_created,
     communities_created,
     community_videos_created,
@@ -139,13 +139,13 @@ const Project: React.FC = () => {
       id: 'project-configuration',
       label: '1. Project Configuration',
       complete: organized,
-      content: <ProjectConfiguration 
-        pipeline={loadedPipeline} 
+      content: <ProjectConfiguration
+        pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={async (formData) => submitTab(() => {
           return showTerminalWhileRunning(async () => {
             const { advanced_options, ...mainProperties } = formData
-            await loadedPipeline.configure({...mainProperties, ...advanced_options})
+            await loadedPipeline.configure({ ...mainProperties, ...advanced_options })
 
           }, "Configuring your project")
         }, 'data-organization')}
@@ -155,19 +155,21 @@ const Project: React.FC = () => {
       id: 'data-organization',
       label: '2. Data Organization',
       complete: organized,
-      content: <Organize 
+      content: <Organize
         pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={async (params) => submitTab(() => {
 
           return showTerminalWhileRunning(async () => {
-            
+
             const { pose_ref_index, advanced_options } = params
+
+            pose_ref_index.description = `${pose_ref_index.description}. `
 
             await loadedPipeline.align({ pose_ref_index, ...advanced_options })
 
             // Create the trainset
-            await loadedPipeline.create_trainset({ pose_ref_index }) 
+            await loadedPipeline.create_trainset({ pose_ref_index })
 
             // NOTE: Allow users to inspect the quality of the trainset here
 
@@ -181,7 +183,7 @@ const Project: React.FC = () => {
       label: '3. Model Creation',
       disabled: !organized ? { tooltip: 'Please organize your data first' } : false,
       complete: modeled,
-      content: <Model 
+      content: <Model
         pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={async ({ train, evaluate } = {
@@ -196,9 +198,9 @@ const Project: React.FC = () => {
               if (train) await loadedPipeline.train() // Train the model
               if (evaluate) await loadedPipeline.evaluate() // Evaluate the model
 
-            }, `Running ${ runAll ? 'model training and evaluation' : train ? 'model training' : 'model evaluation' }`)
+            }, `Running ${runAll ? 'model training and evaluation' : train ? 'model training' : 'model evaluation'}`)
           }, runAll ? 'segmentation' : 'model-creation')
-          
+
         }}
       />
     },
@@ -208,14 +210,14 @@ const Project: React.FC = () => {
       label: '4. Pose Segmentation',
       disabled: !modeled ? { tooltip: 'Please create a model first' } : false,
       complete: segmented,
-      content: <Segmentation 
+      content: <Segmentation
         pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={() => submitTab(() => {
-            return showTerminalWhileRunning(async () => {
-              await loadedPipeline.segment() // Run pose segmentation
-            }, 'Running pose segmentation')
-          }, 'segmentation')}
+          return showTerminalWhileRunning(async () => {
+            await loadedPipeline.segment() // Run pose segmentation
+          }, 'Running pose segmentation')
+        }, 'segmentation')}
       />
     },
     {
@@ -223,14 +225,14 @@ const Project: React.FC = () => {
       label: '5. Motif Videos',
       disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
       complete: motif_videos_created,
-      content: <MotifVideos 
+      content: <MotifVideos
         pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={async () => submitTab(() => {
-            return showTerminalWhileRunning(async () => {
-              await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
-            }, 'Creating motif videos')
-          }, 'motifs')}
+          return showTerminalWhileRunning(async () => {
+            await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
+          }, 'Creating motif videos')
+        }, 'motifs')}
       />
     },
     {
@@ -238,14 +240,14 @@ const Project: React.FC = () => {
       label: '6a. Community Analysis',
       disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
       complete: communities_created,
-      content: <CommunityAnalysis 
+      content: <CommunityAnalysis
         pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={(props) => submitTab(() => {
-            return showTerminalWhileRunning(async () => {
-              await loadedPipeline.community(props) // Run community analysis
-            }, 'Running community analysis')
-          }, 'community-videos')}
+          return showTerminalWhileRunning(async () => {
+            await loadedPipeline.community(props) // Run community analysis
+          }, 'Running community analysis')
+        }, 'community-videos')}
       />
     },
     {
@@ -253,14 +255,14 @@ const Project: React.FC = () => {
       label: '6b. Community Videos',
       disabled: !communities_created ? { tooltip: 'Please run community analysis first' } : false,
       complete: community_videos_created,
-      content: <CommunityVideos 
+      content: <CommunityVideos
         pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={async () => submitTab(() => {
-            return showTerminalWhileRunning(async () => {
-              await loadedPipeline.community_videos() // Creating community videos.
-            }, 'Creating community videos')
-          }, 'community-videos')}
+          return showTerminalWhileRunning(async () => {
+            await loadedPipeline.community_videos() // Creating community videos.
+          }, 'Creating community videos')
+        }, 'community-videos')}
       />
     },
     {
@@ -272,16 +274,16 @@ const Project: React.FC = () => {
         pipeline={loadedPipeline}
         block={willBlock}
         onFormSubmit={async () => submitTab(() => {
-            return showTerminalWhileRunning(async () => {
-              await loadedPipeline.visualization() // Create visualization
-            }, 'Creating UMAP visualization')
-          }, 'umap')}
+          return showTerminalWhileRunning(async () => {
+            await loadedPipeline.visualization() // Create visualization
+          }, 'Creating UMAP visualization')
+        }, 'umap')}
       />
     },
   ];
 
 
-   return (
+  return (
     <div>
       <ProjectHeader>
         <StyledHeaderDiv>
@@ -291,12 +293,12 @@ const Project: React.FC = () => {
               commoners.plugins.open(loadedPipeline.path)
 
             }}>Open in File Explorer</HeaderButton>
-             <HeaderButton onClick={() => {
-                navigate({
-                  pathname: '/create',
-                  search: `?project=${loadedPipeline.path}`
-                })
-              }}>Restart Project</HeaderButton>
+            <HeaderButton onClick={() => {
+              navigate({
+                pathname: '/create',
+                search: `?project=${loadedPipeline.path}`
+              })
+            }}>Restart Project</HeaderButton>
           </HeaderButtonContainer>
         </StyledHeaderDiv>
         <ProjectInformation>
@@ -304,8 +306,8 @@ const Project: React.FC = () => {
           <ProjectInformationCapsule><small><b>Project Location</b> <small>{loadedPipeline.configuration.project_path}</small></small></ProjectInformationCapsule>
         </ProjectInformation>
       </ProjectHeader>
-      <Tabs 
-        tabs={tabs} 
+      <Tabs
+        tabs={tabs}
         selected={selectedTab}
       />
 

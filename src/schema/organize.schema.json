@@ -6,7 +6,9 @@
             "title": "Reference Points",
             "description": "Indices of the reference points in the pose vector.",
             "items": {
-                "type": "integer"
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 5
             },
             "minItems": 2,
             "maxItems": 2,

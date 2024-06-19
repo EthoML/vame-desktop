@@ -89,6 +89,7 @@ class Pipeline {
 
     workflow = {
         organized: false,
+        pose_ref_index_description: "",
         modeled: false,
         segmented: false,
         motif_videos_created: false,
