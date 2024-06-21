@@ -344,13 +344,30 @@ class RegisterProject(Resource):
             # NOTE: Should lock access to the file
             pass
 
-
 @api.route('/log')
 class CurrentLog(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
         return open(CURRENT_LOG_FILE, "r").read()
 
+
+@api.route('/log/<path:log_name>')
+class ProjectLog(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request",404: "Not found", 500: "Internal server error"})
+    def get(self, log_name):
+
+        project_path = request.args.get('project')
+        project_path = Path(project_path)
+
+        if(log_name):
+            log_path = Path(project_path) / "logs" / f"{log_name}.log"
+            if log_path.is_file():
+                log = open(log_path, "r").read()
+                return log
+            else:
+                return f"{log_name} log not found.", 404
+
+        return "missing log_name", 400
 
 @api.route('/load')
 class Load(Resource):
@@ -669,7 +686,7 @@ class Visualization(Resource):
             data, project_path = resolve_request_data(request)
             vame.visualization(
                 **data,
-                # save_logs=True
+                save_logs=True
             )
             return dict(result=get_visualization_images(project_path))
         except Exception as exception:

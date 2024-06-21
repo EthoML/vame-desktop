@@ -4,6 +4,8 @@ import Pipeline from "../Pipeline"
 import { PaddedTab } from "../components/elements"
 import styled from "styled-components"
 import { TabProps } from "./types"
+import TerminalModal from "../components/TerminalModal"
+import { useState } from "react"
 
 const FlexDiv = styled.div`
     display: flex;
@@ -19,7 +21,7 @@ const Model = ({
     onFormSubmit,
     block
 }: TabProps) => {
-
+    const [terminal, setTerminal] = useState(false)
     const isModeled = pipeline.workflow.modeled
 
     if (isModeled) {
@@ -30,6 +32,10 @@ const Model = ({
     
         return (
             <PaddedTab>
+                <button onClick={()=>setTerminal(true)}>Open logs</button>
+
+                <TerminalModal projectPath={pipeline.path} logName={["train_model", "evaluate_model"]} isOpen={terminal} onClose={()=>setTerminal(false)}/> 
+
                 <FlexDiv>
                     {evaluationImages.map((imgPath => {
                         return <Image src={
