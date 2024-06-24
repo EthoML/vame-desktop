@@ -127,7 +127,8 @@ class Pipeline {
 
         this.data = {
             videos: result.videos,
-            csvs: result.csvs
+            csvs: result.csvs,
+            logs: result.logs
         }
 
         this.workflow = result.workflow

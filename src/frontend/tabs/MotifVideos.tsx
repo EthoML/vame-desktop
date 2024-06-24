@@ -1,15 +1,17 @@
+import { useState } from "react"
 import Pipeline from "../Pipeline"
 import DynamicForm, { DynamicFormProps } from "../components/DynamicForm"
 import { VideoGrid } from "../components/VideoGrid"
 import { PaddedTab } from "../components/elements"
 import { TabProps } from "./types"
+import TerminalModal from "../components/TerminalModal"
 
 const MotifVideos = ({
     pipeline,
     onFormSubmit,
     block
 }: TabProps) => {
-
+    const [terminal, setTerminal] = useState(false)
 
     const hasMotifVideos = pipeline.workflow.motif_videos_created
 
@@ -37,7 +39,12 @@ const MotifVideos = ({
     }, {})
 
     
-    return VideoGrid({ videos: organizedVideos, pipeline })
+    return <>
+        <button onClick={()=>setTerminal(true)}>Open logs</button>
+
+        <TerminalModal projectPath={pipeline.path} logName={["motif_videos"]} isOpen={terminal} onClose={()=>setTerminal(false)}/> 
+        <VideoGrid videos={organizedVideos} pipeline={pipeline} />
+    </> 
 }
 
 export default MotifVideos
