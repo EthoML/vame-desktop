@@ -98,6 +98,8 @@ class Pipeline {
         umaps_created: false
     }
 
+    states: Record<string,unknown> | null = null
+
     constructor(absPath?: string) {
         this.path = absPath ?? ''
     }
@@ -132,6 +134,8 @@ class Pipeline {
         }
 
         this.workflow = result.workflow
+
+        this.states = result.states
 
         return result
     }

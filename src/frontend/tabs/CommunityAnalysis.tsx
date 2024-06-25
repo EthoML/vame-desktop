@@ -16,6 +16,7 @@ const CommunityAnalysis = ({
     const schema = structuredClone(communitySchema)
 
     const communitiesCreated = pipeline.workflow.communities_created
+    const states = pipeline.states?.["community"]
 
     if (communitiesCreated) {
         Object.values(schema.properties).forEach(v => v.readOnly = true)
@@ -28,7 +29,7 @@ const CommunityAnalysis = ({
             <TerminalModal projectPath={pipeline.path} logName={["community"]} isOpen={terminal} onClose={()=>setTerminal(false)}/> 
 
             <DynamicForm 
-                initialValues={{}} 
+                initialValues={states ?? {}} 
                 schema={schema}
                 blockSubmission={block}
                 submitText={"Create Communities"}

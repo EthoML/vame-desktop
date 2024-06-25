@@ -383,6 +383,9 @@ class Load(Resource):
             if not symlink.exists():
                 symlink.symlink_to(project_path)
 
+        states_path = Path(project_path) / "states" / "states.json"
+
+        states = json.load(open(states_path)) if os.path.exists(states_path) else None
 
         config = yaml.safe_load(open(config_path, "r")) if config_path.exists() else None
 
@@ -430,7 +433,8 @@ class Load(Resource):
             ),
             videos=original_videos,
             csvs=original_csvs,
-            workflow=workflow
+            workflow=workflow,
+            states=states
         ))
 
 @api.route('/create', methods=['POST'])

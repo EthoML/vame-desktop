@@ -30,6 +30,8 @@ const Organize = ({
         Object.values(schema.properties).forEach(v => v.readOnly = true)
     }
 
+    const states = pipeline.states?.["egocentric_alignment"] ?? {}
+
    const [terminal, setTerminal]=useState(false)
 
     return (
@@ -39,7 +41,7 @@ const Organize = ({
             <TerminalModal projectPath={pipeline.path} logName={["egocentric_alignment", "create_trainset"]} isOpen={terminal} onClose={()=>setTerminal(false)}/> 
 
             <DynamicForm 
-                initialValues={{}} 
+                initialValues={states} 
                 schema={schema}
                 blockSubmission={block}
                 submitText={operations.join(" + ")}

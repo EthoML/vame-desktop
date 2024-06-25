@@ -20,7 +20,7 @@ export const GridTab = styled.div`
 
 export const PaddedBottomRow = styled.div`
     padding: 20px;
-    padding-top: 0px
+    padding-top: 0px;
 `
 
 // Video Players
