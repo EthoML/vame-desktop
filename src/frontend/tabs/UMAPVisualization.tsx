@@ -3,6 +3,8 @@ import DynamicForm from "../components/DynamicForm"
 import { PaddedTab } from "../components/elements"
 import { TabProps } from "./types"
 import { header } from "../utils/text"
+import TerminalModal from "../components/TerminalModal"
+import { useState } from "react"
 
 const FlexGrid = styled.div`
     display: flex;
@@ -28,23 +30,31 @@ const UMAPVisualization = ({
 }: TabProps) => {
 
     const hasUmaps = pipeline.workflow.umaps_created
+    const [terminal, setTerminal] = useState(false)
+
 
     if (hasUmaps) {
         return (
-            <FlexGrid>
-                {Object.entries(pipeline.assets.images.visualization).map(([video_set, images]) => {
-                    return images.map((umapPath: string) => {
-                        const label = umapPath.split('umap_vis_label_')[1].split(`_${video_set}`)[0]
-                        const uniqueKey = `${video_set}_${label}`
-                        return (
-                            <ImageContainer>
-                            <img src={pipeline.getAssetPath(umapPath)} alt={uniqueKey} key={uniqueKey} />
-                            <small><b>{video_set}:</b> {header(label)}</small>
-                            </ImageContainer>
-                        )
-                    })
-                }).flat(1)}
-            </FlexGrid>
+            <>
+                <button onClick={() => setTerminal(true)}>Open logs</button>
+
+                <TerminalModal projectPath={pipeline.path} logName={["visualization"]} isOpen={terminal} onClose={() => setTerminal(false)} />
+
+                <FlexGrid>
+                    {Object.entries(pipeline.assets.images.visualization).map(([video_set, images]) => {
+                        return images.map((umapPath: string) => {
+                            const label = umapPath.split('umap_vis_label_')[1].split(`_${video_set}`)[0]
+                            const uniqueKey = `${video_set}_${label}`
+                            return (
+                                <ImageContainer>
+                                    <img src={pipeline.getAssetPath(umapPath)} alt={uniqueKey} key={uniqueKey} />
+                                    <small><b>{video_set}:</b> {header(label)}</small>
+                                </ImageContainer>
+                            )
+                        })
+                    }).flat(1)}
+                </FlexGrid>
+            </>
         )
     }
 
@@ -52,7 +62,7 @@ const UMAPVisualization = ({
     return (
         <PaddedTab>
             <DynamicForm
-                initialValues={{}} 
+                initialValues={{}}
                 submitText="Create UMAP Visualization"
                 blockSubmission={block}
                 onFormSubmit={onFormSubmit}

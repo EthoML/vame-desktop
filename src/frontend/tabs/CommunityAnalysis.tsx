@@ -3,12 +3,15 @@ import { PaddedTab} from "../components/elements"
 
 import communitySchema from '../../schema/community.schema.json'
 import { TabProps } from "./types"
+import TerminalModal from "../components/TerminalModal"
+import { useState } from "react"
 
 const CommunityAnalysis = ({
     pipeline,
     onFormSubmit,
     block
 }: TabProps) => {
+    const [terminal, setTerminal] = useState(false)
 
     const schema = structuredClone(communitySchema)
 
@@ -20,6 +23,10 @@ const CommunityAnalysis = ({
 
     return (
         <PaddedTab>
+            <button onClick={()=>setTerminal(true)}>Open logs</button>
+
+            <TerminalModal projectPath={pipeline.path} logName={["community"]} isOpen={terminal} onClose={()=>setTerminal(false)}/> 
+
             <DynamicForm 
                 initialValues={{}} 
                 schema={schema}

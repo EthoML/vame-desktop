@@ -1,5 +1,7 @@
+import { useState } from "react"
 import DynamicForm from "../components/DynamicForm"
 import { PaddedTab} from "../components/elements"
+import TerminalModal from "../components/TerminalModal"
 import { VideoGrid } from "../components/VideoGrid"
 import { TabProps } from "./types"
 
@@ -8,6 +10,7 @@ const CommunityVideos = ({
     onFormSubmit,
     block
 }: TabProps) => {
+    const [terminal, setTerminal] = useState(false)
 
     const hasCommunityVideos = pipeline.workflow.community_videos_created
 
@@ -37,7 +40,12 @@ const CommunityVideos = ({
     }, {})
 
     
-    return VideoGrid({ videos: organizedVideos, pipeline })
+    return <>
+        <button onClick={()=>setTerminal(true)}>Open logs</button>
+
+        <TerminalModal projectPath={pipeline.path} logName={["community_videos"]} isOpen={terminal} onClose={()=>setTerminal(false)}/> 
+        <VideoGrid videos={organizedVideos} pipeline={pipeline} />
+    </> 
 }
 
 export default CommunityVideos
