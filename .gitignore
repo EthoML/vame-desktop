@@ -9,7 +9,6 @@ resources/python/*
 
 # Python Service Output
 build
-*.spec
 
 # Logs
 logs
