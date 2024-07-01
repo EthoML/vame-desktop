@@ -11,7 +11,9 @@ import Segmentation from './tabs/Segmentation';
 import UMAPVisualization from './tabs/UMAPVisualization';
 import MotifVideos from './tabs/MotifVideos';
 import CommunityAnalysis from './tabs/CommunityAnalysis';
-import { isConnected, onVAMEReady, post } from '../../utils/requests';
+import { open } from '../../utils/folders';
+import { post } from '../../utils/requests';
+import { onConnected, onVAMEReady } from '../../utils/vame';
 import CommunityVideos from './tabs/CommunityVideos';
 import Pipeline from '@renderer/context/Pipeline';
 import { CenteredFullscreenDiv, StyledHeaderDiv } from '@renderer/components/elements';
@@ -60,7 +62,7 @@ const Project: React.FC = () => {
   const [searchParams] = useSearchParams();
 
   const [canSubmit, setCanSubmit] = useState(false)
-  const [pipeline, setPipeline] = useState();
+  const [pipeline, setPipeline] = useState<Pipeline | undefined>();
 
   const [selectedTab, setSelectedTab] = useState();
 
@@ -70,19 +72,15 @@ const Project: React.FC = () => {
 
   // Load the pipeline configuration when the server is ready
   useEffect(() => {
-    const loadData = async ()=> {
-      const connected = await isConnected()
-      if(connected){
-        if (projectPath) {
-          const pipeline = new Pipeline(projectPath)
-          pipeline.load().then(() => setPipeline(pipeline))
-        }
+    onConnected(async()=>{
+      if (projectPath) {
+        const pipeline = new Pipeline(projectPath)
+        pipeline.load().then(() => setPipeline(pipeline))
       }
-    }
+
+    })
 
     onVAMEReady(() => setCanSubmit(true))
-
-    loadData()
   }, [])
 
   if (!pipeline) return <CenteredFullscreenDiv>
@@ -107,7 +105,7 @@ const Project: React.FC = () => {
     const result = await callback()
 
     // Reload the pipeline
-    const pipeline = new Pipeline(projectPath)
+    const pipeline = new Pipeline(projectPath ?? "")
     await pipeline.load()
     setPipeline(pipeline)
 
@@ -287,7 +285,7 @@ const Project: React.FC = () => {
           <h2>{loadedPipeline.configuration.Project}</h2>
           <HeaderButtonContainer>
             <HeaderButton onClick={() => {
-              commoners.plugins.open(loadedPipeline.path)
+              open(loadedPipeline.path)
 
             }}>Open in File Explorer</HeaderButton>
             <HeaderButton onClick={() => {

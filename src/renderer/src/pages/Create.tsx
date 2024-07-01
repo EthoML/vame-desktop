@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import DynamicForm from '../components/DynamicForm';
-import { onConnected, onVAMEReady, post } from '../utils/requests';
+import { onConnected, onVAMEReady } from '../utils/vame';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import createSchema from '../../../schema/create.schema.json';

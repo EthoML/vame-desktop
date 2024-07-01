@@ -1,11 +1,18 @@
 import { app,  BrowserWindow} from 'electron'
-import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { createWindow } from './handleWindow'
-import { requestHandler } from './handleRequests'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { join } from 'path'
+import { ChildProcessWithoutNullStreams } from 'child_process'
+
+import { createWindow } from './handlers/handleWindow'
+import { requestHandler } from './handlers/handleRequests'
+import { vameStatesHandler } from './handlers/handleVameStates'
+import { runChildProcess } from './handlers/handleChildProcess'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+let backend: ChildProcessWithoutNullStreams | null = null
+
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
@@ -16,10 +23,31 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
-  createWindow()
+  
+  vameStatesHandler()
 
   requestHandler()
+
+  const mainWindow = createWindow()
+
+  if (is.dev) {
+    backend = runChildProcess('python', [join(__dirname, '../../src/services/main.py')])
+
+    backend.stdout.on('data', (data) => {
+      if (data?.toString().includes("Running on")) {
+        console.log(`Python server is active...`)
+        mainWindow.webContents.send('vame:started')
+      }
+    });
+  } else {
+    backend = runChildProcess(join(process.resourcesPath,'python','main'))
+
+    backend.stdout.on('data', (data) => {
+      if (data?.toString().includes("Running on")) {
+        mainWindow.webContents.send('vame:started')
+      }
+    });
+  }
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -37,5 +65,9 @@ app.on('window-all-closed', () => {
   }
 })
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+// App close handler
+app.on('before-quit', function() {
+  if(backend && !backend?.killed){
+    backend?.kill(0)
+  }
+});

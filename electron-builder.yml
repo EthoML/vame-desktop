@@ -9,12 +9,10 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-  - '!resources/python'
-asarUnpack:
-  - resources/**
-extraResources:
-  from: 'resources/python'
-  to: '.'
+  # - '!resources/python'
+extraFiles:
+  - 'resources/python/*'
+  - '!resources/python/build/*'
 win:
   executableName: vame-desktop
 nsis:
@@ -25,8 +23,6 @@ nsis:
 mac:
   entitlementsInherit: resources/entitlements.mac.plist
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { get, onConnected } from '../utils/requests';
+import { get } from '../utils/requests';
+import { onConnected } from '../utils/vame';
 import { useNavigate } from 'react-router-dom';
 import PipelineList from '../components/PipelineList';
 import { StyledHeaderDiv } from '../components/elements';
@@ -16,46 +17,48 @@ export const PaddedContainer = styled.div`
 `;
 
 
-const loadPipelines = async (paths) => {
+const loadPipelines = async (paths?: string[]) => {
+  if(paths?.length)
+  return await Promise.all(paths.map(async (path: any) => {
+    const pipeline = new Pipeline(path)
+    await pipeline.load()
+    return pipeline
+  }))
 
-   return await Promise.all(paths.map(async (path: any) => {
-        const pipeline = new Pipeline(path)
-        await pipeline.load()
-        return pipeline
-    }))
+  return []
 }
 
 const Home: React.FC = () => {
 
   const navigate = useNavigate()
 
-  const [ allPipelines, setAllPipelines ] = useState<any[] | null>(null);
-  const [ recentPipelines, setRecentPipelines ] = useState<any[] | null>(null);
+  const [allPipelines, setAllPipelines] = useState<any[] | null>(null);
+  const [recentPipelines, setRecentPipelines] = useState<any[] | null>(null);
 
   // Load the pipeline configuration when the server is ready
   useEffect(() => {
-      onConnected(()=>{
-        get('projects').then(async (data) => setAllPipelines(await loadPipelines(data)))
+    onConnected(async () => {
+      get('projects').then(async (data) => setAllPipelines(await loadPipelines(data)))
 
-        get('projects/recent').then(async (data) => {
-          setRecentPipelines((await loadPipelines(data)).reverse())
-        })
+      get('projects/recent').then(async (data) => {
+        setRecentPipelines((await loadPipelines(data)).reverse())
       })
+    })
 
-   }, [])
+  }, [])
 
 
-   const onEdit = async (pipeline) => {
+  const onEdit = async (pipeline) => {
 
-    navigate({ 
+    navigate({
       pathname: "/project",
       search: `?project=${pipeline.path}`
     });
   }
 
   const onDelete = (pipeline) => {
-    const newAllPipelines = allPipelines.filter((p: any) => p.path !== pipeline.path)
-    const newRecentPipelines = recentPipelines.filter((p: any) => p.path !== pipeline.path)
+    const newAllPipelines = allPipelines?.filter((p: any) => p.path !== pipeline.path)
+    const newRecentPipelines = recentPipelines?.filter((p: any) => p.path !== pipeline.path)
     setAllPipelines(newAllPipelines)
     setRecentPipelines(newRecentPipelines)
   }
@@ -71,8 +74,8 @@ const Home: React.FC = () => {
       </StyledHeaderDiv>
 
       {recentPipelines ? (recentPipelines?.length > 0 ? (
-        <PipelineList 
-          pipelines={recentPipelines} 
+        <PipelineList
+          pipelines={recentPipelines}
           onEdit={onEdit}
           onDelete={onDelete}
         />
@@ -84,8 +87,8 @@ const Home: React.FC = () => {
         <h2>All Projects</h2>
       </StyledHeaderDiv>
       {allPipelines ? (allPipelines?.length > 0 ? (
-        <PipelineList 
-          pipelines={allPipelines.sort((a: any, b: any) => a.creationDate > b.creationDate ? -1 : 1)} 
+        <PipelineList
+          pipelines={allPipelines.sort((a: any, b: any) => a.creationDate > b.creationDate ? -1 : 1)}
           onEdit={onEdit}
           onDelete={onDelete}
         />

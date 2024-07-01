@@ -310,7 +310,9 @@ class Projects(Resource):
 class RecentProjects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
-        states = json.loads(open(GLOBAL_STATES_FILE, "r").read())
+        with open(GLOBAL_STATES_FILE, "r") as inp:
+            states = json.load(fp=inp)
+        # states = json.loads(open(GLOBAL_STATES_FILE, "r").read())
         recent_projects = states.get("recent_projects", [])
 
         # Filter those that no longer exist

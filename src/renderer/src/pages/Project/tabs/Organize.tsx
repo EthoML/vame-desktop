@@ -37,6 +37,9 @@ const Organize = ({
 
     return (
         <PaddedTab>
+            {/* <ControlButton>
+                    <FontAwesomeIcon icon={faTerminal} />
+            </ControlButton> */}
             <button onClick={()=>setTerminal(true)}>Open logs</button>
 
             <TerminalModal projectPath={pipeline.path} logName={["egocentric_alignment", "create_trainset"]} isOpen={terminal} onClose={()=>setTerminal(false)}/> 

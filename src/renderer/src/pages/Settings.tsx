@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import DynamicForm from '../components/DynamicForm';
-import { get, onConnected, post } from '../utils/requests';
+import { get, post } from '../utils/requests';
+import { onConnected } from '../utils/vame';
 
 import settingsSchema from '../../../schema/settings.schema.json';
 
@@ -11,7 +12,7 @@ const PaddedContainer = styled.div`
 
 const Settings: React.FC = () => {
 
-  const [ settings, setSettings ] = useState(null);
+  const [ settings, setSettings ] = useState<unknown>(null);
 
   // Load the pipeline configuration when the server is ready
   useEffect(() => {

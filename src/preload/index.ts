@@ -1,23 +1,21 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { handleActivities } from './utils'
-import { get, post, Requests } from './utils/requests'
 
-export type PythonAPI = {
-  post: Requests["post"]
-  get:Requests["get"]
-  onConnected: (callback: () => void) => void
-  onVAMEReady: (callback: () => void) => void
-}
-
-const {onConnected,onVAMEReady} = handleActivities()
+import { onConnected, onVAMEReady } from './handlers/activitiesHandler'
+import { open } from './handlers/folderHandler'
+import { get, post } from './handlers/requestsHandler'
 
 const services = {
-  api: {
+  vame: {
     onConnected,
     onVAMEReady,
+  },
+  api: {
     post,
     get
+  },
+  folder: {
+    open,
   }
 }
 
