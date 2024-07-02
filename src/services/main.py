@@ -322,8 +322,6 @@ class RecentProjects(Resource):
         with open(GLOBAL_STATES_FILE, "w") as file:
             json.dump(states, file)
 
-        print("recent_projects",recent_projects)
-
         return jsonify(recent_projects)
     
 @api.route('/project/register')
@@ -332,7 +330,8 @@ class RegisterProject(Resource):
     def post(self):
 
         try:
-            states = json.loads(open(GLOBAL_STATES_FILE, "r").read())
+            with open(GLOBAL_STATES_FILE, "r") as inp:
+                states = json.load(fp=inp)
 
             recent_projects = states.get("recent_projects", [])
 
