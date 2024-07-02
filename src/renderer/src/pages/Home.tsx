@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { get } from '../utils/requests';
 import { onConnected } from '../utils/vame';
@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import PipelineList from '../components/PipelineList';
 import { StyledHeaderDiv } from '../components/elements';
 import Pipeline from '@renderer/context/Pipeline';
+import Tippy from '@tippyjs/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 
 export const PaddedContainer = styled.div`
   padding: 25px 50px;
@@ -16,6 +19,19 @@ export const PaddedContainer = styled.div`
   }
 `;
 
+const ControlButton = styled.button`
+  font-size: 20px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: white;
+  background: #181c24;
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+`;
 
 const loadPipelines = async (paths?: string[]) => {
   if(paths?.length)
@@ -35,17 +51,21 @@ const Home: React.FC = () => {
   const [allPipelines, setAllPipelines] = useState<any[] | null>(null);
   const [recentPipelines, setRecentPipelines] = useState<any[] | null>(null);
 
+  const loadData = useCallback(async()=>{
+    get('projects').then(async (data) => setAllPipelines(await loadPipelines(data)))
+
+    get('projects/recent').then(async (data) => {
+      setRecentPipelines((await loadPipelines(data)).reverse())
+    })
+  },[])
+
   // Load the pipeline configuration when the server is ready
   useEffect(() => {
     onConnected(async () => {
-      get('projects').then(async (data) => setAllPipelines(await loadPipelines(data)))
-
-      get('projects/recent').then(async (data) => {
-        setRecentPipelines((await loadPipelines(data)).reverse())
-      })
+      loadData()
     })
 
-  }, [])
+  }, [loadData])
 
 
   const onEdit = async (pipeline) => {
@@ -71,6 +91,11 @@ const Home: React.FC = () => {
 
       <StyledHeaderDiv>
         <h2>Recent Projects</h2>
+        <Tippy content={<span>Refresh</span>}>
+            <ControlButton onClick={loadData}>
+                <FontAwesomeIcon icon={faArrowsRotate} />
+            </ControlButton>
+        </Tippy>
       </StyledHeaderDiv>
 
       {recentPipelines ? (recentPipelines?.length > 0 ? (
