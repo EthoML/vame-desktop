@@ -470,6 +470,7 @@ class Create(Resource):
             ))
 
         except Exception as exception:
+            print("exception", exception)
             if notBadRequestException(exception):
                 api.abort(500, str(exception))
 
