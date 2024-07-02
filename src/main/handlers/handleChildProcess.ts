@@ -5,7 +5,7 @@ export function runChildProcess(process: string, path?: string[]) {
   const child = spawn(process, path);
 
   child.on('exit', (code) =>
-    console.log('Process exited with code', code)
+    console.log(`[${process}]: Process exited with code ${code}`)
   );
 
   child.stdout.on('data', (data) => {
@@ -17,10 +17,6 @@ export function runChildProcess(process: string, path?: string[]) {
     console.log(`[${process} error]:`, data.toString());
     stderrChunks = stderrChunks.concat(data);
   });
-
-  child.once("exit", (data) => {
-    console.log(`[${process}]: ${data?.toString()}`)
-  })
 
   return child
 }

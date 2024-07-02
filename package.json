@@ -5,7 +5,7 @@
   "private": true,
   "description": "An open-source machine learning tool for behavioral segmentation and analyses.",
   "license": "GPL-3.0-only",
-  "author": "Garrett Flynn <garrettmflynn@gmail.com>, Nathan Vieira <nathan.v.marcelino@gmail.com>",
+  "author": "Catalyst Neuro <hello@catalystneuro.com>, Nathan Vieira <nathan.v.marcelino@gmail.com>, Garrett Flynn <garrettmflynn@gmail.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/catalystneuro/vame-desktop.git"
