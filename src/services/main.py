@@ -5,6 +5,7 @@ import json
 import csv
 from pathlib import Path
 import sys
+import signal
 from logging.config import dictConfig
 
 import traceback
@@ -730,6 +731,12 @@ class CreateGif(Resource):
         except Exception as exception:
             if notBadRequestException(exception):
                 api.abort(500, str(exception))
+
+def signal_handler(sig, frame):
+    print('Received SIGTERM, shutting down...')
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, signal_handler)
 
 if __name__ == "__main__":
     env_port = os.getenv('PORT')

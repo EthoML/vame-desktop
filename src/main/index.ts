@@ -66,8 +66,16 @@ app.on('window-all-closed', () => {
 })
 
 // App close handler
-app.on('before-quit', function() {
-  if(backend && !backend?.killed){
-    backend?.kill(0)
+app.on('before-quit', (event) => {
+  if (backend) {
+    backend.once("exit", () => {
+      console.log('Child process has exited. Quitting the app...');
+      app.exit(0) // Quit the app after the child process exits
+    })
+    backend.kill("SIGTERM");  // Send SIGTERM to the child process
+    event.preventDefault()  // Prevent the default behavior of quitting immediately
+  } else {
+    console.log('No backend process found. Quitting the app directly...');
+    app.exit(0)
   }
 });
