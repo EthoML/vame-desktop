@@ -74,16 +74,16 @@ app.on("window-all-closed", () => {
 app.on("before-quit", (event) => {
   if (backend && backend.exitCode === null) {
     event.preventDefault(); // Prevent the default behavior of quitting immediately
-    backend.once("exit", () => {
-      console.log("[electron]: Child process has exited. Quitting the app...");
-      app.exit(0); // Quit the app after the child process exits
+    backend.once("exit", (code) => {
+      console.log(`[electron]: Process exited with code ${code}`)
+      app.exit(code ?? 0); // Quit the app after the child process exits
     });
     backend.kill("SIGTERM"); // Send SIGTERM to the child process
   } else if (backend && backend.exitCode !== null) {
-    console.log("[electron]: Child process error. Exited code: ", backend.exitCode);
+    console.log(`[electron]: Process exited with code ${backend.exitCode}`)
     app.exit(backend.exitCode);
   } else {
-    console.log("[electron]: Child process not found. Quitting the app directly...");
+    console.log("[electron]: Process exited with code ", 1)
     app.exit(1);
   }
 });

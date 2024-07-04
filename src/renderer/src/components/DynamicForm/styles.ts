@@ -27,6 +27,7 @@ export const AccordionContent = styled.div<AccordionContentProps>`
 `;
 
 export const Form = styled.form`
+  overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -40,7 +41,7 @@ export const InputGroup = styled.div`
 `;
 
 interface InputLabelProps {
-  required: boolean;
+  required?: boolean;
 }
 
 export const InputLabel = styled.label<InputLabelProps>`

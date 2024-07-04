@@ -7,17 +7,22 @@ interface FileSelectorProps {
   multiple?: boolean;
   accept?: string;
   webkitdirectory?: boolean;
+  required?: boolean
 }
 
 const FileInput: React.FC<FileSelectorProps> = ({ 
   name, 
   multiple, 
   accept, 
-  webkitdirectory }) => {
+  webkitdirectory,
+  required }) => {
 
   return (
     <Controller
       name={name}
+      rules={{
+        required
+      }}
       render={({field:{value, onChange}}) => (
 
         <FileSelectorBody>

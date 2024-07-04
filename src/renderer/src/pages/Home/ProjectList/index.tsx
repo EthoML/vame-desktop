@@ -14,8 +14,6 @@ const ProjectsList: React.FC<Props> = ({
     onEdit
 }) => {
 
-    console.log(projects)
-
     return (
     <List>
     {projects.map((project) => (

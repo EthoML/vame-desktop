@@ -1,20 +1,27 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import FileInput from "./FileSelector";
+import ArrayInput from "./ArrayInput";
+import { Accordion, AccordionContent, AccordionHeader, InputGroup, InputLabel } from './styles';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 type DynamicInputProps = {
   name: string;
   property: Property;
-  defaultValue?: any
+  required?: boolean
 }
 
-const DynamicInput = ({
+const DynamicInput: React.FC<DynamicInputProps> = ({
   name,
   property,
-  defaultValue,
-}: DynamicInputProps) => {
+  required,
+}) => {
+  const itemKey = name
+  const [accordionState, setAccordionState] = useState(false)
 
-  const { register } = useFormContext()
+  const methods = useFormContext()
+  const { register } = methods
 
   const type = useMemo(() => {
     if (property && "enum" in property && property?.enum) return "enum";
@@ -32,7 +39,7 @@ const DynamicInput = ({
   if (type === "enum") {
     return (
       <select
-        {...register(name)}
+        {...register(itemKey, { required })}
       >
         {(property as EnumProperty)!.enum.map((option) => (
           <option key={option} value={option}>
@@ -47,8 +54,7 @@ const DynamicInput = ({
     return (
       <input
         type='checkbox'
-        defaultChecked={!!defaultValue}
-        {...register(name)}
+        {...register(itemKey, { required })}
       />
     );
   }
@@ -56,14 +62,14 @@ const DynamicInput = ({
   if (type === "number") {
     const numberProperty = property as NumberProperty
     const isInteger = numberProperty.type === 'integer';
+
     return (
       <input
         type="number"
         max={numberProperty?.maximum}
         min={numberProperty?.minimum}
         step={isInteger ? 1 : 0.01}
-        defaultValue={defaultValue}
-        {...register(name)}
+        {...register(itemKey, { required, valueAsNumber: true })}
       />
     );
   }
@@ -72,19 +78,56 @@ const DynamicInput = ({
     const fileProperty = property as FileProperty
     return (
       <FileInput
-        name={name}
+        name={itemKey}
         accept={fileProperty?.accept}
         multiple={fileProperty.multiple}
         webkitdirectory={type === "folder"}
+        required={required}
       />
     );
+  }
+
+  if (type === "object") {
+    const objectProperty = property as ObjectProperty
+
+    return (<>
+      <Accordion>
+        <AccordionHeader onClick={() => setAccordionState(prevState => !prevState)}>
+          {objectProperty.title ?? "Other options"}
+          <FontAwesomeIcon icon={accordionState ? faChevronUp : faChevronDown} />
+        </AccordionHeader>
+        <AccordionContent isOpen={accordionState}>
+          {Object.entries(objectProperty.properties).map(([key, property]) => (
+            <InputGroup key={`${itemKey}.${key}`}>
+              <InputLabel required={required}>
+                <span>{property.title ?? key}
+                </span>
+                <br />
+                {property.description && <small>{property.description}</small>}
+              </InputLabel>
+              <DynamicInput
+                name={`${itemKey}.${key}`}
+                property={property}
+                required={required}
+              />
+            </InputGroup>
+          ))}
+        </AccordionContent>
+      </Accordion>
+    </>
+    );
+  }
+
+  if (type === "array") {
+    const arrayProperty = property as ArrayProperty
+
+    return (<ArrayInput name={itemKey} property={arrayProperty} />);
   }
 
   return (
     <input
       type={"text"}
-      defaultValue={defaultValue}
-      {...register(name)}
+      {...register(itemKey, { required })}
       onKeyDown={(e) => {
         if (property && property['allow-spaces'] === false && e.key === ' ') e.preventDefault();
       }}

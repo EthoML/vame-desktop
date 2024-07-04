@@ -21,9 +21,15 @@
             "format": "file",
             "description": "A set of pose estimation data. NOTE: CSV file name needs to match video file name.",
             "title": "CSV Files",
-            "accept": [".csv"],
+            "accept": [
+                ".csv"
+            ],
             "multiple": true
         }
     },
-    "required": [ "name", "videos", "csvs" ]
+    "required": [
+        "name",
+        "videos",
+        "csvs"
+    ]
 }

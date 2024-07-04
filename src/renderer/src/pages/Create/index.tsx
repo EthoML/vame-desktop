@@ -24,8 +24,6 @@ const Create: React.FC = () => {
     try {
       const result = await createProject(formData)
 
-      console.log(result)
-
       if (!result.created) 
         return alert('A project with this name already exists!')
 
@@ -43,7 +41,7 @@ const Create: React.FC = () => {
     <PaddedContainer>
       <Header title="Create a New Project" />
       <DynamicForm
-        schema={createSchema as Schema}
+        schema={createSchema as unknown as Schema}
         onFormSubmit={handleFormSubmit}
         blockSubmission={blockSubmission}
         submitText='Create Project'

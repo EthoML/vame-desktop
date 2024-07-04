@@ -1,6 +1,7 @@
 import React from "react"
 import { FormProvider, useForm } from "react-hook-form"
-import Button from "../Button"
+import { extractDefaultValues } from "@renderer/utils/extractDefaultValues"
+import { Button, Form, InputGroup, InputLabel } from './styles';
 import DynamicInput from "./DynamicInput"
 
 interface Props {
@@ -18,26 +19,38 @@ const DynamicForm: React.FC<Props> = ({
   initialValues,
   submitText = "Submit",
 }) => {
+  const defaultValues = extractDefaultValues(schema) ?? initialValues
+
   const methods = useForm({
     disabled: blockSubmission,
-    defaultValues: initialValues,
+    defaultValues,
   })
 
   const properties = Object.entries(schema.properties)
-  // const isRequired = useCallback((key: string) => schema.required?.includes(key), [schema])
 
   return (
     <FormProvider {...methods}>
-      <form
+      
+      <Form
         onSubmit={methods.handleSubmit(onFormSubmit)}>
+        {properties.map(([name, property]) => {
+          const required = schema.required?.includes(name)
 
-        {properties.map(([name, property]) => (
-          <DynamicInput key={name} name={name} property={property} />
-        ))}
+          return (
+          <InputGroup key={name}>
+            <InputLabel required={required}>
+              <span>{property.title}
+              </span>
+              <br />
+              {property.description && <small>{property.description}</small>}
+            </InputLabel>
+            <DynamicInput  name={name} property={property} required={required} />
+          </InputGroup>
+        )})}
 
         <Button type="submit">{submitText}</Button>
 
-      </form>
+      </Form>
     </FormProvider>
   );
 }
