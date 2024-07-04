@@ -18,7 +18,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build":"npm run build:python && npm run build:electron ",
+    "build": "npm run build:python && npm run build:electron ",
     "build:python": "pyinstaller --distpath ./resources/python --workpath ./resources/python/build -y main.spec",
     "buid:electron-type-check": "npm run typecheck && electron-vite build",
     "build:electron": "electron-vite build",
@@ -40,6 +40,7 @@
     "electron-updater": "^6.1.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.52.1",
     "react-router-dom": "^6.23.1",
     "styled-components": "^6.1.11"
   },

@@ -10,9 +10,9 @@ export const onConnected: VameActivities["onConnected"] = async (callback, count
   if (connected.success) {
     callback()
   } else if (count > 3) {
-    Promise.reject(new Error("Maximum retries"))
+    alert("Can't connect with Python server")
   } else {
-    onConnected(callback, count + 1)
+    setTimeout(()=>onConnected(callback, count + 1),500)
   }
 }
 
@@ -21,9 +21,9 @@ export const onVAMEReady: VameActivities["onConnected"] = async (callback: () =>
   if (ready) {
     callback()
   } else if (count > 3) {
-    Promise.reject(new Error("Maximum retries"))
+    alert("Can't connect with VAME")
   } else {
-    onVAMEReady(callback, count + 1)
+    setTimeout(()=>onVAMEReady(callback, count + 1),500)
   }
 }
 

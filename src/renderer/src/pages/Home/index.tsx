@@ -14,26 +14,28 @@ const Home: React.FC = () => {
   const { projects, refresh, deleteProject } = useProjects()
   const navigate = useNavigate()
 
-  const onEdit = useCallback((project:Project)=>{
+  const onEdit = useCallback((project: Project) => {
     navigate(`project?path=${project.config.project_path}`)
-  },[])
+  }, [])
 
-  const onDelete = useCallback(async (project:Project)=>{
-    try{
+  const onDelete = useCallback(async (project: Project) => {
+    try {
       await deleteProject(project.config.project_path)
     } catch (e) {
       alert(e)
     }
-  },[])
+  }, [])
 
   return (
     <PaddedContainer>
 
       <Header title="Projects">
         <Tippy content={<span>Refresh</span>}>
+          <>
             <Button onClick={refresh}>
-                <FontAwesomeIcon icon={faArrowsRotate} />
+              <FontAwesomeIcon icon={faArrowsRotate} />
             </Button>
+          </>
         </Tippy>
       </Header>
 

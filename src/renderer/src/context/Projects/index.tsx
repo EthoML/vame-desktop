@@ -12,7 +12,7 @@ import {
   type IProjectContext,
   type Project
 } from "./types";
-import createVAMEProject from "./createVAMEProject";
+import createVAMEProject, { CreateProps } from "./createVAMEProject";
 import configureVAMEProject from "./configureVAMEProject";
 import deleteVAMEProject from "./deleteProject";
 
@@ -82,7 +82,11 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     onVAMEReady(loadProjectsData)
   }, [loadProjectsData])
 
-  const createProject = useCallback(createVAMEProject,[])
+  const createProject = useCallback(async (params: CreateProps)=>{
+    const res = await createVAMEProject(params)
+    await refresh()
+    return res
+  },[])
   const configureProject = useCallback(configureVAMEProject,[])
   const deleteProject = useCallback(deleteVAMEProject,[])
 

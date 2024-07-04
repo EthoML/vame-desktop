@@ -1,12 +1,5 @@
 import { ipcRenderer } from "electron";
-
-type IPCResponse<D> = {
-  success: true;
-  data: D;
-} | {
-  success: false;
-  error: string;
-}
+import { IPCResponse } from "./types";
 
 export type Requests = {
   post<R = unknown,T = unknown>(url: string, data: T): Promise<IPCResponse<R>>

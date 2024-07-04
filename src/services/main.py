@@ -734,7 +734,7 @@ class CreateGif(Resource):
 
 def signal_handler(sig, frame):
     print('Received SIGTERM, shutting down...')
-    sys.exit(0)
+    os._exit(0)
 
 signal.signal(signal.SIGTERM, signal_handler)
 

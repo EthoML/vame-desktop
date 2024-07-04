@@ -1,4 +1,6 @@
 {
+    "title": "Create VAME Project",
+    "type": "object",
     "properties": {
         "name": {
             "type": "string",

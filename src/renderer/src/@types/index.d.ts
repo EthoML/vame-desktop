@@ -48,16 +48,21 @@ declare global {
   interface DefaultPropertyAttrs {
     title: string;
     description?: string;
-    "allow-spaces": boolean;
+    "allow-spaces"?: boolean;
     readOnly?: boolean;
   }
 
   export type StringProperty = DefaultPropertyAttrs & {
     type: "string";
-    format?: "file" | "folder";
+    default?: string;
+  };
+
+  export type FileProperty = DefaultPropertyAttrs & {
+    type: "string";
+    format: "file" | "folder";
     default?: string;
     multiple?: boolean;
-    accept?: "string"; 
+    accept?: "string";
   };
 
   export type BooleanProperty = DefaultPropertyAttrs & {
