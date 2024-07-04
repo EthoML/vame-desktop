@@ -1,30 +1,50 @@
 import { ipcMain } from "electron";
 import { get } from "../libs/requests";
+import { AxiosError } from "axios";
 
 export function vameStatesHandler() {
-
   const states = {
     connected: false,
     ready: false
-  }
-  
-  ipcMain.handle("vame:connected",async (): Promise<boolean> => {
-    if(states.connected) {
-      return true
-    }
-    
-    return await get("connected").then(()=>states.connected = true).catch(()=>states.connected = false)
-  })
+  };
 
-  ipcMain.handle("vame:ready",async (): Promise<boolean> => {
-    if(states.ready) {
-      return true
+  ipcMain.handle("vame:connected", async (): Promise<{ success: boolean; data?: boolean; error?: string }> => {
+    if (states.connected) {
+      return { success: true, data: true };
     }
     
-    return await get("ready").then(()=>{
-      states.ready = true
-      console.log(`VAME is ready!`)
-      return states.ready
-    }).catch(()=>states.ready = false)
-  })
+    try {
+      await get("connected");
+      console.log(`[electron]: Python connected!`);
+      states.connected = true;
+      return { success: true, data: states.connected };
+    } catch (e) {
+      let errorMessage = "Error on main process";
+      if (e instanceof AxiosError) {
+        errorMessage = e.message;
+      }
+      states.connected = false;
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  ipcMain.handle("vame:ready", async (): Promise<{ success: boolean; data?: boolean; error?: string }> => {
+    if (states.ready) {
+      return { success: true, data: true };
+    }
+    
+    try {
+      await get("ready");
+      console.log(`[electron]: VAME is ready!`);
+      states.ready = true;
+      return { success: true, data: states.ready };
+    } catch (e) {
+      let errorMessage = "Error on main process";
+      if (e instanceof AxiosError) {
+        errorMessage = e.message;
+      }
+      states.ready = false;
+      return { success: false, error: errorMessage };
+    }
+  });
 }

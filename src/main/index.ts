@@ -3,10 +3,12 @@ import { electronApp, is, optimizer } from "@electron-toolkit/utils"
 import { join } from "path"
 import { ChildProcessWithoutNullStreams } from "child_process"
 
+import { runChildProcess } from "./process/runChildProcess"
+
 import { createWindow } from "./handlers/handleWindow"
 import { requestHandler } from "./handlers/handleRequests"
 import { vameStatesHandler } from "./handlers/handleVameStates"
-import { runChildProcess } from "./handlers/handleChildProcess"
+import { folderHandler } from "./handlers/handleExplorer"
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -15,7 +17,7 @@ let backend: ChildProcessWithoutNullStreams | null = null
 
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId("com.electron")
+  electronApp.setAppUserModelId("com.vame-desktop")
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -28,6 +30,8 @@ app.whenReady().then(() => {
 
   requestHandler()
 
+  folderHandler()
+
   const mainWindow = createWindow()
 
   if (is.dev) {
@@ -35,7 +39,7 @@ app.whenReady().then(() => {
 
     backend.stdout.on("data", (data) => {
       if (data?.toString().includes("Running on")) {
-        console.log(`Python server is active...`)
+        console.log(`[electron]: Python server is active...`)
         mainWindow.webContents.send("vame:started")
       }
     });
@@ -44,6 +48,7 @@ app.whenReady().then(() => {
 
     backend.stdout.on("data", (data) => {
       if (data?.toString().includes("Running on")) {
+        console.log(`[electron]: Python server is active...`)
         mainWindow.webContents.send("vame:started")
       }
     });
@@ -70,15 +75,15 @@ app.on("before-quit", (event) => {
   if (backend && backend.exitCode === null) {
     event.preventDefault(); // Prevent the default behavior of quitting immediately
     backend.once("exit", () => {
-      console.log("Child process has exited. Quitting the app...");
+      console.log("[electron]: Child process has exited. Quitting the app...");
       app.exit(0); // Quit the app after the child process exits
     });
     backend.kill("SIGTERM"); // Send SIGTERM to the child process
   } else if (backend && backend.exitCode !== null) {
-    console.log("Child process error. Exited code: ", backend.exitCode);
+    console.log("[electron]: Child process error. Exited code: ", backend.exitCode);
     app.exit(backend.exitCode);
   } else {
-    console.log("Child process not found. Quitting the app directly...");
+    console.log("[electron]: Child process not found. Quitting the app directly...");
     app.exit(1);
   }
 });

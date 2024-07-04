@@ -1,8 +1,16 @@
 import { ipcRenderer } from "electron";
 
+type IPCResponse<D> = {
+  success: true;
+  data: D;
+} | {
+  success: false;
+  error: string;
+}
+
 export type Requests = {
-  post<T = unknown, R = unknown>(url: string, data: Record<string, T>): Promise<R | void>
-  get<R = unknown>(url: string): Promise<R | void>
+  post<R = unknown,T = unknown>(url: string, data: T): Promise<IPCResponse<R>>
+  get<R = unknown>(url: string): Promise<IPCResponse<R>>
 }
 
 export const post: Requests["post"] = (url, data, options = {}) => ipcRenderer.invoke('vame:post', url, data, options);

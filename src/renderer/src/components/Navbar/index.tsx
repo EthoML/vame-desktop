@@ -1,52 +1,45 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileCirclePlus, faFileImport, faGear, faHome } from '@fortawesome/free-solid-svg-icons';
 
 import Tippy from '@tippyjs/react';
-
-const NavbarHeader = styled(Link)`
-    font-size: 24px;
-    color: black;
-    font-weight: bold;
-    text-decoration: none;
-`;
-
-const NavbarContainer = styled.nav`
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  font-size: 20px;
-  padding: 20px 20px;
-  background: whitesmoke;
-`;
-
-const NavbarSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-`;
-
-const ControlButton = styled.button`
-  font-size: 20px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  color: white;
-  background: #181c24;
-
-  &[disabled] {
-    opacity: 0.5;
-  }
-`;
+import { NavbarButton, NavbarContainer, NavbarHeader, NavbarSection } from './styles';
 
 const Navbar: React.FC = () => {
 
     const navigate = useNavigate()
+
+    const upload = useCallback(async () => {
+        const fileInput = document.createElement('input')
+        fileInput.type = 'file'
+        fileInput.webkitdirectory = true
+        fileInput.click()
+
+        const promise = new Promise((resolve, reject) => {
+            fileInput.onchange = async (ev) => {
+                // @ts-ignore
+                const files = Array.from(ev.target.files);
+                // @ts-ignore
+                const configPath = files.length > 0 ? files.find((file) => file.name === 'config.yaml')?.path : null
+                if (!configPath) {
+                    const mainError = "No config.yaml file found in the selected directory."
+                    window.alert(`${mainError} \n\nPlease select a valid VAME project.`)
+                    return reject(mainError)
+                }
+
+                resolve(configPath)
+            }
+        })
+
+        const project = await promise
+
+        navigate({
+            pathname: "/project",
+            search: `?project=${project}`
+        });
+    },[])
 
     return (
         <NavbarContainer>
@@ -56,63 +49,28 @@ const Navbar: React.FC = () => {
             <NavbarSection>
                 <Link to="/">
                     <Tippy content={<span>Home page</span>}>
-                        <ControlButton>
+                        <NavbarButton>
                             <FontAwesomeIcon icon={faHome} />
-                        </ControlButton>
+                        </NavbarButton>
+                    </Tippy>
+                </Link>
+                <Link to="/create">
+                    <Tippy content={<span>Create a new project</span>}>
+                        <NavbarButton>
+                            <FontAwesomeIcon icon={faFileCirclePlus} />
+                        </NavbarButton>
                     </Tippy>
                 </Link>
                 <Tippy content={<span>Load an external project</span>}>
-                    <ControlButton onClick={async () => {
-
-                        const fileInput = document.createElement('input')
-                        fileInput.type = 'file'
-                        fileInput.webkitdirectory = true
-                        fileInput.click()
-
-                        const promise = new Promise((resolve, reject) => {
-
-                            fileInput.onchange = async (ev) => {
-
-                                const files = Array.from(ev.target.files);
-                                const configPath = files.length > 0 ? files.find(file => file.name === 'config.yaml')?.path : null
-                                if (!configPath) {
-                                    const mainError = "No config.yaml file found in the selected directory."
-                                    window.alert(`${mainError} \n\nPlease select a valid VAME project.`)
-                                    return reject(mainError)
-                                }
-
-                                // const pipeline = new Pipeline(configPath)
-                                // await pipeline.load()
-
-                                // mainConsoleElement.innerHTML = '' // Clear the console
-                                // app.set(pipeline)
-
-                                resolve(configPath)
-                            }
-                        })
-
-                        const project = await promise
-
-                        navigate({
-                            pathname: "/project",
-                            search: `?project=${project}`
-                        });
-                    }}>
+                    <NavbarButton onClick={upload}>
                         <FontAwesomeIcon icon={faFileImport} />
-                    </ControlButton>
+                    </NavbarButton>
                 </Tippy>
-                <Link to="/create">
-                    <Tippy content={<span>Create a new project</span>}>
-                        <ControlButton>
-                            <FontAwesomeIcon icon={faFileCirclePlus} />
-                        </ControlButton>
-                    </Tippy>
-                </Link>
                 <Link to="/settings">
                     <Tippy content={<span>Edit global settings</span>}>
-                        <ControlButton>
+                        <NavbarButton>
                             <FontAwesomeIcon icon={faGear} />
-                        </ControlButton>
+                        </NavbarButton>
                     </Tippy>
                 </Link>
             </NavbarSection>
