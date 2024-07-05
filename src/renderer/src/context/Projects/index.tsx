@@ -10,7 +10,6 @@ import { get, post } from "@renderer/utils/requests";
 
 import {
   type IProjectContext,
-  type Project
 } from "./types";
 import createVAMEProject, { CreateProps } from "./createVAMEProject";
 import configureVAMEProject from "./configureVAMEProject";
@@ -33,8 +32,6 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     try {
       setLoadingPaths(true);
       const projectsPath = await get<string[]>('projects')
-      const recentsProjectsPath = await get<string[]>('projects/recent')
-
 
       if(projectsPath.success){
         setPaths(projectsPath.data)
@@ -55,14 +52,17 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     setLoadingProjects(true)
 
     const promises = paths.map(async (path) => {
-      return await post<Project>('load', { project: path })
+      return await post<Omit<Project,"created_at">>('load', { project: path })
     })
 
     Promise.allSettled(promises).then(data => {
       setProjects(data.map(icpResponse => {
         if (icpResponse.status === "fulfilled") {
           if(icpResponse.value.success){
-            return icpResponse.value.data
+            const { Project, project_path } = icpResponse.value.data.config
+            const created_at = new Date(project_path.split(`${Project}-`)[1]).toLocaleDateString()
+            const project = {...icpResponse.value.data, created_at}
+            return project
           }
         }
         return
@@ -87,8 +87,17 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     await refresh()
     return res
   },[])
-  const configureProject = useCallback(configureVAMEProject,[])
-  const deleteProject = useCallback(deleteVAMEProject,[])
+  const configureProject = useCallback(async (data)=>{
+    const res = await configureVAMEProject(data)
+    await refresh()
+    return res
+  },[])
+
+  const deleteProject = useCallback(async (data:string)=>{
+    const res = await deleteVAMEProject(data)
+    await refresh()
+    return res
+  },[])
 
   const alignProject = useCallback(async ()=>{},[])
   const createProjectTrainset = useCallback(async ()=>{},[])
@@ -102,9 +111,14 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
 
   const getAssets = useCallback(async ()=>{},[])
 
+  const getProject = useCallback((path:string)=>{
+    return projects.find(p=>p.config.project_path === path)
+  },[projects])
+
   const value = {
     projects,
     refresh,
+    getProject,
 
     createProject,
     configureProject,

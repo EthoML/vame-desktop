@@ -29,7 +29,7 @@ const Create: React.FC = () => {
 
       navigate({
         pathname: "/project",
-        search: `?project=${result.config.project_path}`
+        search: `?path=${result.config.project_path}`
       });
       
     } catch (error) {

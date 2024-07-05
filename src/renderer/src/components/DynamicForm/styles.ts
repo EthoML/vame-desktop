@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import ButtonComponent from "@renderer/components/Button"
 
 // Accordion Component
 export const Accordion = styled.div`
@@ -18,12 +19,12 @@ export const AccordionHeader = styled.div`
 `;
 
 interface AccordionContentProps {
-  isOpen: boolean;
+  $isOpen: boolean;
 }
 
 export const AccordionContent = styled.div<AccordionContentProps>`
   padding: 10px;
-  display: ${props => (props.isOpen ? 'block' : 'none')};
+  display: ${props => (props.$isOpen ? 'block' : 'none')};
 `;
 
 export const Form = styled.form`
@@ -42,6 +43,7 @@ export const InputGroup = styled.div`
 
 interface InputLabelProps {
   required?: boolean;
+  readOnly?: boolean;
 }
 
 export const InputLabel = styled.label<InputLabelProps>`
@@ -58,6 +60,12 @@ export const InputLabel = styled.label<InputLabelProps>`
   &[required] span:after {
     content: '*';
     color: red;
+    margin-left: 5px;
+  }
+
+  &[readOnly] span:after {
+    content: 'read only';
+    color: gray;
     margin-left: 5px;
   }
 
@@ -96,31 +104,27 @@ export const List = styled.ol`
   margin: 0;
 `;
 
-// export const ArrayButtons = styled.div`
-//   display: flex;
-//   gap: 5px;
-// `;
+export const ArrayButtons = styled.div`
+  display: flex;
+  gap: 5px;
+`;
 
-// export const ArrayButton = styled.button`
-//   color: black;
-//   background: none;
-//   border: none;
-//   cursor: pointer;
-// `;
+export const ArrayButton = styled.button`
+  color: black;
+  background: none;
+  border: none;
+  cursor: pointer;
+`;
 
-// export const AddButton = styled.button`
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   margin-top: 10px;
-//   padding: 10px;
-//   background-color: #007bff;
-//   width: 100%;
-//   color: white;
-//   border: none;
-//   border-radius: 3px;
-//   cursor: pointer;
-// `;
+export const AddButton = styled(ButtonComponent)`
+  background-color: #007bff;
+  color: white;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 export const FileSelectorBody = styled.div`
   display: grid;

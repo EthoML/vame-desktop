@@ -1,4 +1,3 @@
-import { Project } from "@renderer/context/Projects/types";
 import Button from "@renderer/components/Button";
 import { ButtonContainer, List, ListItem } from "./styles";
 

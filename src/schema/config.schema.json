@@ -113,7 +113,7 @@
           "type": "number"
         },
         "scheduler_threshold": {
-          "type": "string"
+          "type": "number"
         },
         "softplus": {
           "type": "boolean"

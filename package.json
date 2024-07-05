@@ -2,7 +2,6 @@
   "name": "vame-desktop",
   "main": "./out/main/index.js",
   "version": "1.0.0",
-  "private": true,
   "description": "An open-source machine learning tool for behavioral segmentation and analyses.",
   "license": "GPL-3.0-only",
   "author": "Catalyst Neuro <hello@catalystneuro.com>, Nathan Vieira <nathan.v.marcelino@gmail.com>, Garrett Flynn <garrettmflynn@gmail.com>",

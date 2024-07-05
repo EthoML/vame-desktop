@@ -7,7 +7,6 @@ import Button from '@renderer/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import ProjectsList from './ProjectList';
-import { Project } from '@renderer/context/Projects/types';
 import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {

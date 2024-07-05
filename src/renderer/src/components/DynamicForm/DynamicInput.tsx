@@ -5,19 +5,24 @@ import ArrayInput from "./ArrayInput";
 import { Accordion, AccordionContent, AccordionHeader, InputGroup, InputLabel } from './styles';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { read } from "fs";
 
 type DynamicInputProps = {
   name: string;
   property: Property;
-  required?: boolean
+  required?: boolean;
+  readOnly?: boolean;
 }
 
 const DynamicInput: React.FC<DynamicInputProps> = ({
   name,
   property,
   required,
+  readOnly,
 }) => {
   const itemKey = name
+  readOnly = readOnly ?? property.readOnly
+
   const [accordionState, setAccordionState] = useState(false)
 
   const methods = useFormContext()
@@ -40,6 +45,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     return (
       <select
         {...register(itemKey, { required })}
+        disabled={readOnly}
       >
         {(property as EnumProperty)!.enum.map((option) => (
           <option key={option} value={option}>
@@ -54,7 +60,8 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     return (
       <input
         type='checkbox'
-        {...register(itemKey, { required })}
+        {...register(itemKey)}
+        readOnly={readOnly}
       />
     );
   }
@@ -68,8 +75,9 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
         type="number"
         max={numberProperty?.maximum}
         min={numberProperty?.minimum}
-        step={isInteger ? 1 : 0.01}
+        step={isInteger ? 1 : "any"}
         {...register(itemKey, { required, valueAsNumber: true })}
+        readOnly={readOnly}
       />
     );
   }
@@ -83,6 +91,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
         multiple={fileProperty.multiple}
         webkitdirectory={type === "folder"}
         required={required}
+        readOnly={readOnly}
       />
     );
   }
@@ -96,10 +105,10 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
           {objectProperty.title ?? "Other options"}
           <FontAwesomeIcon icon={accordionState ? faChevronUp : faChevronDown} />
         </AccordionHeader>
-        <AccordionContent isOpen={accordionState}>
+        <AccordionContent $isOpen={accordionState}>
           {Object.entries(objectProperty.properties).map(([key, property]) => (
             <InputGroup key={`${itemKey}.${key}`}>
-              <InputLabel required={required}>
+              <InputLabel required={required} readOnly={property.readOnly}>
                 <span>{property.title ?? key}
                 </span>
                 <br />
@@ -109,6 +118,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
                 name={`${itemKey}.${key}`}
                 property={property}
                 required={required}
+                readOnly={property.readOnly ?? readOnly}
               />
             </InputGroup>
           ))}
@@ -121,13 +131,19 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
   if (type === "array") {
     const arrayProperty = property as ArrayProperty
 
-    return (<ArrayInput name={itemKey} property={arrayProperty} />);
+    return (
+      <ArrayInput
+        name={itemKey}
+        property={arrayProperty}
+        readOnly={readOnly}
+      />);
   }
 
   return (
     <input
       type={"text"}
       {...register(itemKey, { required })}
+      readOnly={readOnly}
       onKeyDown={(e) => {
         if (property && property['allow-spaces'] === false && e.key === ' ') e.preventDefault();
       }}

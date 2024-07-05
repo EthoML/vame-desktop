@@ -7,6 +7,8 @@ import Dashboard from './components/Dashboard';
 import Home from './pages/Home';
 import { ProjectsProvider } from './context/Projects';
 import Create from './pages/Create';
+import Settings from './pages/Settings';
+import Project from './pages/Project';
 
 const App: React.FC = () => {
 
@@ -16,6 +18,8 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/create" element={<Create />} />
+          <Route path="/project" element={<Project />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </ProjectsProvider>
   </Dashboard>

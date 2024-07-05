@@ -1,5 +1,4 @@
 import { post } from "@renderer/utils/requests"
-import { Project } from "./types"
 
 export interface CreateProps {
   name: string

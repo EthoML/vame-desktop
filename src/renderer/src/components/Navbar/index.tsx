@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
 
         navigate({
             pathname: "/project",
-            search: `?project=${project}`
+            search: `?path=${project}`
         });
     },[])
 

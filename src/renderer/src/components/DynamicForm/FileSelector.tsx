@@ -8,6 +8,7 @@ interface FileSelectorProps {
   accept?: string;
   webkitdirectory?: boolean;
   required?: boolean
+  readOnly?: boolean
 }
 
 const FileInput: React.FC<FileSelectorProps> = ({ 
@@ -15,7 +16,9 @@ const FileInput: React.FC<FileSelectorProps> = ({
   multiple, 
   accept, 
   webkitdirectory,
-  required }) => {
+  required,
+  readOnly
+}) => {
 
   return (
     <Controller
@@ -44,6 +47,7 @@ const FileInput: React.FC<FileSelectorProps> = ({
 
               onChange(value);
             }}
+            readOnly={readOnly}
             //@ts-ignore
             webkitdirectory={webkitdirectory ? String(webkitdirectory) : undefined}
           />

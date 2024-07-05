@@ -1,25 +1,26 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { extractDefaultValues } from "@renderer/utils/extractDefaultValues"
 import { Button, Form, InputGroup, InputLabel } from './styles';
 import DynamicInput from "./DynamicInput"
+import { header } from "@renderer/utils/text";
 
-interface Props {
+export interface DynamicFormProps {
   schema: Schema
   initialValues?: Record<string, unknown>
   onFormSubmit: <T = unknown>(data: T) => void
-  blockSubmission: boolean
+  blockSubmission?: boolean
   submitText: string
 }
 
-const DynamicForm: React.FC<Props> = ({
+const DynamicForm: React.FC<DynamicFormProps> = ({
   schema,
   onFormSubmit,
   blockSubmission,
   initialValues,
   submitText = "Submit",
 }) => {
-  const defaultValues = extractDefaultValues(schema) ?? initialValues
+  const defaultValues = initialValues ?? extractDefaultValues(schema)
 
   const methods = useForm({
     disabled: blockSubmission,
@@ -28,25 +29,31 @@ const DynamicForm: React.FC<Props> = ({
 
   const properties = Object.entries(schema.properties)
 
+  console.log(methods.formState.errors)
+
   return (
     <FormProvider {...methods}>
-      
+
       <Form
-        onSubmit={methods.handleSubmit(onFormSubmit)}>
+        onSubmit={methods.handleSubmit((data) => {
+          console.log("aaaaaa")
+          return onFormSubmit(data)
+        })}>
         {properties.map(([name, property]) => {
           const required = schema.required?.includes(name)
 
           return (
-          <InputGroup key={name}>
-            <InputLabel required={required}>
-              <span>{property.title}
-              </span>
-              <br />
-              {property.description && <small>{property.description}</small>}
-            </InputLabel>
-            <DynamicInput  name={name} property={property} required={required} />
-          </InputGroup>
-        )})}
+            <InputGroup key={name}>
+              <InputLabel required={required} readOnly={property.readOnly}>
+                <span>{property.title ?? header(name)}
+                </span>
+                <br />
+                {property.description && <small>{property.description}</small>}
+              </InputLabel>
+              <DynamicInput name={name} property={property} required={required} readOnly={property.readOnly} />
+            </InputGroup>
+          )
+        })}
 
         <Button type="submit">{submitText}</Button>
 
