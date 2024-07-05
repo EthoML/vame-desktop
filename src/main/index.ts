@@ -14,6 +14,7 @@ import { folderHandler } from "./handlers/handleExplorer"
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 let backend: ChildProcessWithoutNullStreams | null = null
+let mainWindow: BrowserWindow | null = null
 
 app.whenReady().then(() => {
   // Set app user model id for windows
@@ -32,24 +33,24 @@ app.whenReady().then(() => {
 
   folderHandler()
 
-  const mainWindow = createWindow()
-
   if (is.dev) {
     backend = runChildProcess("python", [join(__dirname, "..","..","src","services","main.py")])
 
-    backend.stdout.on("data", (data) => {
+    backend?.stdout.on("data", (data) => {
       if (data?.toString().includes("Running on")) {
         console.log(`[electron]: Python server is active...`)
-        mainWindow.webContents.send("vame:started")
+        if(!mainWindow)
+          createWindow()
       }
     });
   } else {
-    backend = runChildProcess(join(process.resourcesPath, "python", "main"))
+    backend = runChildProcess(join(process.resourcesPath,"python","main", "main"))
 
-    backend.stdout.on("data", (data) => {
+    backend?.stdout.on("data", (data) => {
       if (data?.toString().includes("Running on")) {
         console.log(`[electron]: Python server is active...`)
-        mainWindow.webContents.send("vame:started")
+        if(!mainWindow)
+          createWindow()
       }
     });
   }

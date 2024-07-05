@@ -1,20 +1,26 @@
-import { spawn } from "child_process";
+import { resolve } from "path";
 
-export function runChildProcess(process: string, path?: string[]) {
+export function runChildProcess(exec: string, path?: string[]) {
   let stdoutChunks = [], stderrChunks = [];
-  const child = spawn(process, path);
+  const spawn = require("child_process").spawn
+
+  const child = spawn(resolve(exec), path, {
+    env: {
+      PATH: process.env.PATH
+    }
+  });
 
   child.on('exit', (code) =>
-    console.log(`[${process}]: Process exited with code ${code}`)
+    console.log(`[${exec}]: Process exited with code ${code}`)
   );
 
   child.stdout.on('data', (data) => {
-    console.log(`[${process}]:`, data.toString());
+    console.log(`[${exec}]:`, data.toString());
     stdoutChunks = stdoutChunks.concat(data);
   });
 
   child.stderr.on('data', (data) => {
-    console.log(`[${process} error]:`, data.toString());
+    console.log(`[${exec} error]:`, data.toString());
     stderrChunks = stderrChunks.concat(data);
   });
 

@@ -5,10 +5,10 @@ data/*.mp4
 # Python
 venv
 __pycache__
-resources/python/*
 
 # Python Service Output
-build
+resources/python/build
+resources/python/main
 
 # Logs
 logs

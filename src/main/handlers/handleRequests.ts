@@ -28,4 +28,13 @@ export function requestHandler() {
       return { success: false, error: errorMessage };
     }
   });
+
+  // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: {
+  //       ...details.responseHeaders,
+  //       "Content-Security-Policy": ["*"],
+  //     },
+  //   });
+  // });
 }
