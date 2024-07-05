@@ -1,13 +1,13 @@
 
 import { post } from "@renderer/utils/requests"
 
-type ConfigureProjectProps = {
+type TrainProjectProps = {
     project: string
     [key:string]: any
 }
 
-const configureVAMEProject = async (data: ConfigureProjectProps) => {
-    const result = await post<Project>('configure', { ...data})
+const trainVAMEProject = async (data: TrainProjectProps) => {
+    const result = await post<Project>('train', { ...data})
 
     if (result.success) {
         return result.data
@@ -16,4 +16,4 @@ const configureVAMEProject = async (data: ConfigureProjectProps) => {
     }
 }
 
-export default configureVAMEProject
+export default trainVAMEProject

@@ -29,16 +29,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const properties = Object.entries(schema.properties)
 
-  console.log(methods.formState.errors)
-
   return (
     <FormProvider {...methods}>
 
       <Form
-        onSubmit={methods.handleSubmit((data) => {
-          console.log("aaaaaa")
-          return onFormSubmit(data)
-        })}>
+        onSubmit={methods.handleSubmit(onFormSubmit)}>
         {properties.map(([name, property]) => {
           const required = schema.required?.includes(name)
 
@@ -55,7 +50,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
           )
         })}
 
-        <Button type="submit">{submitText}</Button>
+        <Button type="submit" disabled={blockSubmission}>{submitText}</Button>
 
       </Form>
     </FormProvider>

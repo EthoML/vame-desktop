@@ -1,10 +1,14 @@
 import styled from "styled-components";
 
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+
+`;
+
 export const ProjectHeader = styled.header`
-  height: 100%;
   width: 100%;
   padding: 20px 30px;
-  overflow: visible;
 `
 
 export const ProjectInformation = styled.div`

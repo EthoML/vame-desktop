@@ -14,6 +14,10 @@ import {
 import createVAMEProject, { CreateProps } from "./createVAMEProject";
 import configureVAMEProject from "./configureVAMEProject";
 import deleteVAMEProject from "./deleteProject";
+import alignVAMEProject from "./alignProjectVAMEProject";
+import createVAMEProjectTrainset from "./createVAMEProjectTrainset";
+import trainVAMEProject from "./trainVAMEProject";
+import evaluateVAMEProject from "./evaluateVAMEProject copy";
 
 export const [ProjectsContext, useProjects] = createCustomContext<IProjectContext>("Projects Context");
 
@@ -99,17 +103,47 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     return res
   },[])
 
-  const alignProject = useCallback(async ()=>{},[])
-  const createProjectTrainset = useCallback(async ()=>{},[])
-  const trainProject = useCallback(async ()=>{},[])
-  const evaluateProject = useCallback(async ()=>{},[])
+  const alignProject = useCallback(async (data)=>{
+    const res = await alignVAMEProject(data)
+    await refresh()
+    return res
+  },[])
+
+  const createProjectTrainset = useCallback(async (data)=>{
+    const res = await createVAMEProjectTrainset(data)
+    await refresh()
+    return res
+  },[])
+  
+  const trainProject = useCallback(async (data)=>{
+    const res = await trainVAMEProject(data)
+    await refresh()
+    return res
+  },[])
+  const evaluateProject = useCallback(async (data)=>{
+    const res = await evaluateVAMEProject(data)
+    await refresh()
+    return res
+  },[])
+  
   const segmentProject = useCallback(async ()=>{},[])
   const createMotifVideos = useCallback(async ()=>{},[])
   const createCommunityMotifVideos = useCallback(async ()=>{},[])
   const createVisualization = useCallback(async ()=>{},[])
   const createGenerativeModel = useCallback(async ()=>{},[])
 
-  const getAssets = useCallback(async ()=>{},[])
+  const getAssetsPath = useCallback((projectPath:string,asset: string, basePath = 'files') => {
+      const project = getProject(projectPath)
+      if(!project){
+        throw new Error("cant find project")
+      }
+
+      const { Project, project_path } = project.config
+
+      const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
+
+      return new URL(`${basePath}/${fullProjectDirectory}/${asset}`, "http://0.0.0.0/").href
+  },[])
 
   const getProject = useCallback((path:string)=>{
     return projects.find(p=>p.config.project_path === path)
@@ -119,6 +153,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     projects,
     refresh,
     getProject,
+    getAssetsPath,
 
     createProject,
     configureProject,
@@ -134,7 +169,6 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     createVisualization,
     createGenerativeModel,
 
-    getAssets,
   }
 
   return (

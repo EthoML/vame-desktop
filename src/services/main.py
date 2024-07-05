@@ -269,6 +269,27 @@ class VAMEReady(Resource):
     def get(self):
         import vame
         return jsonify({ "payload": True })
+
+@api.route('/project_ready')
+class ProjectReady(Resource):
+    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
+    def post(self):
+        data, project_path = resolve_request_data(request)
+
+        states_path = Path(project_path) / "states" / "states.json"
+
+        with open(states_path, "r") as file:
+            states = json.load(fp=file)
+
+        if states is None:
+            return jsonify({ "is_ready": True })
+
+        for _, value in states.items():
+            execution_state = value.get("execution_state", None)
+            if execution_state == "running":
+                return jsonify({ "is_ready": False })
+
+        return jsonify({ "is_ready": True })
     
 @api.route('/settings')
 class Settings(Resource):
@@ -551,7 +572,7 @@ class Align(Resource):
 
             # If your experiment is by design egocentrical (e.g. head-fixed experiment on treadmill etc)
             # you can use the following to convert your .csv to a .npy array, ready to train vame on it
-            egocentric_data = data.pop('egocentric_data')
+            egocentric_data = data.pop('egocentric_data', None)
 
 
             if egocentric_data:
@@ -740,7 +761,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 if __name__ == "__main__":
     env_port = os.getenv('PORT')
-    PORT = int(env_port) if env_port else 8080
+    PORT = int(env_port) if env_port else 8641 
     HOST = os.getenv('HOST') or 'localhost'
     
     VAME_PROJECTS_DIRECTORY.mkdir(exist_ok=True, parents=True) # Create the VAME_PROJECTS_DIRECTORY if it doesn't exist

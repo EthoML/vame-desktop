@@ -28,35 +28,52 @@ const Tabs = ({
   const handleTabClick = (id) => setActiveTab(id);
 
   return (
-    <TabsContainer>
+    <>
       <TabList>
         {tabs.map(({ id, label, complete, disabled, tooltip }) => {
           return (
-            <Tippy content={tooltip} key={id} placement='bottom' hideOnClick={false}>
-              <TabButton
-                key={id}
-                disabled={disabled}
-                $active={id === activeTab}
-                $complete={complete}
-                onClick={() => handleTabClick(id)}
-              >
-                {label}
-              </TabButton>
-            </Tippy>
+            <div key={id} >
+              {tooltip ? (
+                <Tippy content={tooltip} placement='bottom' hideOnClick={false}>
+                  <TabButton
+                    disabled={disabled}
+                    $active={id === activeTab}
+                    $complete={complete}
+                    onClick={() => handleTabClick(id)}
+                  >
+                    {label}
+                  </TabButton>
+                </Tippy>
+              ) :
+                (
+                  <TabButton
+                    key={id}
+                    disabled={disabled}
+                    $active={id === activeTab}
+                    $complete={complete}
+                    onClick={() => handleTabClick(id)}
+                  >
+                    {label}
+                  </TabButton>
+                )
+              }
+            </div>
           )
         })}
       </TabList>
-      <TabContent>
-        {tabs.map((tab) => (
-          <TabPane
-            key={tab.id}
-            $active={tab.id === activeTab}
-          >
-            {tab.content}
-          </TabPane>
-        ))}
-      </TabContent>
-    </TabsContainer>
+      <TabsContainer>
+        <TabContent>
+          {tabs.map((tab) => (
+            <TabPane
+              key={tab.id}
+              $active={tab.id === activeTab}
+            >
+              {tab.content}
+            </TabPane>
+          ))}
+        </TabContent>
+      </TabsContainer>
+    </>
   );
 };
 

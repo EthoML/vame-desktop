@@ -69,49 +69,74 @@ declare global {
       zdims: number;
     };
     workflow: {
-      communities_created: boolean;
-      community_videos_created: boolean;
-      modeled: boolean;
-      motif_videos_created: boolean;
       organized: boolean;
       pose_ref_index_description: string;
+      modeled: boolean;
       segmented: boolean;
+      motif_videos_created: boolean;
+      communities_created: boolean;
+      community_videos_created: boolean;
+      motif_community_videos_created: boolean;
       umaps_created: boolean;
     };
     states: {
-      community: Record<string, unknown>;
-      community_videos: Record<string, unknown>;
+      community: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
+      community_videos: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
       create_trainset: {
+        execution_state?: string;
         check_parameter: boolean;
         config: string;
-        execution_state: string;
         pose_ref_index: number[];
       };
-      csv_to_numpy: Record<string, unknown>;
+      csv_to_numpy: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
       egocentric_alignment: {
         check_video: boolean;
         config: string;
         crop_size: number[];
-        execution_state: string;
+        execution_state?: string;
         pose_ref_index: number[];
         use_video: boolean;
         video_format: string;
       };
-      evaluate_model: Record<string, unknown>;
-      generative_model: Record<string, unknown>;
-      motif_videos: Record<string, unknown>;
-      pose_segmentation: Record<string, unknown>;
+      evaluate_model: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
+      generative_model: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
+      motif_videos: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
+      pose_segmentation: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
       train_model: {
         config: string;
-        execution_state: string;
+        execution_state?: string;
       };
-      visualization: Record<string, unknown>;
+      visualization: {
+        execution_state?: string;
+        [key:string]: unknown
+      };
     };
     videos: string[];
     csvs: string[];
     assets: {
       images: {
-        evaluation: unknown[];
+        evaluation: string[];
         visualization: Record<string,unknown[]>;
       };
       videos: {

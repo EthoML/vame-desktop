@@ -1,7 +1,7 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
-import { onConnected, onVAMEReady } from './handlers/activitiesHandler'
+import { onConnected, onProjectReady, onVAMEReady } from './handlers/activitiesHandler'
 import { open } from './handlers/folderHandler'
 import { get, post } from './handlers/requestsHandler'
 
@@ -9,6 +9,7 @@ const services = {
   vame: {
     onConnected,
     onVAMEReady,
+    onProjectReady,
   },
   api: {
     post,

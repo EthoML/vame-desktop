@@ -9,16 +9,16 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const TerminalModal: FC<ModalProps> = ({ isOpen, onClose, logName,projectPath }) => {
+const TerminalModal: FC<ModalProps> = ({ isOpen, onClose, logName, projectPath }) => {
 
   const node = useRef(null)
 
-  const handleBackgroundClick = useCallback<MouseEventHandler<HTMLDivElement>>((e)=>{
+  const handleBackgroundClick = useCallback<MouseEventHandler<HTMLDivElement>>((e) => {
 
     if (node.current === e.target) {
       onClose()
     }
-  },[node])
+  }, [node])
 
   return (
     <>
@@ -26,7 +26,7 @@ const TerminalModal: FC<ModalProps> = ({ isOpen, onClose, logName,projectPath })
         <BaseModalBackground onClick={handleBackgroundClick} ref={node}>
           {typeof logName === "string" ? <LogComponent logName={logName} projectPath={projectPath} /> : (
             <TerminalContainer >
-              {logName?.map(l=><LogComponent key={l} logName={l} projectPath={projectPath} />)}
+              {logName?.map(l => <LogComponent key={l} logName={l} projectPath={projectPath} />)}
             </TerminalContainer>
           )}
         </BaseModalBackground>}

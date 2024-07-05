@@ -3,17 +3,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { open } from '@renderer/utils/folders';
 import { post } from '@renderer/utils/requests';
-import { onConnected, onVAMEReady } from '@renderer/utils/vame';
+import { onConnected, onProjectReady } from '@renderer/utils/vame';
 
 import { useProjects } from '@renderer/context/Projects';
 
 import Tabs from '@renderer/components/Tabs';
 import Header from '@renderer/components/Header';
-import { CenteredFullscreenDiv, HeaderButton, HeaderButtonContainer, ProjectHeader, ProjectInformation, ProjectInformationCapsule } from './styles';
+import { CenteredFullscreenDiv, Container, HeaderButton, HeaderButtonContainer, ProjectHeader, ProjectInformation, ProjectInformationCapsule } from './styles';
 
 import ProjectConfiguration from './Tabs/ProjectConfiguration';
+import Organize from './Tabs/Organize';
+import Model from './Tabs/Model';
 
-// import Organize from './tabs/Organize';
 // import Model from './tabs/Model';
 // import Segmentation from './tabs/Segmentation';
 // import UMAPVisualization from './tabs/UMAPVisualization';
@@ -30,6 +31,10 @@ const Project: React.FC = () => {
     getProject,
     refresh,
     configureProject,
+    alignProject,
+    createProjectTrainset,
+    trainProject,
+    evaluateProject,
   } = useProjects()
 
   const [project, setProject] = useState<Project | undefined>()
@@ -43,8 +48,6 @@ const Project: React.FC = () => {
     callback: () => Promise<void>,
     tab?: string
   ) => {
-    console.log("submitTab")
-
     await callback()
     await refresh()
 
@@ -53,16 +56,16 @@ const Project: React.FC = () => {
 
 
   useEffect(() => {
-    onConnected(async () => {
-      if (projectPath) {
+    if (projectPath) {
+      onConnected(async () => {
         post('project/register', { project: projectPath }).then(res => {
           if (res.success)
             setProject(getProject(projectPath))
         })
-      }
-    })
+      })
 
-    onVAMEReady(() => setBlockSubmit(false))
+      onProjectReady(projectPath, () => setBlockSubmit(false))
+    }
   }, [projectPath])
 
   if (!project) {
@@ -218,6 +221,8 @@ const Project: React.FC = () => {
   // ];
 
 
+  console.log("blockSubmit", blockSubmit)
+
   const tabs = [
     {
       id: 'project-configuration',
@@ -231,16 +236,105 @@ const Project: React.FC = () => {
           const { advanced_options, ...mainProperties } = formData as any
 
           await configureProject(
-            { config: { ...mainProperties, ...advanced_options }, project: project.config.project_path 
-          }).catch(e => alert(e))
-          
+            {
+              config: { ...mainProperties, ...advanced_options }, project: project.config.project_path
+            }).catch(e => alert(e))
+
         }, 'data-organization')}
       />
     },
+    {
+      id: 'data-organization',
+      label: '2. Data Organization',
+      complete: organized,
+      content: <Organize
+        project={project}
+        blockSubmission={blockSubmit}
+        blockTooltip="Waiting VAME to be ready."
+        onFormSubmit={async (params) => submitTab(async () => {
+
+          const { pose_ref_index, advanced_options } = params
+
+          pose_ref_index.description = `${pose_ref_index.description}. `
+
+          await alignProject({ project: project.config.project_path, pose_ref_index, ...advanced_options })
+
+          // Create the trainset
+          await createProjectTrainset({ pose_ref_index })
+
+          // NOTE: Allow users to inspect the quality of the trainset here
+
+        }, 'model-creation')}
+      />,
+    },
+    {
+      id: 'model-creation',
+      label: '3. Model Creation',
+      // disabled: !organized,
+      complete: modeled,
+      content: <Model
+        project={project}
+        blockSubmission={blockSubmit}
+        blockTooltip="Waiting VAME to be ready."
+        onFormSubmit={({ train, evaluate }: any) => {
+          const runAll = train && evaluate
+          return submitTab(async () => {
+            const projectPath = project.config.project_path
+
+            if (train) await trainProject({ project: projectPath }) // Train the model
+            if (evaluate) await evaluateProject({ project: projectPath }) // Evaluate the model
+
+          }, runAll ? 'segmentation' : 'model-creation')
+        }}
+      />
+    },
+    {
+      id: 'segmentation',
+      label: '4. Pose Segmentation',
+      // disabled: !modeled,
+      complete: segmented,
+      content: <div>Lero</div>
+    },
+    {
+      id: 'motifs',
+      label: '5. Motif Videos',
+      // disabled: !segmented,
+      complete: motif_videos_created,
+      content: <div>Lero</div>
+    },
+    {
+      id: 'community',
+      label: '6a. Community Analysis',
+      // disabled: !segmented,
+      complete: communities_created,
+      content: <div>Lero</div>
+    },
+    {
+      id: 'community-videos',
+      label: '6b. Community Videos',
+      // disabled: !communities_created,
+      complete: community_videos_created,
+      content: <div>Lero</div>
+    },
+    {
+      id: 'motif-community-videos',
+      label: '6c. Motif Community Videos',
+      // disabled: !community_videos_created,
+      complete: community_videos_created,
+      content: <div>Lero</div>
+    },
+    {
+      id: 'umap',
+      label: '7. UMAP Visualization',
+      completed: umaps_created,
+      // disabled: !segmented,
+      content: <div>Lero</div>
+    },
+
   ]
 
   return (
-    <>
+    <div>
       <ProjectHeader>
         <Header title={project.config.Project}>
           <HeaderButtonContainer>
@@ -279,7 +373,7 @@ const Project: React.FC = () => {
         tabs={tabs}
         selected={selectedTab}
       />
-    </>
+    </div>
   );
 };
 
