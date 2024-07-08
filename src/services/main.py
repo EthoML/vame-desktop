@@ -776,7 +776,7 @@ if __name__ == "__main__":
     
     # Run the app
     try:
-        print(f"Running on {HOST}:{PORT}")
+        print(f"Flask server started at {HOST}:{PORT}")
         app.run(host=HOST, port = PORT)
 
     except Exception as e:

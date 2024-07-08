@@ -14,6 +14,8 @@ extraResources:
   to: "python/main"
   filter: ["**/*"]
 win:
+  target:
+    - exe
   executableName: vame-desktop
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
@@ -21,6 +23,8 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
+  target:
+    - dmg
   entitlementsInherit: resources/entitlements.mac.plist
   extendInfo:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
@@ -30,8 +34,6 @@ dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
   target:
-    - AppImage
-    - snap
     - deb
   maintainer: electronjs.org
   category: Utility

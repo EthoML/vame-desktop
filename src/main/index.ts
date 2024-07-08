@@ -16,6 +16,20 @@ import { folderHandler } from "./handlers/handleExplorer"
 let backend: ChildProcessWithoutNullStreams | null = null
 let mainWindow: BrowserWindow | null = null
 
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
+}
+
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId("com.vame-desktop")
@@ -34,25 +48,25 @@ app.whenReady().then(() => {
   folderHandler()
 
   if (is.dev) {
-    console.log(join(__dirname, "..","..","src","services","main.py"))
+    console.log(join(__dirname, "..", "..", "src", "services", "main.py"))
 
-    backend = runChildProcess("python", [join(__dirname, "..","..","src","services","main.py")])
+    backend = runChildProcess("python", [join(__dirname, "..", "..", "src", "services", "main.py")])
 
     backend?.stdout.on("data", (data) => {
-      if (data?.toString().includes("Running on")) {
+      if (data?.toString().includes("Flask server started at")) {
         console.log(`[electron]: Python server is active...`)
-        if(!mainWindow)
-          createWindow()
+        if (!mainWindow)
+          mainWindow = createWindow()
       }
     });
   } else {
-    backend = runChildProcess(resolve(join(process.resourcesPath,"python","main", "main")))
+    backend = runChildProcess(resolve(join(process.resourcesPath, "python", "main", "main")))
 
     backend?.stdout.on("data", (data) => {
-      if (data?.toString().includes("Running on")) {
+      if (data?.toString().includes("Flask server started at")) {
         console.log(`[electron]: Python server is active...`)
-        if(!mainWindow)
-          createWindow()
+        if (!mainWindow)
+          mainWindow = createWindow()
       }
     });
   }
