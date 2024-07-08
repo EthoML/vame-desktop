@@ -1,7 +1,7 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { FormProvider, useForm } from "react-hook-form"
 import { extractDefaultValues } from "@renderer/utils/extractDefaultValues"
-import { Button, Form, InputGroup, InputLabel } from './styles';
+import { Button, InputGroup, InputLabel } from './styles';
 import DynamicInput from "./DynamicInput"
 import { header } from "@renderer/utils/text";
 
@@ -32,7 +32,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   return (
     <FormProvider {...methods}>
 
-      <Form
+      <form
         onSubmit={methods.handleSubmit(onFormSubmit)}>
         {properties.map(([name, property]) => {
           const required = schema.required?.includes(name)
@@ -52,7 +52,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
         <Button type="submit" disabled={blockSubmission}>{submitText}</Button>
 
-      </Form>
+      </form>
     </FormProvider>
   );
 }

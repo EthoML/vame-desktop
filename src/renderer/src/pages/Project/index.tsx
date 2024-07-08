@@ -9,7 +9,7 @@ import { useProjects } from '@renderer/context/Projects';
 
 import Tabs from '@renderer/components/Tabs';
 import Header from '@renderer/components/Header';
-import { CenteredFullscreenDiv, Container, HeaderButton, HeaderButtonContainer, ProjectHeader, ProjectInformation, ProjectInformationCapsule } from './styles';
+import { Container, HeaderButton, HeaderButtonContainer, ProjectContent, ProjectHeader, ProjectInformation, ProjectInformationCapsule } from './styles';
 
 import ProjectConfiguration from './Tabs/ProjectConfiguration';
 import Organize from './Tabs/Organize';
@@ -70,13 +70,13 @@ const Project: React.FC = () => {
 
   if (!project) {
     return (
-      <CenteredFullscreenDiv>
+      <Container>
         <div>
           <b>Loading project details...</b>
           <br />
           <small>{projectPath}</small>
         </div>
-      </CenteredFullscreenDiv>
+      </Container>
     );
   }
 
@@ -260,7 +260,7 @@ const Project: React.FC = () => {
           await alignProject({ project: project.config.project_path, pose_ref_index, ...advanced_options })
 
           // Create the trainset
-          await createProjectTrainset({ pose_ref_index })
+          await createProjectTrainset({ project: project.config.project_path, pose_ref_index })
 
           // NOTE: Allow users to inspect the quality of the trainset here
 
@@ -334,7 +334,7 @@ const Project: React.FC = () => {
   ]
 
   return (
-    <div>
+    <Container>
       <ProjectHeader>
         <Header title={project.config.Project}>
           <HeaderButtonContainer>
@@ -368,12 +368,11 @@ const Project: React.FC = () => {
           </ProjectInformationCapsule>
         </ProjectInformation>
       </ProjectHeader>
-
-      <Tabs
-        tabs={tabs}
-        selected={selectedTab}
-      />
-    </div>
+        <Tabs
+          tabs={tabs}
+          selected={selectedTab}
+        />
+    </Container>
   );
 };
 

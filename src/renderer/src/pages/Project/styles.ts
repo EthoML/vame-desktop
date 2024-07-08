@@ -3,26 +3,27 @@ import styled from "styled-components";
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-
+  flex: 1;
+  overflow: hidden;
 `;
 
 export const ProjectHeader = styled.header`
   width: 100%;
   padding: 20px 30px;
-`
+`;
 
 export const ProjectInformation = styled.div`
   display: flex;
   gap: 15px;
   padding: 10px;
-
 `;
 
-export const CenteredFullscreenDiv = styled.div`
+export const ProjectContent = styled.div`
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+  flex-direction: column;
 `;
 
 export const ProjectInformationCapsule = styled.div`

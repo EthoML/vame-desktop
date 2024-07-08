@@ -27,13 +27,6 @@ export const AccordionContent = styled.div<AccordionContentProps>`
   display: ${props => (props.$isOpen ? 'block' : 'none')};
 `;
 
-export const Form = styled.form`
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-`;
-
 export const InputGroup = styled.div`
   display: flex;
   justify-content: space-between;
