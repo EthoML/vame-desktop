@@ -1,10 +1,9 @@
-import { resolve } from "path";
 
 export function runChildProcess(exec: string, path?: string[]) {
   let stdoutChunks = [], stderrChunks = [];
   const spawn = require("child_process").spawn
 
-  const child = spawn(resolve(exec), path, {
+  const child = spawn(exec, path, {
     env: {
       PATH: process.env.PATH
     }

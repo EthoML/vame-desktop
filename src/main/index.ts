@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from "electron"
 import { electronApp, is, optimizer } from "@electron-toolkit/utils"
-import { join } from "path"
+import { join, resolve } from "path"
 import { ChildProcessWithoutNullStreams } from "child_process"
 
 import { runChildProcess } from "./process/runChildProcess"
@@ -34,6 +34,8 @@ app.whenReady().then(() => {
   folderHandler()
 
   if (is.dev) {
+    console.log(join(__dirname, "..","..","src","services","main.py"))
+
     backend = runChildProcess("python", [join(__dirname, "..","..","src","services","main.py")])
 
     backend?.stdout.on("data", (data) => {
@@ -44,7 +46,7 @@ app.whenReady().then(() => {
       }
     });
   } else {
-    backend = runChildProcess(join(process.resourcesPath,"python","main", "main"))
+    backend = runChildProcess(resolve(join(process.resourcesPath,"python","main", "main")))
 
     backend?.stdout.on("data", (data) => {
       if (data?.toString().includes("Running on")) {
