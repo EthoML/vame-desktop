@@ -1,6 +1,6 @@
 import { post } from "@renderer/utils/requests"
 
-const deleteVAMEProject = async (path: string) => {
+export const deleteVAMEProject = async (path: string) => {
   const result = await post<Project>('delete_project', { project: path })
 
   if(result.success){
@@ -10,5 +10,3 @@ const deleteVAMEProject = async (path: string) => {
   }
 
 }
-
-export default deleteVAMEProject

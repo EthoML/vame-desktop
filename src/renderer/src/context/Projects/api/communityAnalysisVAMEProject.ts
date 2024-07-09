@@ -1,13 +1,13 @@
 
 import { post } from "@renderer/utils/requests"
 
-type TrainProjectProps = {
+type AlignProjectProps = {
     project: string
     [key:string]: any
 }
 
-const trainVAMEProject = async (data: TrainProjectProps) => {
-    const result = await post<Project>('train', { ...data})
+export const communityAnalysisVAMEProject = async (data: AlignProjectProps) => {
+    const result = await post<Project>('community', { ...data})
 
     if (result.success) {
         return result.data
@@ -15,5 +15,3 @@ const trainVAMEProject = async (data: TrainProjectProps) => {
         throw new Error(result.error)
     }
 }
-
-export default trainVAMEProject

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { open } from '@renderer/utils/folders';
@@ -9,11 +9,16 @@ import { useProjects } from '@renderer/context/Projects';
 
 import Tabs from '@renderer/components/Tabs';
 import Header from '@renderer/components/Header';
-import { Container, HeaderButton, HeaderButtonContainer, ProjectContent, ProjectHeader, ProjectInformation, ProjectInformationCapsule } from './styles';
+import { Container, HeaderButton, HeaderButtonContainer, ProjectHeader, ProjectInformation, ProjectInformationCapsule } from './styles';
 
 import ProjectConfiguration from './Tabs/ProjectConfiguration';
 import Organize from './Tabs/Organize';
 import Model from './Tabs/Model';
+import Segmentation from './Tabs/Segmentation';
+import MotifVideos from './Tabs/MotifVideos';
+import { CommunityAnalysis } from './Tabs/CommunityAnalysis';
+import CommunityVideos from './Tabs/CommunityVideos';
+import UMAPVisualization from './Tabs/UMAPVisualization';
 
 // import Model from './tabs/Model';
 // import Segmentation from './tabs/Segmentation';
@@ -31,10 +36,15 @@ const Project: React.FC = () => {
     getProject,
     refresh,
     configureProject,
-    alignProject,
-    createProjectTrainset,
-    trainProject,
-    evaluateProject,
+    align,
+    createTrainset,
+    train,
+    evaluate,
+    segment,
+    communityAnalysis,
+    createCommunityVideos,
+    createMotifVideos,
+    createUMAPVisualization,
   } = useProjects()
 
   const [project, setProject] = useState<Project | undefined>()
@@ -43,7 +53,6 @@ const Project: React.FC = () => {
 
   const navigate = useNavigate()
 
-
   const submitTab = useCallback(async (
     callback: () => Promise<void>,
     tab?: string
@@ -51,7 +60,15 @@ const Project: React.FC = () => {
     await callback()
     await refresh()
 
-    if (tab) setSelectedTab(tab)
+
+    if (tab) {
+      console.log("next tab", tab)
+      setSelectedTab(a => {
+        console.log("next tab", a)
+
+        return tab
+      })
+    }
   }, [])
 
 
@@ -90,138 +107,9 @@ const Project: React.FC = () => {
     umaps_created
   } = project.workflow
 
-
-  // const tabs = [
-  //   {
-  //     id: 'project-configuration',
-  //     label: '1. Project Configuration',
-  //     complete: organized,
-  //     content: <ProjectConfiguration
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={async (formData) => submitTab(async () => {
-  //         const { advanced_options, ...mainProperties } = formData
-  //         await loadedPipeline.configure({ ...mainProperties, ...advanced_options })
-  //       }
-  //         , 'data-organization')}
-  //     />
-  //   },
-  //   {
-  //     id: 'data-organization',
-  //     label: '2. Data Organization',
-  //     complete: organized,
-  //     content: <Organize
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={async (params) => submitTab(async () => {
-
-  //         const { pose_ref_index, advanced_options } = params
-
-  //         pose_ref_index.description = `${pose_ref_index.description}. `
-
-  //         await loadedPipeline.align({ pose_ref_index, ...advanced_options })
-
-  //         // Create the trainset
-  //         await loadedPipeline.create_trainset({ pose_ref_index })
-
-  //         // NOTE: Allow users to inspect the quality of the trainset here
-
-  //       }, 'model-creation')}
-  //     />,
-  //   },
-  //   {
-  //     id: 'model-creation',
-  //     label: '3. Model Creation',
-  //     disabled: !organized ? { tooltip: 'Please organize your data first' } : false,
-  //     complete: modeled,
-  //     content: <Model
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={async ({ train, evaluate } = {
-  //         train: true,
-  //         evaluate: true
-  //       }) => {
-
-  //         const runAll = train && evaluate
-  //         return submitTab(async () => {
-
-  //           if (train) await loadedPipeline.train() // Train the model
-  //           if (evaluate) await loadedPipeline.evaluate() // Evaluate the model
-
-  //         }, runAll ? 'segmentation' : 'model-creation')
-  //       }}
-  //     />
-  //   },
-
-  //   {
-  //     id: 'segmentation',
-  //     label: '4. Pose Segmentation',
-  //     disabled: !modeled ? { tooltip: 'Please create a model first' } : false,
-  //     complete: segmented,
-  //     content: <Segmentation
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={() => submitTab(async () => {
-  //         await loadedPipeline.segment() // Run pose segmentation
-  //       }, 'segmentation')}
-  //     />
-  //   },
-  //   {
-  //     id: 'motifs',
-  //     label: '5. Motif Videos',
-  //     disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
-  //     complete: motif_videos_created,
-  //     content: <MotifVideos
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={async () => submitTab(async () => {
-  //         await loadedPipeline.motif_videos() // Create motif videos separately from pose segmentation
-  //       }, 'motifs')}
-  //     />
-  //   },
-  //   {
-  //     id: 'community',
-  //     label: '6a. Community Analysis',
-  //     disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
-  //     complete: communities_created,
-  //     content: <CommunityAnalysis
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={(props) => submitTab(async () => {
-  //         await loadedPipeline.community(props) // Run community analysis
-  //       }, 'community-videos')}
-  //     />
-  //   },
-  //   {
-  //     id: 'community-videos',
-  //     label: '6b. Community Videos',
-  //     disabled: !communities_created ? { tooltip: 'Please run community analysis first' } : false,
-  //     complete: community_videos_created,
-  //     content: <CommunityVideos
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={async () => submitTab(async () => {
-  //         await loadedPipeline.community_videos() // Creating community videos.
-  //       }, 'community-videos')}
-  //     />
-  //   },
-  //   {
-  //     id: 'umap',
-  //     label: '7. UMAP Visualization',
-  //     completed: umaps_created,
-  //     disabled: !segmented ? { tooltip: 'Please segment poses first' } : false,
-  //     content: <UMAPVisualization
-  //       pipeline={loadedPipeline}
-  //       block={willBlock}
-  //       onFormSubmit={async () => submitTab(async () => {
-  //         await loadedPipeline.visualization() // Create visualization
-  //       }, 'umap')}
-  //     />
-  //   },
-  // ];
-
-
-  console.log("blockSubmit", blockSubmit)
+  const {
+    community,
+  } = project.states
 
   const tabs = [
     {
@@ -253,16 +141,15 @@ const Project: React.FC = () => {
         blockTooltip="Waiting VAME to be ready."
         onFormSubmit={async (params) => submitTab(async () => {
 
-          const { pose_ref_index, advanced_options } = params
+          const { pose_ref_index, advanced_options } = params as any
 
           pose_ref_index.description = `${pose_ref_index.description}. `
 
-          await alignProject({ project: project.config.project_path, pose_ref_index, ...advanced_options })
+          await align({ project: project.config.project_path, pose_ref_index, ...advanced_options })
 
-          // Create the trainset
-          await createProjectTrainset({ project: project.config.project_path, pose_ref_index })
+          await createTrainset({ project: project.config.project_path, pose_ref_index })
 
-          // NOTE: Allow users to inspect the quality of the trainset here
+          // TODO: Allow users to inspect the quality of the trainset here
 
         }, 'model-creation')}
       />,
@@ -270,19 +157,20 @@ const Project: React.FC = () => {
     {
       id: 'model-creation',
       label: '3. Model Creation',
-      // disabled: !organized,
+      disabled: !organized,
       complete: modeled,
+      tooltip: "Organize your project first.",
       content: <Model
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={({ train, evaluate }: any) => {
-          const runAll = train && evaluate
+        onFormSubmit={({ train: needTrain, evaluate: needEvaluate }: any) => {
+          const runAll = needTrain && needEvaluate
           return submitTab(async () => {
             const projectPath = project.config.project_path
 
-            if (train) await trainProject({ project: projectPath }) // Train the model
-            if (evaluate) await evaluateProject({ project: projectPath }) // Evaluate the model
+            if (needTrain) await train({ project: projectPath })
+            if (needEvaluate) await evaluate({ project: projectPath })
 
           }, runAll ? 'segmentation' : 'model-creation')
         }}
@@ -291,44 +179,97 @@ const Project: React.FC = () => {
     {
       id: 'segmentation',
       label: '4. Pose Segmentation',
-      // disabled: !modeled,
+      disabled: !modeled ? true : false,
       complete: segmented,
-      content: <div>Lero</div>
+      tooltip: "Model your project first.",
+      content: <Segmentation
+        project={project}
+        blockSubmission={blockSubmit}
+        blockTooltip="Waiting VAME to be ready."
+        onFormSubmit={() => submitTab(async () => {
+          const projectPath = project.config.project_path 
+          await segment({ project: projectPath })
+        }, 'segmentation')}
+      />
     },
     {
-      id: 'motifs',
+      id: 'motifs-videos',
       label: '5. Motif Videos',
-      // disabled: !segmented,
+      disabled: !segmented,
       complete: motif_videos_created,
-      content: <div>Lero</div>
+      tooltip: "Need Pose Segmentation.",
+      content: <MotifVideos
+        project={project}
+        blockSubmission={blockSubmit}
+        blockTooltip="Waiting VAME to be ready."
+        onFormSubmit={()=>submitTab(async()=>{
+          const projectPath = project.config.project_path 
+          await createMotifVideos({
+            project: projectPath,
+          })
+        },"motifs-videos")}
+      />
     },
     {
-      id: 'community',
+      id: 'community-analysis',
       label: '6a. Community Analysis',
-      // disabled: !segmented,
+      disabled: !segmented,
       complete: communities_created,
-      content: <div>Lero</div>
+      tooltip: "Need Pose Segmentation.",
+      content: <CommunityAnalysis 
+        project={project}
+        blockSubmission={blockSubmit}
+        blockTooltip="Waiting VAME to be ready."
+        onFormSubmit={()=>submitTab(async()=>{
+          const projectPath = project.config.project_path 
+          await communityAnalysis({
+            project: projectPath,
+          })
+        },"community-analysis")}
+      />
     },
     {
       id: 'community-videos',
       label: '6b. Community Videos',
-      // disabled: !communities_created,
+      disabled: !communities_created || !!community.cohort ,
       complete: community_videos_created,
-      content: <div>Lero</div>
+      tooltip: "Need community analysis with cohort false.",
+      content: <CommunityVideos
+        project={project}
+        blockSubmission={blockSubmit}
+        blockTooltip="Waiting VAME to be ready."
+        onFormSubmit={()=>submitTab(async()=>{
+          const projectPath = project.config.project_path 
+          await createCommunityVideos({
+            project: projectPath,
+          })
+        },"community-videos")}
+      />
     },
     {
       id: 'motif-community-videos',
       label: '6c. Motif Community Videos',
-      // disabled: !community_videos_created,
+      disabled: !community_videos_created,
       complete: community_videos_created,
-      content: <div>Lero</div>
+      content: <div>Feature not implemented yet</div>
     },
     {
-      id: 'umap',
+      id: 'umap-visualization',
       label: '7. UMAP Visualization',
       completed: umaps_created,
-      // disabled: !segmented,
-      content: <div>Lero</div>
+      disabled: !segmented,
+      tooltip: "Need segmentation.",
+      content: <UMAPVisualization
+        project={project}
+        blockSubmission={blockSubmit}
+        blockTooltip="Waiting VAME to be ready."
+        onFormSubmit={()=>submitTab(async()=>{
+          const projectPath = project.config.project_path 
+          await createUMAPVisualization({
+            project: projectPath,
+          })
+        },"umap-visualization")}
+      />
     },
 
   ]
@@ -368,10 +309,10 @@ const Project: React.FC = () => {
           </ProjectInformationCapsule>
         </ProjectInformation>
       </ProjectHeader>
-        <Tabs
-          tabs={tabs}
-          selected={selectedTab}
-        />
+      <Tabs
+        tabs={tabs}
+        selected={selectedTab}
+      />
     </Container>
   );
 };

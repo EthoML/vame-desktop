@@ -12,7 +12,7 @@ export interface CreateResponse {
   project: string
 }
 
-const createVAMEProject = async ({ name, videos, csvs }: CreateProps) => {
+export const createVAMEProject = async ({ name, videos, csvs }: CreateProps) => {
     const result = await post<CreateResponse>('create', {
       project: name,
       videos: videos,
@@ -25,5 +25,3 @@ const createVAMEProject = async ({ name, videos, csvs }: CreateProps) => {
       throw new Error(result.error)
     }
 }
-
-export default createVAMEProject

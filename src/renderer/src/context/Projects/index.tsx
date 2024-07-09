@@ -11,13 +11,20 @@ import { get, post } from "@renderer/utils/requests";
 import {
   type IProjectContext,
 } from "./types";
-import createVAMEProject, { CreateProps } from "./createVAMEProject";
-import configureVAMEProject from "./configureVAMEProject";
-import deleteVAMEProject from "./deleteProject";
-import alignVAMEProject from "./alignProjectVAMEProject";
-import createVAMEProjectTrainset from "./createVAMEProjectTrainset";
-import trainVAMEProject from "./trainVAMEProject";
-import evaluateVAMEProject from "./evaluateVAMEProject copy";
+
+import { 
+  createVAMEProject, 
+  deleteVAMEProject, 
+  configureVAMEProject, 
+  alignVAMEProject, 
+  createTrainsetVAMEProject, 
+  trainVAMEProject,
+  evaluateVAMEProject, 
+  segmentVAMEProject, 
+  createMotifVideosVAMEProject, createUMAPVisualizationVAMEProject,
+  communityAnalysisVAMEProject,
+  createCommunityVideosVAMEProject, 
+} from "./api";
 
 export const [ProjectsContext, useProjects] = createCustomContext<IProjectContext>("Projects Context");
 
@@ -26,18 +33,18 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   // Loaded projects
   const [projects, setProjects] = useState<Project[]>([])
-  const [loadingProjects,setLoadingProjects] = useState<boolean>(true);
+  const [loadingProjects, setLoadingProjects] = useState<boolean>(true);
 
   // deal with paths
   const [paths, setPaths] = useState<string[]>([]);
-  const [loadingPaths,setLoadingPaths] = useState<boolean>(true);
+  const [loadingPaths, setLoadingPaths] = useState<boolean>(true);
 
   const loadProjectsPaths = useCallback(async () => {
     try {
       setLoadingPaths(true);
       const projectsPath = await get<string[]>('projects')
 
-      if(projectsPath.success){
+      if (projectsPath.success) {
         setPaths(projectsPath.data)
       } else {
         throw new Error(projectsPath.error)
@@ -56,27 +63,27 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     setLoadingProjects(true)
 
     const promises = paths.map(async (path) => {
-      return await post<Omit<Project,"created_at">>('load', { project: path })
+      return await post<Omit<Project, "created_at">>('load', { project: path })
     })
 
     Promise.allSettled(promises).then(data => {
       setProjects(data.map(icpResponse => {
         if (icpResponse.status === "fulfilled") {
-          if(icpResponse.value.success){
+          if (icpResponse.value.success) {
             const { Project, project_path } = icpResponse.value.data.config
             const created_at = new Date(project_path.split(`${Project}-`)[1]).toLocaleDateString()
-            const project = {...icpResponse.value.data, created_at}
+            const project = { ...icpResponse.value.data, created_at }
             return project
           }
         }
         return
       }).filter(p => !!p) as Project[])
-    }).finally(()=>{
+    }).finally(() => {
       setLoadingProjects(false)
     })
   }, [paths])
 
-  const refresh = useCallback(loadProjectsPaths,[])
+  const refresh = useCallback(loadProjectsPaths, [])
 
   useEffect(() => {
     onConnected(loadProjectsPaths)
@@ -86,68 +93,104 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     onVAMEReady(loadProjectsData)
   }, [loadProjectsData])
 
-  const createProject = useCallback(async (params: CreateProps)=>{
+  const createProject = useCallback(async (params) => {
     const res = await createVAMEProject(params)
     await refresh()
     return res
-  },[])
-  const configureProject = useCallback(async (data)=>{
-    const res = await configureVAMEProject(data)
-    await refresh()
-    return res
-  },[])
+  }, [])
 
-  const deleteProject = useCallback(async (data:string)=>{
+  const deleteProject = useCallback(async (data: string) => {
     const res = await deleteVAMEProject(data)
     await refresh()
     return res
-  },[])
+  }, [])
 
-  const alignProject = useCallback(async (data)=>{
+  const configureProject = useCallback(async (data) => {
+    const res = await configureVAMEProject(data)
+    await refresh()
+    return res
+  }, [])
+
+  const align = useCallback(async (data) => {
     const res = await alignVAMEProject(data)
     await refresh()
     return res
-  },[])
+  }, [])
 
-  const createProjectTrainset = useCallback(async (data)=>{
-    const res = await createVAMEProjectTrainset(data)
+  const createTrainset = useCallback(async (data) => {
+    const res = await createTrainsetVAMEProject(data)
     await refresh()
     return res
-  },[])
-  
-  const trainProject = useCallback(async (data)=>{
+  }, [])
+
+  const train = useCallback(async (data) => {
     const res = await trainVAMEProject(data)
     await refresh()
     return res
-  },[])
-  const evaluateProject = useCallback(async (data)=>{
+  }, [])
+
+  const evaluate = useCallback(async (data) => {
     const res = await evaluateVAMEProject(data)
     await refresh()
     return res
-  },[])
-  
-  const segmentProject = useCallback(async ()=>{},[])
-  const createMotifVideos = useCallback(async ()=>{},[])
-  const createCommunityMotifVideos = useCallback(async ()=>{},[])
-  const createVisualization = useCallback(async ()=>{},[])
-  const createGenerativeModel = useCallback(async ()=>{},[])
+  }, [])
 
-  const getAssetsPath = useCallback((projectPath:string,asset: string, basePath = 'files') => {
-      const project = getProject(projectPath)
-      if(!project){
-        throw new Error("cant find project")
-      }
+  const segment = useCallback(async (data) => {
+    const res = await segmentVAMEProject(data)
+    await refresh()
+    return res
+  }, [])
 
-      const { Project, project_path } = project.config
+  const createMotifVideos = useCallback(async (data) => {
+    const res = await createMotifVideosVAMEProject(data)
+    await refresh()
+    return res
+  }, [])
 
-      const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
+  const communityAnalysis = useCallback(async (data) => { 
+    const res = await communityAnalysisVAMEProject(data)
+    await refresh()
+    return res
+  }, [])
 
-      return new URL(`${basePath}/${fullProjectDirectory}/${asset}`, "http://0.0.0.0/").href
-  },[])
+  const createCommunityVideos = useCallback(async (data) => {
+    const res = await createCommunityVideosVAMEProject(data)
+    await refresh()
+    return res
+   }, [])
 
-  const getProject = useCallback((path:string)=>{
-    return projects.find(p=>p.config.project_path === path)
-  },[projects])
+  const createMotifCommunityVideos = useCallback(async (data) => {
+    const res = await createMotifVideosVAMEProject(data)
+    await refresh()
+    return res
+  }, [])
+
+  const createUMAPVisualization = useCallback(async (data) => {
+    const res = await createUMAPVisualizationVAMEProject(data)
+    await refresh()
+    return res
+  }, [])
+
+  const getProject = useCallback((path: string) => {
+    return projects.find(p => p.config.project_path === path)
+  }, [projects])
+
+  const getAssetsPath = useCallback((projectPath: string, asset: string, basePath = 'files') => {
+    const project = getProject(projectPath)
+    
+    if (!project) {
+      console.log("projectPath",projectPath)
+      console.error("Cant find project")
+      return
+    }
+
+    const { Project, project_path } = project.config
+
+    const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
+
+    return new URL(`${basePath}/${fullProjectDirectory}/${asset}`, "http://0.0.0.0/").href
+  }, [getProject])
+
 
   const value = {
     projects,
@@ -156,28 +199,36 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     getAssetsPath,
 
     createProject,
-    configureProject,
     deleteProject,
 
-    alignProject,
-    createProjectTrainset,
-    trainProject,
-    evaluateProject,
-    segmentProject,
-    createMotifVideos,
-    createCommunityMotifVideos,
-    createVisualization,
-    createGenerativeModel,
+    configureProject,
 
+    align,
+    createTrainset,
+
+    train,
+    evaluate,
+
+    segment,
+
+    createMotifVideos,
+
+    communityAnalysis,
+
+    createCommunityVideos,
+
+    createMotifCommunityVideos,
+
+    createUMAPVisualization
   }
 
   return (
     <ProjectsContext.Provider value={value}>
-      {loadingPaths ? 
-        <>Finding Projects on VAME projects path</> : 
-          loadingProjects ? 
-            <>Loading Projects</> :
-            <>{children}</>
+      {loadingPaths ?
+        <>Finding Projects on VAME projects path</> :
+        loadingProjects ?
+          <>Loading Projects</> :
+          <>{children}</>
       }
     </ProjectsContext.Provider>
   );

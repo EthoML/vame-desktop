@@ -6,7 +6,7 @@ type CreateProjectTrainsetProps = {
     [key:string]: any
 }
 
-const createVAMEProjectTrainset = async (data: CreateProjectTrainsetProps) => {
+export const createTrainsetVAMEProject = async (data: CreateProjectTrainsetProps) => {
     const result = await post<Project>('create_trainset', { ...data})
 
     if (result.success) {
@@ -15,5 +15,3 @@ const createVAMEProjectTrainset = async (data: CreateProjectTrainsetProps) => {
         throw new Error(result.error)
     }
 }
-
-export default createVAMEProjectTrainset

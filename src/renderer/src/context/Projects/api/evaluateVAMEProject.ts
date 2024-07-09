@@ -1,13 +1,13 @@
 
 import { post } from "@renderer/utils/requests"
 
-type AlignProjectProps = {
+type EvaluateProjectProps = {
     project: string
     [key:string]: any
 }
 
-const alignVAMEProject = async (data: AlignProjectProps) => {
-    const result = await post<Project>('align', { ...data})
+export const evaluateVAMEProject = async (data: EvaluateProjectProps) => {
+    const result = await post<Project>('evaluate', { ...data})
 
     if (result.success) {
         return result.data
@@ -15,5 +15,3 @@ const alignVAMEProject = async (data: AlignProjectProps) => {
         throw new Error(result.error)
     }
 }
-
-export default alignVAMEProject

@@ -377,7 +377,7 @@ class RegisterProject(Resource):
             return jsonify(recent_projects)
         
         except Exception as exception:
-            # NOTE: Should lock access to the file
+            # TODO: Should lock access to the file
             pass
 
 @api.route('/log/<path:log_name>')

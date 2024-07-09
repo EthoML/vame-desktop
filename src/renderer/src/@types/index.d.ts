@@ -137,11 +137,11 @@ declare global {
     assets: {
       images: {
         evaluation: string[];
-        visualization: Record<string,unknown[]>;
+        visualization: Record<string,string[]>;
       };
       videos: {
-        community: Record<string,unknown[]>;
-        motif: Record<string,unknown[]>;
+        community: Record<string,string[]>;
+        motif: Record<string,string[]>;
       };
     };
     created_at: string;

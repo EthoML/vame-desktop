@@ -7,6 +7,10 @@ import { useState } from "react"
 import { Button } from "@renderer/components/DynamicForm/styles"
 import { useProjects } from "@renderer/context/Projects"
 import { PaddedTab } from "@renderer/components/Tabs/styles"
+import { ControlButton } from "@renderer/pages/Home/styles"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTerminal } from "@fortawesome/free-solid-svg-icons"
+import Tippy from "@tippyjs/react"
 
 const FlexDiv = styled.div`
     display: flex;
@@ -20,7 +24,8 @@ const Image = styled.img`
 const Model = ({
   project,
   onFormSubmit,
-  blockSubmission
+  blockSubmission,
+  blockTooltip
 }: TabProps) => {
   const { getAssetsPath } = useProjects()
   const [terminal, setTerminal] = useState(false)
@@ -34,7 +39,9 @@ const Model = ({
 
     return (
       <PaddedTab>
-        <button onClick={() => setTerminal(true)}>Open logs</button>
+        <ControlButton onClick={() => setTerminal(true)}>
+          <FontAwesomeIcon icon={faTerminal} />
+        </ControlButton>
 
         <TerminalModal
           projectPath={project.config.project_path}
@@ -51,12 +58,22 @@ const Model = ({
           }))}
         </FlexDiv>
         <br />
-        <Button
-          disabled={blockSubmission}
-          onClick={() => onFormSubmit({ evaluate: true })}
+        <Tippy
+          content={blockTooltip}
+          placement="bottom"
+          hideOnClick={false}
+          onShow={() => !blockSubmission as false}
         >
-          Regenerate Images
-        </Button>
+          <span>
+
+            <Button
+              disabled={blockSubmission}
+              onClick={() => onFormSubmit({ evaluate: true })}
+            >
+              Regenerate Images
+            </Button>
+          </span>
+        </Tippy>
       </PaddedTab>
     )
   }
@@ -64,12 +81,22 @@ const Model = ({
   // Show the form to train the model
   return (
     <PaddedTab>
-      <Button
-        disabled={blockSubmission}
-        onClick={() => onFormSubmit({})}
+      <Tippy
+        content={blockTooltip}
+        placement="bottom"
+        hideOnClick={false}
+        onShow={() => !blockSubmission as false}
       >
-        Train Model
-      </Button>
+        <span>
+
+          <Button
+            disabled={blockSubmission}
+            onClick={() => onFormSubmit({ evaluate: true, train: true })}
+          >
+            Train Model
+          </Button>
+        </span>
+      </Tippy>
     </PaddedTab>
   )
 }

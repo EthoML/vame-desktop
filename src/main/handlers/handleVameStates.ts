@@ -53,8 +53,8 @@ export function vameStatesHandler() {
     return await new Promise((resolve) => {
       let isReady: boolean | null = null;
       let error: string | null = null
-
-      const id = setInterval(() => {
+      let intervalId: NodeJS.Timeout
+      intervalId = setInterval(() => {
         post(`project_ready`, { project: data })
           .then((res: any) => {
             if (res) {
@@ -64,11 +64,12 @@ export function vameStatesHandler() {
           .catch((e) => {
             error = String(e)
           });
+          
         if (typeof isReady === "boolean") {
-          clearInterval(id)
+          clearInterval(intervalId)
           return resolve({ success: true, data: isReady })
         } else if (typeof error === "string") {
-          clearInterval(id)
+          clearInterval(intervalId)
           return resolve({ success: false, error: error })
         }
       }, 1000)

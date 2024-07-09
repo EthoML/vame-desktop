@@ -1,13 +1,13 @@
 
 import { post } from "@renderer/utils/requests"
 
-type ConfigureProjectProps = {
+type SegmentProjectTrainsetProps = {
     project: string
     [key:string]: any
 }
 
-const configureVAMEProject = async (data: ConfigureProjectProps) => {
-    const result = await post<Project>('configure', { ...data})
+export const segmentVAMEProject = async (data: SegmentProjectTrainsetProps) => {
+    const result = await post<Project>('segment', { ...data})
 
     if (result.success) {
         return result.data
@@ -15,5 +15,3 @@ const configureVAMEProject = async (data: ConfigureProjectProps) => {
         throw new Error(result.error)
     }
 }
-
-export default configureVAMEProject
