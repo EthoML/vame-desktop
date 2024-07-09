@@ -61,7 +61,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
       <input
         type='checkbox'
         {...register(itemKey)}
-        readOnly={readOnly}
+        disabled={readOnly}
       />
     );
   }
