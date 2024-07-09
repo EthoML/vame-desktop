@@ -57,13 +57,15 @@ const ProjectConfiguration = ({
         hideOnClick={false}
         onShow={() => !blockSubmission as false}
       >
-        <DynamicForm
-          initialValues={toEdit}
-          schema={schema}
-          blockSubmission={blockSubmission}
-          submitText="Finalize Configuration"
-          onFormSubmit={onFormSubmit}
-        />
+        <>
+          <DynamicForm
+            initialValues={toEdit}
+            schema={schema}
+            blockSubmission={blockSubmission}
+            submitText="Finalize Configuration"
+            onFormSubmit={onFormSubmit}
+          />
+        </>
       </Tippy>
     </PaddedTab>
   )

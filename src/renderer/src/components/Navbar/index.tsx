@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
             pathname: "/project",
             search: `?path=${project}`
         });
-    },[])
+    }, [])
 
     return (
         <NavbarContainer>
@@ -49,28 +49,36 @@ const Navbar: React.FC = () => {
             <NavbarSection>
                 <Link to="/">
                     <Tippy content={<span>Home page</span>}>
-                        <NavbarButton>
-                            <FontAwesomeIcon icon={faHome} />
-                        </NavbarButton>
+                        <span>
+                            <NavbarButton>
+                                <FontAwesomeIcon icon={faHome} />
+                            </NavbarButton>
+                        </span>
                     </Tippy>
                 </Link>
                 <Link to="/create">
                     <Tippy content={<span>Create a new project</span>}>
-                        <NavbarButton>
-                            <FontAwesomeIcon icon={faFileCirclePlus} />
-                        </NavbarButton>
+                        <span>
+                            <NavbarButton>
+                                <FontAwesomeIcon icon={faFileCirclePlus} />
+                            </NavbarButton>
+                        </span>
                     </Tippy>
                 </Link>
                 <Tippy content={<span>Load an external project</span>}>
-                    <NavbarButton onClick={upload}>
-                        <FontAwesomeIcon icon={faFileImport} />
-                    </NavbarButton>
+                    <span>
+                        <NavbarButton onClick={upload}>
+                            <FontAwesomeIcon icon={faFileImport} />
+                        </NavbarButton>
+                    </span>
                 </Tippy>
                 <Link to="/settings">
                     <Tippy content={<span>Edit global settings</span>}>
-                        <NavbarButton>
-                            <FontAwesomeIcon icon={faGear} />
-                        </NavbarButton>
+                        <span>
+                            <NavbarButton>
+                                <FontAwesomeIcon icon={faGear} />
+                            </NavbarButton>
+                        </span>
                     </Tippy>
                 </Link>
             </NavbarSection>

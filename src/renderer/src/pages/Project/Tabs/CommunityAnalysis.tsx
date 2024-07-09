@@ -40,19 +40,21 @@ export const CommunityAnalysis = ({
         onClose={() => setTerminal(false)}
       />
 
-      <Tippy 
-        content={blockTooltip} 
-        placement="bottom" 
-        hideOnClick={false} 
+      <Tippy
+        content={blockTooltip}
+        placement="bottom"
+        hideOnClick={false}
         onShow={() => !blockSubmission as false}
       >
-        <DynamicForm
-          initialValues={states ?? {}}
-          schema={schema}
-          blockSubmission={blockSubmission}
-          submitText={"Create Communities"}
-          onFormSubmit={onFormSubmit}
-        />
+        <>
+          <DynamicForm
+            initialValues={states ?? {}}
+            schema={schema}
+            blockSubmission={blockSubmission}
+            submitText={"Create Communities"}
+            onFormSubmit={onFormSubmit}
+          />
+        </>
       </Tippy>
     </PaddedTab>
   )

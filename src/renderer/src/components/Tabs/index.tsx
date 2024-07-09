@@ -34,14 +34,16 @@ const Tabs = ({
           <div key={id}>
             {tooltip ? (
               <Tippy content={tooltip} placement="bottom" hideOnClick={false}>
-                <TabButton
-                  disabled={disabled}
-                  $active={id === activeTab}
-                  $complete={complete}
-                  onClick={() => handleTabClick(id)}
-                >
-                  {label}
-                </TabButton>
+                <span>
+                  <TabButton
+                    disabled={disabled}
+                    $active={id === activeTab}
+                    $complete={complete}
+                    onClick={() => handleTabClick(id)}
+                  >
+                    {label}
+                  </TabButton>
+                </span>
               </Tippy>
             ) : (
               <TabButton

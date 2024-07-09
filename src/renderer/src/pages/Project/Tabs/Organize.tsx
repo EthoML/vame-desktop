@@ -60,13 +60,15 @@ const Organize = ({
         hideOnClick={false}
         onShow={() => !blockSubmission as false}
       >
-        <DynamicForm
-          // initialValues={states} 
-          schema={schema}
-          blockSubmission={blockSubmission}
-          submitText={operations.join(" + ")}
-          onFormSubmit={onFormSubmit}
-        />
+        <>
+          <DynamicForm
+            // initialValues={states} 
+            schema={schema}
+            blockSubmission={blockSubmission}
+            submitText={operations.join(" + ")}
+            onFormSubmit={onFormSubmit}
+          />
+        </>
       </Tippy>
     </PaddedTab>
   )
