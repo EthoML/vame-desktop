@@ -26,7 +26,11 @@ const LogComponent: React.FC<TerminalProps> = ({ logName, projectPath }) => {
   }, [logName, projectPath])
 
   useEffect(() => {
-    fetchLogs()
+    const intervalId = setInterval(()=>{
+      fetchLogs()
+    },1000)
+
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
