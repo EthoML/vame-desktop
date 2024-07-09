@@ -5,13 +5,13 @@ channels:
 dependencies:
   - python=3.11
   - pip
-  - numpy  # may have x64/arm64 mismatch issues so install from conda-forge
+  - numpy
   - pip:
     - flask
     - flask_restx
     - flask-cors
     - pyinstaller==6.8.0
     - pyinstaller-hooks-contrib == 2024.6
-    - vame-py @ git+https://github.com/EthoML/VAME.git@refactor/output-files-structure#vame
+    - vame-py=0.2.0
 
 prefix: /opt/anaconda3/envs/vame-desktop

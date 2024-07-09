@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is building a Linux release
 
 on:
   push:
-    branches: ["refactor/fix-build-issues"]
+    branches: ["main"]
     paths:
       - package.json
 
@@ -40,4 +40,4 @@ jobs:
       - name: Build and deploy on Linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:linux
+        run: npm run build:linux -- --publish
