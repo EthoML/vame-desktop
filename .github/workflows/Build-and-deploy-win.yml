@@ -3,9 +3,11 @@ run-name: ${{ github.actor }} is building a Windows release
 
 on:
   push:
-    branches: ["main"]
-    paths:
-      - package.json
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write 
@@ -40,4 +42,5 @@ jobs:
       - name: Build and deploy on Windows
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:win -- --publish
+          PUBLISH_FOR_PULL_REQUEST: true
+        run: npm run build:win -- --publish=onTagOrDraft

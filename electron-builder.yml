@@ -1,5 +1,5 @@
-appId: com.gladstoneinstitutes.vame
-productName: vame-desktop
+appId: com.gladstoneinstitutes.vame-desktop
+productName: VAME Desktop
 directories:
   buildResources: resources
 files:
@@ -15,10 +15,11 @@ extraResources:
   filter: ["**/*"]
 win:
   target:
-    - exe
+    - nsis
   executableName: vame-desktop
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  differentialPackage: false
+  artifactName: ${name}-${version}-win-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -31,14 +32,14 @@ mac:
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-macos.${ext}
+  writeUpdateInfo: false
 linux:
+  artifactName: ${name}-${version}-linux.${ext}
   target:
     - deb
   maintainer: electronjs.org
   category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: github

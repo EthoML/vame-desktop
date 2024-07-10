@@ -3,9 +3,11 @@ run-name: ${{ github.actor }} is building a Linux release
 
 on:
   push:
-    branches: ["refactor/fix-build-issues"]
-#     paths:
-#       - package.json
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   actions: write
@@ -42,4 +44,5 @@ jobs:
       - name: Build and deploy on Linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:linux
+          PUBLISH_FOR_PULL_REQUEST: true
+        run: npm run build:linux -- --publish=onTagOrDraft

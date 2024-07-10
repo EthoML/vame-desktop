@@ -3,9 +3,11 @@ run-name: ${{ github.actor }} is building a Mac release
 
 on:
   push:
-    branches: ["main"]
-    paths:
-      - package.json
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write 
@@ -45,7 +47,8 @@ jobs:
       - name: Build and deploy on Mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_FOR_PULL_REQUEST: true
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # APPLE_ID: ${{ secrets.APPLE_ID }}
           # APPLE_ID_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-        run: npm run build:mac -- --publish
+        run: npm run build:mac -- --publish=onTagOrDraft
