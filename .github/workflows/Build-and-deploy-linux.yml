@@ -8,7 +8,9 @@ on:
 #       - package.json
 
 permissions:
-  contents: write 
+  actions: write
+  contents: write
+  packages: write
 
 jobs:
   deploy-on-linux:
