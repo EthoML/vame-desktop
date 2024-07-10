@@ -33,7 +33,7 @@ const Tabs = ({
         {tabs.map(({ id, label, complete, disabled, tooltip }) => (
           <div key={id}>
             {tooltip ? (
-              <Tippy content={tooltip} placement="bottom" hideOnClick={false}>
+              <Tippy content={tooltip} disabled={!disabled || !tooltip} placement="bottom" hideOnClick={false}>
                 <span>
                   <TabButton
                     disabled={disabled}

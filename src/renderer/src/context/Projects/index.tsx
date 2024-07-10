@@ -187,7 +187,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
 
     const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
 
-    return new URL(`${basePath}/${fullProjectDirectory}/${asset}`, "http://0.0.0.0:8641").href
+    return new URL(`${basePath}/${fullProjectDirectory}/${asset}`, "http://localhost:8641").href
   }, [getProject])
 
 

@@ -22,11 +22,11 @@ const CommunityVideos = ({
         content={blockTooltip}
         placement="bottom"
         hideOnClick={false}
-        onShow={() => !blockSubmission as false}
+        disabled={!blockSubmission}
       >
         <span>
           <Button
-            disabled
+            disabled={blockSubmission}
             onClick={onFormSubmit}
           >
             Create Community Videos

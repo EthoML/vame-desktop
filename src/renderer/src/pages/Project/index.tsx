@@ -57,12 +57,18 @@ const Project: React.FC = () => {
     callback: () => Promise<void>,
     tab?: string
   ) => {
-    await callback()
-    await refresh()
-
-
-    if (tab) {
-      setSelectedTab(tab)
+    try{
+      setBlockSubmit(true)
+      await callback()
+      await refresh()
+      setBlockSubmit(true)
+      if (tab) {
+        setSelectedTab(tab)
+      }
+    } catch (e){
+      console.log
+    } finally {
+      setBlockSubmit(false)
     }
   }, [])
 
@@ -174,7 +180,7 @@ const Project: React.FC = () => {
     {
       id: 'segmentation',
       label: '4. Pose Segmentation',
-      disabled: !modeled ? true : false,
+      disabled: !modeled,
       complete: segmented,
       tooltip: "Model your project first.",
       content: <Segmentation
@@ -215,18 +221,22 @@ const Project: React.FC = () => {
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={()=>submitTab(async()=>{
+        onFormSubmit={(data: any)=>submitTab(async()=>{
           const projectPath = project.config.project_path 
+
           await communityAnalysis({
             project: projectPath,
+            cohort: data.cohort,
+            cut_tree: data.cut_tree,
+            show_umap: data.show_umap
           })
-        },"community-analysis")}
+        },"community-videos")}
       />
     },
     {
       id: 'community-videos',
       label: '6b. Community Videos',
-      disabled: !communities_created || !!community.cohort ,
+      disabled: !!community.cohort ,
       complete: community_videos_created,
       tooltip: "Need community analysis with cohort false.",
       content: <CommunityVideos
@@ -240,13 +250,6 @@ const Project: React.FC = () => {
           })
         },"community-videos")}
       />
-    },
-    {
-      id: 'motif-community-videos',
-      label: '6c. Motif Community Videos',
-      disabled: !community_videos_created,
-      complete: community_videos_created,
-      content: <div>Feature not implemented yet</div>
     },
     {
       id: 'umap-visualization',
