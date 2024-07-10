@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { open } from '@renderer/utils/folders';
@@ -19,14 +19,6 @@ import MotifVideos from './Tabs/MotifVideos';
 import { CommunityAnalysis } from './Tabs/CommunityAnalysis';
 import CommunityVideos from './Tabs/CommunityVideos';
 import UMAPVisualization from './Tabs/UMAPVisualization';
-
-// import Model from './tabs/Model';
-// import Segmentation from './tabs/Segmentation';
-// import UMAPVisualization from './tabs/UMAPVisualization';
-// import MotifVideos from './tabs/MotifVideos';
-// import CommunityAnalysis from './tabs/CommunityAnalysis';
-// import CommunityVideos from './tabs/CommunityVideos';
-
 
 const Project: React.FC = () => {
 
@@ -49,7 +41,7 @@ const Project: React.FC = () => {
 
   const [project, setProject] = useState<Project | undefined>()
   const [blockSubmit, setBlockSubmit] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<string>();
+  const [selectedTab, setSelectedTab] = useState<string>(localStorage.getItem("selected-tab") ?? "project-configuration");
 
   const navigate = useNavigate()
 
@@ -57,15 +49,17 @@ const Project: React.FC = () => {
     callback: () => Promise<void>,
     tab?: string
   ) => {
-    try{
+    try {
       setBlockSubmit(true)
       await callback()
       await refresh()
       setBlockSubmit(true)
       if (tab) {
+        console.log("next tab", tab)
+        localStorage.setItem("selected-tab", tab)
         setSelectedTab(tab)
       }
-    } catch (e){
+    } catch (e) {
       console.log
     } finally {
       setBlockSubmit(false)
@@ -188,7 +182,7 @@ const Project: React.FC = () => {
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
         onFormSubmit={() => submitTab(async () => {
-          const projectPath = project.config.project_path 
+          const projectPath = project.config.project_path
           await segment({ project: projectPath })
         }, 'segmentation')}
       />
@@ -203,12 +197,12 @@ const Project: React.FC = () => {
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={()=>submitTab(async()=>{
-          const projectPath = project.config.project_path 
+        onFormSubmit={() => submitTab(async () => {
+          const projectPath = project.config.project_path
           await createMotifVideos({
             project: projectPath,
           })
-        },"motifs-videos")}
+        }, "motifs-videos")}
       />
     },
     {
@@ -217,12 +211,12 @@ const Project: React.FC = () => {
       disabled: !segmented,
       complete: communities_created,
       tooltip: "Need Pose Segmentation.",
-      content: <CommunityAnalysis 
+      content: <CommunityAnalysis
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={(data: any)=>submitTab(async()=>{
-          const projectPath = project.config.project_path 
+        onFormSubmit={(data: any) => submitTab(async () => {
+          const projectPath = project.config.project_path
 
           await communityAnalysis({
             project: projectPath,
@@ -230,25 +224,25 @@ const Project: React.FC = () => {
             cut_tree: data.cut_tree,
             show_umap: data.show_umap
           })
-        },"community-videos")}
+        }, "community-videos")}
       />
     },
     {
       id: 'community-videos',
       label: '6b. Community Videos',
-      disabled: !!community.cohort ,
+      disabled: !!community.cohort,
       complete: community_videos_created,
       tooltip: "Need community analysis with cohort false.",
       content: <CommunityVideos
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={()=>submitTab(async()=>{
-          const projectPath = project.config.project_path 
+        onFormSubmit={() => submitTab(async () => {
+          const projectPath = project.config.project_path
           await createCommunityVideos({
             project: projectPath,
           })
-        },"community-videos")}
+        }, "community-videos")}
       />
     },
     {
@@ -261,12 +255,12 @@ const Project: React.FC = () => {
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={()=>submitTab(async()=>{
-          const projectPath = project.config.project_path 
+        onFormSubmit={() => submitTab(async () => {
+          const projectPath = project.config.project_path
           await createUMAPVisualization({
             project: projectPath,
           })
-        },"umap-visualization")}
+        }, "umap-visualization")}
       />
     },
 

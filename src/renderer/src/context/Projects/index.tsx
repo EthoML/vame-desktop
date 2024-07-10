@@ -60,8 +60,11 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
   }, [])
 
   const loadProjectsData = useCallback(() => {
-    setLoadingProjects(true)
+    if(!paths){
+      return
+    }
 
+    setLoadingProjects(true)
     const promises = paths.map(async (path) => {
       return await post<Omit<Project, "created_at">>('load', { project: path })
     })
