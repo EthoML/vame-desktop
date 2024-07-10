@@ -179,7 +179,6 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     const project = getProject(projectPath)
     
     if (!project) {
-      console.log("projectPath",projectPath)
       console.error("Cant find project")
       return
     }
@@ -188,7 +187,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
 
     const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
 
-    return new URL(`${basePath}/${fullProjectDirectory}/${asset}`, "http://0.0.0.0/").href
+    return new URL(`${basePath}/${fullProjectDirectory}/${asset}`, "http://0.0.0.0:8641").href
   }, [getProject])
 
 

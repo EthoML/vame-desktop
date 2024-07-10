@@ -48,8 +48,6 @@ app.whenReady().then(() => {
   folderHandler()
 
   if (is.dev) {
-    console.log(join(__dirname, "..", "..", "src", "services", "main.py"))
-
     backend = runChildProcess("python", [join(__dirname, "..", "..", "src", "services", "main.py")])
 
     backend?.stdout.on("data", (data) => {

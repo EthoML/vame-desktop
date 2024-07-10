@@ -62,12 +62,7 @@ const Project: React.FC = () => {
 
 
     if (tab) {
-      console.log("next tab", tab)
-      setSelectedTab(a => {
-        console.log("next tab", a)
-
-        return tab
-      })
+      setSelectedTab(tab)
     }
   }, [])
 
