@@ -24,15 +24,26 @@ const Segmentation = ({
     <PaddedTab>
       {isSegmented ?
         <>
-          <ControlButton onClick={() => setTerminal(true)}>
-            <FontAwesomeIcon icon={faTerminal} />
-          </ControlButton>
+          <span>
+            Open logs:{" "}
+            <ControlButton onClick={() => setTerminal(true)}>
+              <FontAwesomeIcon icon={faTerminal} />
+            </ControlButton>
+          </span>
 
           <TerminalModal projectPath={projectPath} logName={["pose_segmentation"]} isOpen={terminal} onClose={() => setTerminal(false)} />
           <p>Pose segmentation has been completed successfully!</p>
         </>
         :
         <PaddedTab>
+          <span>
+            Open logs:{" "}
+            <ControlButton onClick={() => setTerminal(true)}>
+              <FontAwesomeIcon icon={faTerminal} />
+            </ControlButton>
+          </span>
+          <TerminalModal projectPath={projectPath} logName={["pose_segmentation"]} isOpen={terminal} onClose={() => setTerminal(false)} />
+
           <Tippy
             content={blockTooltip}
             placement="bottom"

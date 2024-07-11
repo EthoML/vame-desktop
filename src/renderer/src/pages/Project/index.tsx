@@ -19,6 +19,7 @@ import MotifVideos from './Tabs/MotifVideos';
 import { CommunityAnalysis } from './Tabs/CommunityAnalysis';
 import CommunityVideos from './Tabs/CommunityVideos';
 import UMAPVisualization from './Tabs/UMAPVisualization';
+import { MainContainer } from '@renderer/components/Container';
 
 const Project: React.FC = () => {
 
@@ -41,7 +42,7 @@ const Project: React.FC = () => {
 
   const [project, setProject] = useState<Project | undefined>()
   const [blockSubmit, setBlockSubmit] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<string>(localStorage.getItem("selected-tab") ?? "project-configuration");
+  const [selectedTab, setSelectedTab] = useState<string>("project-configuration");
 
   const navigate = useNavigate()
 
@@ -53,10 +54,11 @@ const Project: React.FC = () => {
       setBlockSubmit(true)
       await callback()
       await refresh()
-      setBlockSubmit(true)
+
       if (tab) {
-        console.log("next tab", tab)
-        localStorage.setItem("selected-tab", tab)
+        const localItem = `selected-tab-${project?.config.Project}`
+        console.log("localItem",localItem)
+        localStorage.setItem(localItem, tab)
         setSelectedTab(tab)
       }
     } catch (e) {
@@ -64,7 +66,7 @@ const Project: React.FC = () => {
     } finally {
       setBlockSubmit(false)
     }
-  }, [])
+  }, [project])
 
 
   useEffect(() => {
@@ -80,15 +82,24 @@ const Project: React.FC = () => {
     }
   }, [projectPath])
 
+  useEffect(()=>{
+    if(project){
+      const loadedTab = localStorage.getItem(`selected-tab-${project?.config.Project}`)
+      if(loadedTab){
+        setSelectedTab(loadedTab)
+      }
+    }
+  },[project])
+
   if (!project) {
     return (
-      <Container>
+      <MainContainer>
         <div>
           <b>Loading project details...</b>
           <br />
           <small>{projectPath}</small>
         </div>
-      </Container>
+      </MainContainer>
     );
   }
 
@@ -104,6 +115,7 @@ const Project: React.FC = () => {
 
   const {
     community,
+    visualization
   } = project.states
 
   const tabs = [
@@ -209,7 +221,7 @@ const Project: React.FC = () => {
       id: 'community-analysis',
       label: '6a. Community Analysis',
       disabled: !segmented,
-      complete: communities_created,
+      complete: community?.execution_state === "success",
       tooltip: "Need Pose Segmentation.",
       content: <CommunityAnalysis
         project={project}
@@ -230,7 +242,7 @@ const Project: React.FC = () => {
     {
       id: 'community-videos',
       label: '6b. Community Videos',
-      disabled: !!community.cohort,
+      disabled: !!community.cohort || community?.execution_state !== "success",
       complete: community_videos_created,
       tooltip: "Need community analysis with cohort false.",
       content: <CommunityVideos
@@ -248,7 +260,7 @@ const Project: React.FC = () => {
     {
       id: 'umap-visualization',
       label: '7. UMAP Visualization',
-      completed: umaps_created,
+      completed: visualization?.execution_state==="success",
       disabled: !segmented,
       tooltip: "Need segmentation.",
       content: <UMAPVisualization

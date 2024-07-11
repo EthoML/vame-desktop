@@ -21,6 +21,14 @@ const MotifVideos = ({
 
   if (!hasMotifVideos) return (
     <PaddedTab>
+      <span>
+        Open logs:{" "}
+        <ControlButton onClick={() => setTerminal(true)}>
+          <FontAwesomeIcon icon={faTerminal} />
+        </ControlButton>
+      </span>
+      <TerminalModal projectPath={project.config.project_path} logName={["motif_videos"]} isOpen={terminal} onClose={() => setTerminal(false)} />
+
       <Tippy
         content={blockTooltip}
         placement="bottom"
@@ -53,10 +61,13 @@ const MotifVideos = ({
   }, {} as Record<string, VideoType[]>)
 
 
-  return <>
-    <ControlButton onClick={() => setTerminal(true)}>
-      <FontAwesomeIcon icon={faTerminal} />
-    </ControlButton>
+  return <PaddedTab>
+    <span>
+      Open logs:{" "}
+      <ControlButton onClick={() => setTerminal(true)}>
+        <FontAwesomeIcon icon={faTerminal} />
+      </ControlButton>
+    </span>
 
     <TerminalModal
       projectPath={project.config.project_path}
@@ -69,7 +80,7 @@ const MotifVideos = ({
       videos={organizedVideos}
       project={project}
     />
-  </>
+  </PaddedTab>
 }
 
 export default MotifVideos

@@ -16,7 +16,7 @@ export function createWindow(): BrowserWindow {
     webPreferences: {
       preload: join(__dirname, '..', 'preload','index.js'),
       sandbox: false,
-      webSecurity: is.dev ? false : true
+      webSecurity: true
     }
   })
 

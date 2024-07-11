@@ -12,64 +12,81 @@ import {
   type IProjectContext,
 } from "./types";
 
-import { 
-  createVAMEProject, 
-  deleteVAMEProject, 
-  configureVAMEProject, 
-  alignVAMEProject, 
-  createTrainsetVAMEProject, 
+import {
+  createVAMEProject,
+  deleteVAMEProject,
+  configureVAMEProject,
+  alignVAMEProject,
+  createTrainsetVAMEProject,
   trainVAMEProject,
-  evaluateVAMEProject, 
-  segmentVAMEProject, 
+  evaluateVAMEProject,
+  segmentVAMEProject,
   createMotifVideosVAMEProject, createUMAPVisualizationVAMEProject,
   communityAnalysisVAMEProject,
-  createCommunityVideosVAMEProject, 
+  createCommunityVideosVAMEProject,
 } from "./api";
+import { MainContainer } from "@renderer/components/Container";
 
 export const [ProjectsContext, useProjects] = createCustomContext<IProjectContext>("Projects Context");
 
 export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // Loaded projects
-  const [projects, setProjects] = useState<Project[]>([])
+  // Loadings
   const [loadingProjects, setLoadingProjects] = useState<boolean>(true);
+  const [loadingPaths, setLoadingPaths] = useState<boolean>(true);
+
+  const [projects, setProjects] = useState<Project[]>([])
+  const [recentProjects, setRecentProjects] = useState<Project[]>([])
 
   // deal with paths
   const [paths, setPaths] = useState<string[]>([]);
-  const [loadingPaths, setLoadingPaths] = useState<boolean>(true);
+  const [recentPaths, setRecentPaths] = useState<string[]>([]);
+
+  // deal with recent projects paths
 
   const loadProjectsPaths = useCallback(async () => {
     try {
       setLoadingPaths(true);
       const projectsPath = await get<string[]>('projects')
+      const recentProjectsPath = await get<string[]>('/projects/recent')
 
-      if (projectsPath.success) {
+      if (projectsPath.success && recentProjectsPath.success) {
         setPaths(projectsPath.data)
+        setRecentPaths(recentProjectsPath.data)
       } else {
-        throw new Error(projectsPath.error)
+        if(!projectsPath.success){
+          throw new Error(projectsPath.error)
+        } else if (!recentProjectsPath.success){
+          throw new Error(recentProjectsPath.error)
+        }
       }
     } catch (e) {
       if (e instanceof Error) {
         window.alert(e.message)
       }
-      throw e
     } finally {
       setLoadingPaths(false)
     }
   }, [])
 
-  const loadProjectsData = useCallback(() => {
-    if(!paths){
+  const loadProjectsData = useCallback(async () => {
+    if (!paths || !recentPaths) {
       return
     }
 
     setLoadingProjects(true)
-    const promises = paths.map(async (path) => {
+    const promisesProjects = paths.map(async (path) => {
       return await post<Omit<Project, "created_at">>('load', { project: path })
     })
 
-    Promise.allSettled(promises).then(data => {
+    const promisesRecents = recentPaths.map(async (path) => {
+      return await post<Omit<Project, "created_at">>('load', { project: path })
+    })
+    try {
+      const data = await Promise.allSettled(promisesProjects)
+      const data2 = await Promise.allSettled(promisesRecents)
+
       setProjects(data.map(icpResponse => {
         if (icpResponse.status === "fulfilled") {
           if (icpResponse.value.success) {
@@ -81,10 +98,25 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
         }
         return
       }).filter(p => !!p) as Project[])
-    }).finally(() => {
+
+      setRecentProjects(data2.map(icpResponse => {
+        if (icpResponse.status === "fulfilled") {
+          if (icpResponse.value.success) {
+            const { Project, project_path } = icpResponse.value.data.config
+            const created_at = new Date(project_path.split(`${Project}-`)[1]).toLocaleDateString()
+            const project = { ...icpResponse.value.data, created_at }
+            return project
+          }
+        }
+        return
+      }).filter(p => !!p) as Project[])
+
+    } catch (error) {
+      window.alert("Something went wrong loading projects.")
+    } finally {
       setLoadingProjects(false)
-    })
-  }, [paths])
+    }
+  }, [paths,recentPaths])
 
   const refresh = useCallback(loadProjectsPaths, [])
 
@@ -150,7 +182,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     return res
   }, [])
 
-  const communityAnalysis = useCallback(async (data) => { 
+  const communityAnalysis = useCallback(async (data) => {
     const res = await communityAnalysisVAMEProject(data)
     await refresh()
     return res
@@ -160,7 +192,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     const res = await createCommunityVideosVAMEProject(data)
     await refresh()
     return res
-   }, [])
+  }, [])
 
   const createMotifCommunityVideos = useCallback(async (data) => {
     const res = await createMotifVideosVAMEProject(data)
@@ -180,7 +212,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
 
   const getAssetsPath = useCallback((projectPath: string, asset: string, basePath = 'files') => {
     const project = getProject(projectPath)
-    
+
     if (!project) {
       console.error("Cant find project")
       return
@@ -196,6 +228,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
 
   const value = {
     projects,
+    recentProjects,
     refresh,
     getProject,
     getAssetsPath,
@@ -227,9 +260,9 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
   return (
     <ProjectsContext.Provider value={value}>
       {loadingPaths ?
-        <>Finding Projects on VAME projects path</> :
+        <MainContainer><strong>Finding Projects on VAME projects path</strong></MainContainer> :
         loadingProjects ?
-          <>Loading Projects</> :
+          <MainContainer><strong>Loading Projects ...</strong></MainContainer> :
           <>{children}</>
       }
     </ProjectsContext.Provider>

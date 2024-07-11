@@ -14,7 +14,7 @@ export const ControlButton = styled.button`
   cursor: pointer;
   border: none;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 2px 5px;
   color: white;
   background: #181c24;
 

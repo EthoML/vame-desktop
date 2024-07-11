@@ -46,8 +46,8 @@ const UMAPVisualization = ({
         const uniqueKey = `${video_set}_${label}`
 
         return (
-          <ImageContainer>
-            <img src={getAssetsPath(project.config.project_path, umapPath)} alt={uniqueKey} key={uniqueKey} />
+          <ImageContainer key={uniqueKey}>
+            <img src={getAssetsPath(project.config.project_path, umapPath)} alt={uniqueKey} />
             <small><b>{video_set}:</b> {header(label)}</small>
           </ImageContainer>
         )
@@ -57,23 +57,36 @@ const UMAPVisualization = ({
 
   if (hasUmaps) {
     return (
-      <>
-        <ControlButton onClick={() => setTerminal(true)}>
-          <FontAwesomeIcon icon={faTerminal} />
-        </ControlButton>
+      <PaddedTab>
+        <span>
+          Open logs:{" "}
+          <ControlButton onClick={() => setTerminal(true)}>
+            <FontAwesomeIcon icon={faTerminal} />
+          </ControlButton>
+        </span>
 
         <TerminalModal projectPath={project.config.project_path} logName={["visualization"]} isOpen={terminal} onClose={() => setTerminal(false)} />
 
         <FlexGrid>
           {images}
         </FlexGrid>
-      </>
+      </PaddedTab>
     )
   }
 
 
   return (
     <PaddedTab>
+      <span>
+        Open logs:{" "}
+        <ControlButton onClick={() => setTerminal(true)}>
+          <FontAwesomeIcon icon={faTerminal} />
+        </ControlButton>
+      </span>
+
+      <TerminalModal projectPath={project.config.project_path} logName={["visualization"]} isOpen={terminal} onClose={() => setTerminal(false)} />
+
+
       <Tippy
         content={blockTooltip}
         placement="bottom"

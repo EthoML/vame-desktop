@@ -30,9 +30,12 @@ export const CommunityAnalysis = ({
 
   return (
     <PaddedTab>
-      <ControlButton onClick={() => setTerminal(true)}>
-        <FontAwesomeIcon icon={faTerminal} />
-      </ControlButton>
+      <span>
+        Open logs:{" "}
+        <ControlButton onClick={() => setTerminal(true)}>
+          <FontAwesomeIcon icon={faTerminal} />
+        </ControlButton>
+      </span>
 
       <TerminalModal
         projectPath={project.config.project_path} logName={["community"]}
@@ -48,7 +51,7 @@ export const CommunityAnalysis = ({
       >
         <>
           <DynamicForm
-            initialValues={states ?? {}}
+            initialValues={states}
             schema={schema}
             blockSubmission={blockSubmission}
             submitText={"Create Communities"}

@@ -44,8 +44,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
   if (type === "enum") {
     return (
       <select
-        {...register(itemKey, { required })}
-        disabled={readOnly}
+        {...register(itemKey, { required, disabled: readOnly })}
       >
         {(property as EnumProperty)!.enum.map((option) => (
           <option key={option} value={option}>
@@ -60,8 +59,9 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     return (
       <input
         type='checkbox'
-        {...register(itemKey)}
-        disabled={readOnly}
+        {...register(itemKey, {
+          disabled: readOnly
+        })}
       />
     );
   }
@@ -76,7 +76,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
         max={numberProperty?.maximum}
         min={numberProperty?.minimum}
         step={isInteger ? 1 : "any"}
-        {...register(itemKey, { required, valueAsNumber: true })}
+        {...register(itemKey, { required, valueAsNumber: true})}
         readOnly={readOnly}
       />
     );

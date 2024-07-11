@@ -39,9 +39,12 @@ const Model = ({
 
     return (
       <PaddedTab>
-        <ControlButton onClick={() => setTerminal(true)}>
-          <FontAwesomeIcon icon={faTerminal} />
-        </ControlButton>
+        <span>
+          Open logs:{" "}
+          <ControlButton onClick={() => setTerminal(true)}>
+            <FontAwesomeIcon icon={faTerminal} />
+          </ControlButton>
+        </span>
 
         <TerminalModal
           projectPath={project.config.project_path}
@@ -81,6 +84,20 @@ const Model = ({
   // Show the form to train the model
   return (
     <PaddedTab>
+      <span>
+        Open logs:{" "}
+        <ControlButton onClick={() => setTerminal(true)}>
+          <FontAwesomeIcon icon={faTerminal} />
+        </ControlButton>
+      </span>
+
+      <TerminalModal
+        projectPath={project.config.project_path}
+        logName={["train_model", "evaluate_model"]}
+        isOpen={terminal}
+        onClose={() => setTerminal(false)}
+      />
+
       <Tippy
         content={blockTooltip}
         placement="bottom"

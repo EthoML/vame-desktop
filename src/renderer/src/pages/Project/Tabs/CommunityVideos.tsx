@@ -5,6 +5,9 @@ import { TabProps } from "./types"
 import { Button } from "@renderer/components/DynamicForm/styles"
 import { PaddedTab } from "@renderer/components/Tabs/styles"
 import Tippy from "@tippyjs/react"
+import { ControlButton } from "@renderer/pages/Home/styles"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTerminal } from "@fortawesome/free-solid-svg-icons"
 
 const CommunityVideos = ({
   project,
@@ -18,6 +21,20 @@ const CommunityVideos = ({
 
   if (!hasCommunityVideos) return (
     <PaddedTab>
+      <span>
+        Open logs:{" "}
+        <ControlButton onClick={() => setTerminal(true)}>
+          <FontAwesomeIcon icon={faTerminal} />
+        </ControlButton>
+      </span>
+
+      <TerminalModal
+        projectPath={project.config.project_path}
+        logName={["community_videos"]}
+        isOpen={terminal}
+        onClose={() => setTerminal(false)}
+      />
+
       <Tippy
         content={blockTooltip}
         placement="bottom"
@@ -51,8 +68,14 @@ const CommunityVideos = ({
   }, {} as Record<string, VideoType[]>)
 
 
-  return <>
-    <button onClick={() => setTerminal(true)}>Open logs</button>
+  return <PaddedTab>
+    <span>
+      Open logs:{" "}
+      <ControlButton onClick={() => setTerminal(true)}>
+        <FontAwesomeIcon icon={faTerminal} />
+      </ControlButton>
+    </span>
+
 
     <TerminalModal
       projectPath={project.config.project_path}
@@ -64,7 +87,7 @@ const CommunityVideos = ({
       videos={organizedVideos}
       project={project}
     />
-  </>
+  </PaddedTab>
 }
 
 export default CommunityVideos

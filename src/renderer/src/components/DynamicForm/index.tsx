@@ -4,6 +4,7 @@ import { extractDefaultValues } from "@renderer/utils/extractDefaultValues"
 import { Button, InputGroup, InputLabel } from './styles';
 import DynamicInput from "./DynamicInput"
 import { header } from "@renderer/utils/text";
+import { isEmpty } from "@renderer/utils/objectIsEmpty";
 
 export interface DynamicFormProps {
   schema: Schema
@@ -20,7 +21,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   initialValues,
   submitText = "Submit",
 }) => {
-  const defaultValues = initialValues ?? extractDefaultValues(schema)
+  const defaultValues = initialValues && !isEmpty(initialValues) ? initialValues : extractDefaultValues(schema)
 
   const methods = useForm({
     disabled: blockSubmission,
@@ -28,6 +29,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   })
 
   const properties = Object.entries(schema.properties)
+  const readOnly = !properties.some(([_,p])=> !p.readOnly)
 
   return (
     <FormProvider {...methods}>
@@ -50,7 +52,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
           )
         })}
 
-        <Button type="submit" disabled={blockSubmission}>{submitText}</Button>
+        <Button type="submit" disabled={blockSubmission || readOnly}>{submitText}</Button>
 
       </form>
     </FormProvider>

@@ -8,9 +8,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import ProjectsList from './ProjectList';
 import { useNavigate } from 'react-router-dom';
+import SubHeader from '@renderer/components/SubHeader';
 
 const Home: React.FC = () => {
-  const { projects, refresh, deleteProject } = useProjects()
+  const { projects, recentProjects, refresh, deleteProject } = useProjects()
   const navigate = useNavigate()
 
   const onEdit = useCallback((project: Project) => {
@@ -37,6 +38,20 @@ const Home: React.FC = () => {
           </>
         </Tippy>
       </Header>
+
+      <SubHeader title="Recents:"/>
+
+      {recentProjects && recentProjects?.length > 0 ? (
+        <ProjectsList
+          projects={recentProjects}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ) : (
+        <p>No recent projects found in the VAME Desktop output directory.</p>
+      )}
+
+      <SubHeader title="All projects:"/>
 
       {projects && projects?.length > 0 ? (
         <ProjectsList

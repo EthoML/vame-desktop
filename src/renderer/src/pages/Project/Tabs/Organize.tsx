@@ -36,16 +36,26 @@ const Organize = ({
     Object.values(schema.properties).forEach(v => v.readOnly = true)
   }
 
-  // const states = project.states?.["egocentric_alignment"]
+  const { pose_ref_index, crop_size, use_video } = project.states?.["egocentric_alignment"]
 
+  const states = {
+    pose_ref_index: pose_ref_index.map(n => String(n)),
+    advanced_options: {
+      crop_size: crop_size.map(n => String(n)),
+      use_video
+    }
+  }
 
   const [terminal, setTerminal] = useState(false)
 
   return (
     <PaddedTab>
-      <ControlButton onClick={() => setTerminal(true)}>
-        <FontAwesomeIcon icon={faTerminal} />
-      </ControlButton>
+      <span>
+        Open logs:{" "}
+        <ControlButton onClick={() => setTerminal(true)}>
+          <FontAwesomeIcon icon={faTerminal} />
+        </ControlButton>
+      </span>
 
       <TerminalModal
         projectPath={project.config.project_path}
@@ -62,7 +72,7 @@ const Organize = ({
       >
         <>
           <DynamicForm
-            // initialValues={states} 
+            initialValues={states}
             schema={schema}
             blockSubmission={blockSubmission}
             submitText={operations.join(" + ")}
