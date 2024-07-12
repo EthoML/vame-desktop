@@ -44,4 +44,4 @@ jobs:
       - name: Build and deploy on Linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:linux -- --publish=onTagOrDraft
+        run: npm run build:linux -- --publish=onTag

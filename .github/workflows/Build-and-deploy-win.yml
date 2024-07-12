@@ -44,4 +44,4 @@ jobs:
       - name: Build and deploy on Windows
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:win -- --publish=onTagOrDraft
+        run: npm run build:win -- --publish=onTag
