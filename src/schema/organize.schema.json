@@ -30,7 +30,7 @@
                 "use_video": {
                     "type": "boolean",
                     "description": "Whether to use video to do the pose alignment.",
-                    "default": true
+                    "default": false
                 }
             }
         }

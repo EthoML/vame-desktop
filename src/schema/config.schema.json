@@ -112,9 +112,6 @@
         "scheduler_gamma": {
           "type": "number"
         },
-        "scheduler_threshold": {
-          "type": "string"
-        },
         "softplus": {
           "type": "boolean"
         },
@@ -192,9 +189,6 @@
         },
         "annealtime": {
           "type": "number"
-        },
-        "legacy": {
-          "type": "boolean"
         }
       },
       "required": []

@@ -1,18 +1,14 @@
-venv/*
-
 # Demo
 demo_output
 data/*.mp4
 
 # Python
+venv
 __pycache__
 
-# Commoners Output
-.commoners
-
 # Python Service Output
-build
-*.spec
+resources/python/build
+resources/python/main
 
 # Logs
 logs
@@ -25,6 +21,7 @@ lerna-debug.log*
 
 node_modules
 dist
+out
 dist-ssr
 *.local
 
