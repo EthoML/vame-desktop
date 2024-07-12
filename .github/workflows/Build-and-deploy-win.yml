@@ -10,7 +10,9 @@ on:
       - main
 
 permissions:
-  contents: write 
+  actions: write
+  contents: write
+  packages: write
 
 jobs:
   deploy-on-windows:
@@ -42,5 +44,4 @@ jobs:
       - name: Build and deploy on Windows
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_FOR_PULL_REQUEST: true
         run: npm run build:win -- --publish=onTagOrDraft
