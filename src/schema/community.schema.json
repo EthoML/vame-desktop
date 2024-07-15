@@ -5,7 +5,7 @@
             "type": "boolean",
             "title": "Cohort Analysis",
             "description": "Flag indicating cohort analysis.",
-            "default": true
+            "default": false
         },
         "cut_tree": {
             "type": "integer",
