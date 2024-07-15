@@ -1,19 +1,10 @@
-name: Build and Deploy — Windows
-run-name: ${{ github.actor }} is building a Windows release
+name: Build — Windows
+run-name: ${{ github.actor }} is building for Windows.
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
-
-permissions:
-  actions: write
-  contents: write
-  packages: write
-
+    branches: [ main ]
+    
 jobs:
   deploy-on-windows:
     runs-on: windows-latest
@@ -42,6 +33,4 @@ jobs:
         run: npm install
 
       - name: Build and deploy on Windows
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:win -- --publish=onTag
+        run: npm run build:win

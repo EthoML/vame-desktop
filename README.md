@@ -84,3 +84,14 @@ Linux Debian
 ```bash
 npm run build:linux
 ```
+
+## Deploy 
+
+The deploy will be trigger every time a new push is maded to the `main` branch with a tag associated, creating a release at [release page](https://github.com/catalystneuro/vame-desktop/releases).
+
+To avoid unecessary deploys, create a branch `git checkout -b <branch_name>`, work on it, and create a pull request once the job is done.
+
+Then create a new tag with `git tag v<tag_number>`, push it to the repo with `git push orgin --tags`.
+
+Then merge the PR into main. The github actions will create a [Draft Release](https://github.com/catalystneuro/vame-desktop/releases) where you can put some infos about it, and finaly approve and publish. 
+
