@@ -4,4 +4,4 @@ flask-restx==1.3.0
 numpy==1.26.4
 pyinstaller==6.8.0
 pyinstaller-hooks-contrib==2024.6
-vame-py==0.2.0
+vame-py==0.3.1
