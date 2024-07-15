@@ -1,21 +1,12 @@
-name: Build and Deploy — Linux
-run-name: ${{ github.actor }} is building a Linux release
+name: Build — Linux
+run-name: ${{ github.actor }} is building for Linux.
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
-
-permissions:
-  actions: write
-  contents: write
-  packages: write
+    branches: [ main ]
 
 jobs:
-  deploy-on-linux:
+  build-on-linux:
     runs-on: ubuntu-latest
 
     defaults:
@@ -41,7 +32,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build and deploy on Linux
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:linux -- --publish=onTag
+      - name: Build
+        run: npm run build:linux

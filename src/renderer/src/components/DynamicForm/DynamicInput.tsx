@@ -5,7 +5,6 @@ import ArrayInput from "./ArrayInput";
 import { Accordion, AccordionContent, AccordionHeader, InputGroup, InputLabel } from './styles';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
-import { read } from "fs";
 
 type DynamicInputProps = {
   name: string;

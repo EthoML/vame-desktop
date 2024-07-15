@@ -108,9 +108,7 @@ const Project: React.FC = () => {
     modeled,
     segmented,
     motif_videos_created,
-    communities_created,
     community_videos_created,
-    umaps_created
   } = project.workflow
 
   const {
