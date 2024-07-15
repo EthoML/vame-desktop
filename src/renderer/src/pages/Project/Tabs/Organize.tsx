@@ -38,13 +38,13 @@ const Organize = ({
 
   const { pose_ref_index, crop_size, use_video } = project.states?.["egocentric_alignment"]
 
-  const states = {
-    pose_ref_index: pose_ref_index.map(n => String(n)),
+  const states = pose_ref_index && crop_size && typeof use_video === "boolean" ? {
+    pose_ref_index: pose_ref_index?.map(n => String(n)),
     advanced_options: {
-      crop_size: crop_size.map(n => String(n)),
+      crop_size: crop_size?.map(n => String(n)),
       use_video
     }
-  }
+  } : undefined
 
   const [terminal, setTerminal] = useState(false)
 
