@@ -30,7 +30,7 @@ FILES_TO_IGNORE = [ '.DS_Store' ]
 def get_files(folder_to_search):
     folder_to_search = Path(folder_to_search)
     ignore_glob = set(FILES_TO_IGNORE)
-    return [ file for file in folder_to_search.glob('*') if file.is_file() and file.name not in ignore_glob ] 
+    return [ file for file in folder_to_search.glob('*') if file.is_file() and file.name not in ignore_glob ]
 
     # Queue to hold stdout messages
     log_queue = queue.Queue()
@@ -165,7 +165,7 @@ def get_evaluation_images(project_path):
 
 def get_visualization_images(project_path):
     community_subfolders = get_video_related_asset(
-        project_path, 
+        project_path,
         subpath='community',
         validate=True
     )
@@ -208,7 +208,7 @@ def get_video_related_asset(
     return video_related_assets
 
 def get_videos(
-        project_path, 
+        project_path,
         subfolder
     ):
 
@@ -239,20 +239,20 @@ def get_pose_ref_index_description(csv_file_path: str) -> str:
     with open(csv_file_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         body_parts = []
-    
+
         # loop to iterate through the rows of csv
         for row in csv_reader:
             if row[0] == "bodyparts":
                 body_parts = list(dict.fromkeys(row[1:]))  # Extract body parts starting from the second element and remove duplicates
                 break
-        
+
         if len(body_parts) == 0:
             print("No body parts headers found in CSV.")
             return ""
-        
+
         # Create the string based on body parts
         body_parts_string = ", ".join([f"{i}-{part}" for i, part in enumerate(body_parts)])
-        
+
     return body_parts_string
 
 
@@ -290,14 +290,14 @@ class ProjectReady(Resource):
                 return jsonify({ "is_ready": False })
 
         return jsonify({ "is_ready": True })
-    
+
 @api.route('/settings')
 class Settings(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
         return json.loads(open(GLOBAL_SETTINGS_FILE, "r").read())
 
-        
+
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         data = json.loads(request.data) if request.data else {}
@@ -311,7 +311,7 @@ class Files(Resource):
     def get(self, project, path):
         from flask import send_from_directory
         return send_from_directory(VAME_PROJECTS_DIRECTORY, Path(project) / path)
-    
+
 
 @api.route('/exists/<path:project>/<path:path>')
 class FileExists(Resource):
@@ -319,15 +319,15 @@ class FileExists(Resource):
     def get(self, project, path):
         full_path = VAME_PROJECTS_DIRECTORY / project / path
         return jsonify(dict(exists=full_path.exists()))
-    
-    
+
+
 @api.route('/projects')
 class Projects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def get(self):
         projects = [ str(project) for project in VAME_PROJECTS_DIRECTORY.glob('*') if project.is_dir() ]
         return jsonify(projects)
-    
+
 @api.route('/projects/recent')
 class RecentProjects(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
@@ -344,7 +344,7 @@ class RecentProjects(Resource):
             json.dump(states, file)
 
         return jsonify(recent_projects)
-    
+
 @api.route('/project/register')
 class RegisterProject(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
@@ -375,7 +375,7 @@ class RegisterProject(Resource):
                 }, file)
 
             return jsonify(recent_projects)
-        
+
         except Exception as exception:
             # TODO: Should lock access to the file
             pass
@@ -541,25 +541,6 @@ class ConfigureProject(Resource):
             if notBadRequestException(exception):
                 api.abort(500, str(exception))
 
-@api.route('/update', methods=['POST'])
-class UpdateConfig(Resource):
-    @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
-    def post(self):
-        import vame
-        try:
-            data, project_path = resolve_request_data(request)
-            config = project_path / 'config.yaml'
-
-            if config.exists():
-                config.rename(config.with_name(f"{config.stem}_backup{config.suffix}"))
-
-            result = vame.update_config(config, force_update=True)
-
-            return jsonify(dict(result = result ))
-
-        except Exception as exception:
-            if notBadRequestException(exception):
-                api.abort(500, str(exception))
 
 @api.route('/align', methods=['POST'])
 class Align(Resource):
@@ -761,9 +742,9 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 if __name__ == "__main__":
     env_port = os.getenv('PORT')
-    PORT = int(env_port) if env_port else 8641 
+    PORT = int(env_port) if env_port else 8641
     HOST = os.getenv('HOST') or 'localhost'
-    
+
     VAME_PROJECTS_DIRECTORY.mkdir(exist_ok=True, parents=True) # Create the VAME_PROJECTS_DIRECTORY if it doesn't exist
     VAME_LOG_DIRECTORY.mkdir(exist_ok=True, parents=True)  # Create the VAME_LOG_DIRECTORY if it doesn't exist
 
@@ -773,7 +754,7 @@ if __name__ == "__main__":
         if not file.exists():
             with open(file, "w") as f:
                 json.dump({}, f)
-    
+
     # Run the app
     try:
         print(f"Flask server started at {HOST}:{PORT}")
