@@ -1,13 +1,13 @@
-name: Build — Linux
-run-name: ${{ github.actor }} is building for Linux.
+name: Test build — Windows
+run-name: ${{ github.actor }} is building for Windows.
 
 on:
   pull_request:
     branches: [ main ]
-
+    
 jobs:
-  build-on-linux:
-    runs-on: ubuntu-latest
+  test-on-windows:
+    runs-on: windows-latest
 
     defaults:
       run:
@@ -32,5 +32,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
-        run: npm run build:linux
+      - name: Build and deploy on Windows
+        run: npm run build:win

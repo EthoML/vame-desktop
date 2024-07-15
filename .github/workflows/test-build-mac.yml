@@ -1,4 +1,4 @@
-name: Build — Mac
+name: Test build — Mac
 run-name: ${{ github.actor }} is building for MacOS.
 
 on:
@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy-on-mac:
+  test-on-mac:
     runs-on: macos-13  
     
     defaults:
