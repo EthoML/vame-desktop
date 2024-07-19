@@ -11,6 +11,9 @@ import { faTerminal } from "@fortawesome/free-solid-svg-icons"
 import { useProjects } from "@renderer/context/Projects"
 import Tippy from "@tippyjs/react"
 
+import UMAPSchema from "../../../../../schema/umap.schema.json"
+import DynamicForm from "@renderer/components/DynamicForm"
+
 const FlexGrid = styled.div`
     display: flex;
     flex-wrap: wrap;
@@ -36,6 +39,8 @@ const UMAPVisualization = ({
 }: TabProps) => {
   const hasUmaps = project.workflow.umaps_created
   const [terminal, setTerminal] = useState(false)
+
+  const schema = structuredClone(UMAPSchema) as unknown as Schema
 
   const { getAssetsPath } = useProjects()
 
@@ -94,12 +99,12 @@ const UMAPVisualization = ({
         disabled={!blockSubmission}
       >
         <span>
-          <Button
-            disabled={blockSubmission}
-            onClick={() => onFormSubmit({ evaluate: true })}
-          >
-            Create UMAP Visualization
-          </Button>
+          <DynamicForm
+            schema={schema}
+            blockSubmission={blockSubmission}
+            submitText={"Create UMAP Visualization"}
+            onFormSubmit={onFormSubmit}
+          />
         </span>
       </Tippy>
     </PaddedTab>

@@ -207,10 +207,11 @@ const Project: React.FC = () => {
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={() => submitTab(async () => {
+        onFormSubmit={(data) => submitTab(async () => {
           const projectPath = project.config.project_path
           await createMotifVideos({
             project: projectPath,
+            ...data,
           })
         }, "motifs-videos")}
       />
@@ -232,7 +233,8 @@ const Project: React.FC = () => {
             project: projectPath,
             cohort: data.cohort,
             cut_tree: data.cut_tree,
-            show_umap: data.show_umap
+            show_umap: data.show_umap,
+            parametrization: data.parametrization,
           })
         }, "community-videos")}
       />
@@ -247,10 +249,11 @@ const Project: React.FC = () => {
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={() => submitTab(async () => {
+        onFormSubmit={(data: any) => submitTab(async () => {
           const projectPath = project.config.project_path
           await createCommunityVideos({
             project: projectPath,
+            parametrization: data.parametrization, 
           })
         }, "community-videos")}
       />
@@ -265,10 +268,11 @@ const Project: React.FC = () => {
         project={project}
         blockSubmission={blockSubmit}
         blockTooltip="Waiting VAME to be ready."
-        onFormSubmit={() => submitTab(async () => {
+        onFormSubmit={(data) => submitTab(async () => {
           const projectPath = project.config.project_path
           await createUMAPVisualization({
             project: projectPath,
+            ...data
           })
         }, "umap-visualization")}
       />

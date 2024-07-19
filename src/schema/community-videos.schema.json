@@ -1,0 +1,13 @@
+{
+    "title": "Community Videos",
+    "type": "object",
+    "properties": {
+        "parametrization": {
+            "type": "string",
+            "enum": ["hmm", "kmeans"]
+        }
+    },
+    "required": [
+        "parametrization"
+    ]
+}

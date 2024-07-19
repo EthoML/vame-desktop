@@ -3,6 +3,7 @@ import { useState } from "react"
 import DynamicForm from "../../../components/DynamicForm"
 
 import communitySchema from '../../../../../schema/community.schema.json'
+
 import { TabProps } from "./types"
 import TerminalModal from "../../../components/TerminalModal"
 import { ControlButton } from "@renderer/pages/Home/styles"
@@ -19,7 +20,7 @@ export const CommunityAnalysis = ({
 }: TabProps) => {
   const [terminal, setTerminal] = useState(false)
 
-  const schema = structuredClone(communitySchema) as Schema
+  const schema = structuredClone(communitySchema) as unknown as Schema
 
   const communitiesCreated = project.workflow.communities_created
   const states = project.states?.["community"]
@@ -47,7 +48,7 @@ export const CommunityAnalysis = ({
         content={blockTooltip}
         placement="bottom"
         hideOnClick={false}
-        onShow={() => !blockSubmission as false}
+        disabled={!blockSubmission || !blockTooltip}
       >
         <>
           <DynamicForm

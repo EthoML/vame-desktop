@@ -39,9 +39,12 @@
       "type": "integer",
       "description": "Please set to 1/2 of video fps. Value should be even, round up if needed"
     },
-    "parametrization": {
+    "parametrizations":{
+      "description": "Hold down the Ctrl (windows) or Command (Mac) button to select multiple options.",
       "type": "string",
-      "description": "Motif clustering method"
+      "multiple": true,
+      "enum": ["hmm","kmeans"],
+      "default": ["hmm","kmeans"]
     },
     "max_epochs": {
       "type": "integer",
@@ -205,7 +208,7 @@
     "time_window",
     "max_epochs",
     "zdims",
-    "parametrization",
+    "parametrizations",
     "advanced_options"
   ]
 }

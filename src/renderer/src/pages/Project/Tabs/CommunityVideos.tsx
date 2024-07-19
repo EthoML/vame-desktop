@@ -9,6 +9,9 @@ import { ControlButton } from "@renderer/pages/Home/styles"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTerminal } from "@fortawesome/free-solid-svg-icons"
 
+import CommunityVideosSchema from "../../../../../schema/community-videos.schema.json"
+import DynamicForm from "@renderer/components/DynamicForm"
+
 const CommunityVideos = ({
   project,
   onFormSubmit,
@@ -16,6 +19,8 @@ const CommunityVideos = ({
   blockTooltip,
 }: TabProps) => {
   const [terminal, setTerminal] = useState(false)
+
+  const schema = structuredClone(CommunityVideosSchema) as unknown as Schema
 
   const hasCommunityVideos = project.workflow.community_videos_created
 
@@ -42,12 +47,12 @@ const CommunityVideos = ({
         disabled={!blockSubmission}
       >
         <span>
-          <Button
-            disabled={blockSubmission}
-            onClick={onFormSubmit}
-          >
-            Create Community Videos
-          </Button>
+          <DynamicForm
+            schema={schema}
+            blockSubmission={blockSubmission}
+            submitText={"Create Community Videos"}
+            onFormSubmit={onFormSubmit}
+          />
         </span>
       </Tippy>
     </PaddedTab>

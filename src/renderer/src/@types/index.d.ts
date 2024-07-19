@@ -227,6 +227,7 @@ declare global {
   export type EnumProperty = DefaultPropertyAttrs &  {
     type: "string";
     enum: string[];
+    multiple?: boolean;
     default?: string;
   };
 

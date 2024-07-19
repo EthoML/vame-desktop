@@ -15,7 +15,7 @@ export function extractDefaultValues(schema: Schema): Record<string, any> {
     }
   };
 
-  if (schema.properties) {
+  if (schema?.properties) {
     extractDefaults(schema.properties);
   }
 

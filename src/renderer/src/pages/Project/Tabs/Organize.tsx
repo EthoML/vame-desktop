@@ -68,7 +68,7 @@ const Organize = ({
         content={blockTooltip}
         placement="bottom"
         hideOnClick={false}
-        onShow={() => !blockSubmission as false}
+        disabled={!blockSubmission || !blockTooltip}
       >
         <>
           <DynamicForm

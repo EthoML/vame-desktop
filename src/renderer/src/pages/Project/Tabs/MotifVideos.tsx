@@ -8,6 +8,9 @@ import { ControlButton } from "@renderer/pages/Home/styles"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTerminal } from "@fortawesome/free-solid-svg-icons"
 import Tippy from "@tippyjs/react"
+import DynamicForm from "@renderer/components/DynamicForm"
+
+import motifVideosSchema from '../../../../../schema/motif-videos.schema.json'
 
 const MotifVideos = ({
   project,
@@ -16,6 +19,8 @@ const MotifVideos = ({
   blockTooltip
 }: TabProps) => {
   const [terminal, setTerminal] = useState(false)
+
+  const schema = structuredClone(motifVideosSchema) as unknown as Schema
 
   const hasMotifVideos = project.workflow.motif_videos_created
 
@@ -33,15 +38,15 @@ const MotifVideos = ({
         content={blockTooltip}
         placement="bottom"
         hideOnClick={false}
-        onShow={() => !blockSubmission as false}
+        disabled={!blockSubmission || !blockTooltip}
       >
         <span>
-          <Button
-            disabled={blockSubmission}
-            onClick={() => onFormSubmit({})}
-          >
-            Generate Motif Videos
-          </Button>
+          <DynamicForm
+            schema={schema}
+            blockSubmission={blockSubmission}
+            submitText={"Generate Motif Videos"}
+            onFormSubmit={onFormSubmit}
+          />
         </span>
       </Tippy>
     </PaddedTab>
