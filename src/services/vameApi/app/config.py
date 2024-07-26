@@ -1,0 +1,7 @@
+from pathlib import Path
+
+VAME_APP_DIRECTORY = Path.home() / 'vame-desktop'
+VAME_PROJECTS_DIRECTORY = VAME_APP_DIRECTORY / 'projects'
+VAME_LOG_DIRECTORY = VAME_APP_DIRECTORY / 'logs'
+GLOBAL_SETTINGS_FILE = VAME_APP_DIRECTORY / 'settings.json'
+GLOBAL_STATES_FILE = VAME_APP_DIRECTORY / 'states.json'

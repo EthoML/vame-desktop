@@ -22,10 +22,23 @@ const MotifVideos = ({
 
   const schema = structuredClone(motifVideosSchema) as unknown as Schema
 
-  const hasMotifVideos = project.workflow.motif_videos_created
+  const { videos } = project.assets
+  const motifVideos = videos?.motif ?? {}
 
-  if (!hasMotifVideos) return (
-    <PaddedTab>
+  const organizedVideos = Object.entries(motifVideos).reduce((acc, [videoLabel, videosObj]) => {
+    Object.entries(videosObj).forEach(([parametrization,videos])=>{
+      acc[`${videoLabel}-${parametrization}`] = videos.map((videoPath: string) => {
+        const num = videoPath.split("-").pop()?.split("_").pop()?.split(".")[0]!
+        
+        return { path: videoPath, label: `Motif ${num}`, idx: Number(num) }
+      }).sort((a, b) => a.idx - b.idx)
+      
+    })
+    return acc
+  }, {} as Record<string, VideoType[]>)
+
+
+  return <PaddedTab>
       <span>
         Open logs:{" "}
         <ControlButton onClick={() => setTerminal(true)}>
@@ -49,37 +62,7 @@ const MotifVideos = ({
           />
         </span>
       </Tippy>
-    </PaddedTab>
-  )
 
-  const { videos } = project.assets
-  const motifVideos = videos?.motif ?? {}
-
-  const organizedVideos = Object.entries(motifVideos).reduce((acc, [label, videos]) => {
-    acc[label] = videos.map((videoPath: string) => {
-      const num = videoPath.split("-").pop()?.split("_").pop()?.split(".")[0]!
-
-      return { path: videoPath, label: `Motif ${num}`, idx: Number(num) }
-    }).sort((a, b) => a.idx - b.idx)
-
-    return acc
-  }, {} as Record<string, VideoType[]>)
-
-
-  return <PaddedTab>
-    <span>
-      Open logs:{" "}
-      <ControlButton onClick={() => setTerminal(true)}>
-        <FontAwesomeIcon icon={faTerminal} />
-      </ControlButton>
-    </span>
-
-    <TerminalModal
-      projectPath={project.config.project_path}
-      logName={["motif_videos"]}
-      isOpen={terminal}
-      onClose={() => setTerminal(false)}
-    />
 
     <VideoGrid
       videos={organizedVideos}

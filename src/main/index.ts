@@ -48,7 +48,7 @@ app.whenReady().then(() => {
   folderHandler()
 
   if (is.dev) {
-    backend = runChildProcess("python", [join(__dirname, "..", "..", "src", "services", "main.py")])
+    backend = runChildProcess("python", [join(__dirname, "..", "..", "src", "services", "vameApi", "main.py")])
 
     backend?.stdout.on("data", (data) => {
       if (data?.toString().includes("Flask server started at")) {
@@ -89,10 +89,6 @@ app.on("window-all-closed", () => {
 app.on("before-quit", (event) => {
   if (backend && backend.exitCode === null) {
     event.preventDefault(); // Prevent the default behavior of quitting immediately
-    backend.once("exit", (code) => {
-      console.log(`[electron]: Process exited with code ${code}`)
-      app.exit(code ?? 0); // Quit the app after the child process exits
-    });
     backend.kill("SIGTERM"); // Send SIGTERM to the child process
   } else if (backend && backend.exitCode !== null) {
     console.log(`[electron]: Process exited with code ${backend.exitCode}`)
