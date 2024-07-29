@@ -157,17 +157,26 @@ def load_project(project_path: Path):
     original_videos = list(map(lambda file: str(file), get_files(original_videos_location)))
     original_csvs = list(map(lambda file: str(file), get_files(original_csvs_location)))
 
+    motif_videos_created_hmm=all(map(lambda videos: len(videos) > 0, videos["motif"]["hmm"].values()))
+    motif_videos_created_kmeans=all(map(lambda videos: len(videos) > 0, videos["motif"]["kmeans"].values()))
+
+    community_videos_created_hmm = all(map(lambda videos: len(videos) > 0, videos["community"]["kmeans"].values()))
+    community_videos_created_kmeans = all(map(lambda videos: len(videos) > 0, videos["community"]["hmm"].values()))
+
+    umaps_created_hmm = any(map(lambda videos: len(videos) > 0, images["visualization"]["hmm"].values()))
+
+    umaps_created_kmeans = any(map(lambda videos: len(videos) > 0, images["visualization"]["kmeans"].values()))
+
     # Provide project workflow status
     workflow = dict(
         organized = (project_path / 'data' / 'train').exists(),
         pose_ref_index_description=get_pose_ref_index_description(original_csvs[0]),
         modeled = len(images["evaluation"]) > 0,
         segmented = has_latent_vector_files,
-        motif_videos_created_hmm = all(map(lambda videos: len(videos) > 0, videos["motif"]["hmm"].values())),
-        motif_videos_created_kmeans = all(map(lambda videos: len(videos) > 0, videos["motif"]["kmeans"].values())),
-        communities_created = has_communities,
-        community_videos_created = all(map(lambda videos: len(videos) > 0, videos["community"].values())),
-        umaps_created = any(map(lambda videos: len(videos) > 0, images["visualization"].values())),
+        motif_videos_created=(lambda: motif_videos_created_hmm or motif_videos_created_kmeans)(),
+        communities_created=has_communities,
+        community_videos_created = (lambda: community_videos_created_hmm or community_videos_created_kmeans)(),
+        umaps_created = (lambda: umaps_created_hmm or umaps_created_kmeans)(),
     )
 
     return dict(

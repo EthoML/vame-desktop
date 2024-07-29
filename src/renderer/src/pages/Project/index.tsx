@@ -57,7 +57,6 @@ const Project: React.FC = () => {
 
       if (tab) {
         const localItem = `selected-tab-${project?.config.Project}`
-        console.log("localItem",localItem)
         localStorage.setItem(localItem, tab)
         setSelectedTab(tab)
       }
@@ -109,6 +108,7 @@ const Project: React.FC = () => {
     segmented,
     motif_videos_created,
     community_videos_created,
+    umaps_created,
   } = project.workflow
 
   const {
@@ -261,7 +261,7 @@ const Project: React.FC = () => {
     {
       id: 'umap-visualization',
       label: '7. UMAP Visualization',
-      completed: visualization?.execution_state==="success",
+      complete: umaps_created,
       disabled: !segmented,
       tooltip: "Need segmentation.",
       content: <UMAPVisualization

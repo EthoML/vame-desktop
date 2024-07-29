@@ -177,7 +177,6 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
   }, [])
 
   const createMotifVideos = useCallback(async (data) => {
-    console.log(data)
     const res = await createMotifVideosVAMEProject(data)
     await refresh()
     return res

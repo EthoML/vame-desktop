@@ -11,6 +11,8 @@ class Align(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
 
             data, project_path = resolve_request_data(request)
@@ -45,6 +47,8 @@ class CreateTrainset(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
 
@@ -63,6 +67,8 @@ class TrainModel(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
 
@@ -99,6 +105,8 @@ class Segment(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
             result = vame.pose_segmentation(
@@ -115,6 +123,8 @@ class MotifVideos(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
             result = vame.motif_videos(
@@ -131,6 +141,8 @@ class Community(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
             result = vame.community(
@@ -147,6 +159,8 @@ class CommunityVideos(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
             result = vame.community_videos(
@@ -163,6 +177,8 @@ class Visualization(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
             vame.visualization(
@@ -179,6 +195,8 @@ class GenerativeModel(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
             result = vame.generative_model(**data)
@@ -192,6 +210,8 @@ class CreateGif(Resource):
     @api.doc(responses={200: "Success", 400: "Bad Request", 500: "Internal server error"})
     def post(self):
         import vame
+        import matplotlib
+        matplotlib.use('agg')
         try:
             data, project_path = resolve_request_data(request)
             result = vame.gif(**data)
