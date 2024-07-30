@@ -9,6 +9,9 @@ import { ControlButton } from "@renderer/pages/Home/styles"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTerminal } from "@fortawesome/free-solid-svg-icons"
 
+import CommunityVideosSchema from "../../../../../schema/community-videos.schema.json"
+import DynamicForm from "@renderer/components/DynamicForm"
+
 const CommunityVideos = ({
   project,
   onFormSubmit,
@@ -17,52 +20,20 @@ const CommunityVideos = ({
 }: TabProps) => {
   const [terminal, setTerminal] = useState(false)
 
-  const hasCommunityVideos = project.workflow.community_videos_created
-
-  if (!hasCommunityVideos) return (
-    <PaddedTab>
-      <span>
-        Open logs:{" "}
-        <ControlButton onClick={() => setTerminal(true)}>
-          <FontAwesomeIcon icon={faTerminal} />
-        </ControlButton>
-      </span>
-
-      <TerminalModal
-        projectPath={project.config.project_path}
-        logName={["community_videos"]}
-        isOpen={terminal}
-        onClose={() => setTerminal(false)}
-      />
-
-      <Tippy
-        content={blockTooltip}
-        placement="bottom"
-        hideOnClick={false}
-        disabled={!blockSubmission}
-      >
-        <span>
-          <Button
-            disabled={blockSubmission}
-            onClick={onFormSubmit}
-          >
-            Create Community Videos
-          </Button>
-        </span>
-      </Tippy>
-    </PaddedTab>
-  )
-
+  const schema = structuredClone(CommunityVideosSchema) as unknown as Schema
 
   const { videos } = project.assets
 
   const communityVideos = videos?.community ?? {}
 
-  const organizedVideos = Object.entries(communityVideos).reduce((acc, [label, videos]) => {
-    acc[label] = videos.map((videoPath: string) => {
-      const number = videoPath.split('-').pop()?.split('_').pop()?.split('.')[0]
-      return { path: videoPath, label: `Community ${number}`, idx: Number(number) }
-    }).sort((a, b) => a.idx - b.idx)
+  const organizedVideos = Object.entries(communityVideos).reduce((acc, [label, videosObj]) => {
+    Object.entries(videosObj).forEach(([parametrization, videos]) => {
+
+      acc[`${label}-${parametrization}`] = videos.map((videoPath: string) => {
+        const number = videoPath.split('-').pop()?.split('_').pop()?.split('.')[0]
+        return { path: videoPath, label: `Community ${number}`, idx: Number(number) }
+      }).sort((a, b) => a.idx - b.idx)
+    })
 
     return acc
   }, {} as Record<string, VideoType[]>)
@@ -76,6 +47,21 @@ const CommunityVideos = ({
       </ControlButton>
     </span>
 
+    <Tippy
+      content={blockTooltip}
+      placement="bottom"
+      hideOnClick={false}
+      disabled={!blockSubmission}
+    >
+      <span>
+        <DynamicForm
+          schema={schema}
+          blockSubmission={blockSubmission}
+          submitText={"Create Community Videos"}
+          onFormSubmit={onFormSubmit}
+        />
+      </span>
+    </Tippy>
 
     <TerminalModal
       projectPath={project.config.project_path}

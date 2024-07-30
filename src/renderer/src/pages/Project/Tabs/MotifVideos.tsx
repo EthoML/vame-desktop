@@ -8,6 +8,9 @@ import { ControlButton } from "@renderer/pages/Home/styles"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTerminal } from "@fortawesome/free-solid-svg-icons"
 import Tippy from "@tippyjs/react"
+import DynamicForm from "@renderer/components/DynamicForm"
+
+import motifVideosSchema from '../../../../../schema/motif-videos.schema.json'
 
 const MotifVideos = ({
   project,
@@ -17,10 +20,25 @@ const MotifVideos = ({
 }: TabProps) => {
   const [terminal, setTerminal] = useState(false)
 
-  const hasMotifVideos = project.workflow.motif_videos_created
+  const schema = structuredClone(motifVideosSchema) as unknown as Schema
 
-  if (!hasMotifVideos) return (
-    <PaddedTab>
+  const { videos } = project.assets
+  const motifVideos = videos?.motif ?? {}
+
+  const organizedVideos = Object.entries(motifVideos).reduce((acc, [videoLabel, videosObj]) => {
+    Object.entries(videosObj).forEach(([parametrization,videos])=>{
+      acc[`${videoLabel}-${parametrization}`] = videos.map((videoPath: string) => {
+        const num = videoPath.split("-").pop()?.split("_").pop()?.split(".")[0]!
+        
+        return { path: videoPath, label: `Motif ${num}`, idx: Number(num) }
+      }).sort((a, b) => a.idx - b.idx)
+      
+    })
+    return acc
+  }, {} as Record<string, VideoType[]>)
+
+
+  return <PaddedTab>
       <span>
         Open logs:{" "}
         <ControlButton onClick={() => setTerminal(true)}>
@@ -33,48 +51,18 @@ const MotifVideos = ({
         content={blockTooltip}
         placement="bottom"
         hideOnClick={false}
-        onShow={() => !blockSubmission as false}
+        disabled={!blockSubmission || !blockTooltip}
       >
         <span>
-          <Button
-            disabled={blockSubmission}
-            onClick={() => onFormSubmit({})}
-          >
-            Generate Motif Videos
-          </Button>
+          <DynamicForm
+            schema={schema}
+            blockSubmission={blockSubmission}
+            submitText={"Generate Motif Videos"}
+            onFormSubmit={onFormSubmit}
+          />
         </span>
       </Tippy>
-    </PaddedTab>
-  )
 
-  const { videos } = project.assets
-  const motifVideos = videos?.motif ?? {}
-
-  const organizedVideos = Object.entries(motifVideos).reduce((acc, [label, videos]) => {
-    acc[label] = videos.map((videoPath: string) => {
-      const num = videoPath.split("-").pop()?.split("_").pop()?.split(".")[0]!
-
-      return { path: videoPath, label: `Motif ${num}`, idx: Number(num) }
-    }).sort((a, b) => a.idx - b.idx)
-
-    return acc
-  }, {} as Record<string, VideoType[]>)
-
-
-  return <PaddedTab>
-    <span>
-      Open logs:{" "}
-      <ControlButton onClick={() => setTerminal(true)}>
-        <FontAwesomeIcon icon={faTerminal} />
-      </ControlButton>
-    </span>
-
-    <TerminalModal
-      projectPath={project.config.project_path}
-      logName={["motif_videos"]}
-      isOpen={terminal}
-      onClose={() => setTerminal(false)}
-    />
 
     <VideoGrid
       videos={organizedVideos}

@@ -65,7 +65,7 @@ const Model = ({
           content={blockTooltip}
           placement="bottom"
           hideOnClick={false}
-          onShow={() => !blockSubmission as false}
+          disabled={!blockSubmission || !blockTooltip}
         >
           <span>
 
@@ -102,7 +102,7 @@ const Model = ({
         content={blockTooltip}
         placement="bottom"
         hideOnClick={false}
-        onShow={() => !blockSubmission as false}
+        disabled={!blockSubmission || !blockTooltip}
       >
         <span>
 

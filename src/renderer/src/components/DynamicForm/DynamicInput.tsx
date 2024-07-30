@@ -41,9 +41,11 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
 
   // Handle select fields
   if (type === "enum") {
+    const enumProperty = property as EnumProperty
     return (
       <select
         {...register(itemKey, { required, disabled: readOnly })}
+        multiple={enumProperty.multiple}
       >
         {(property as EnumProperty)!.enum.map((option) => (
           <option key={option} value={option}>

@@ -1,3 +1,4 @@
+import { app } from "electron";
 
 export function runChildProcess(exec: string, path?: string[]) {
   let stdoutChunks = [], stderrChunks = [];
@@ -9,9 +10,10 @@ export function runChildProcess(exec: string, path?: string[]) {
     }
   });
 
-  child.on('exit', (code) =>
+  child.on('exit', (code) => {
     console.log(`[${exec}]: Process exited with code ${code}`)
-  );
+    app.exit(code ?? -1)
+  });
 
   child.stdout.on('data', (data) => {
     console.log(`[${exec}]:`, data.toString());

@@ -5,6 +5,13 @@ A desktop application for the Variational Animal Motion Encoding (VAME) project.
 VAME Desktop has been designed to run each step of a VAME project **only once**. This is to ensure that the project is reproducible and that the data is not accidentally overwritten.
 
 ## Installation
+
+### Download builded versions:
+
+You can find the builed versions of VAME Desktop on the [release page](https://github.com/catalystneuro/vame-desktop/releases).
+
+## Development mode
+
 ### Python
 You will need to have [miniconda](https://docs.conda.io/en/latest/miniconda.html) installed on your machine OR [pyenv](https://github.com/pyenv/pyenv).
 

@@ -12,9 +12,14 @@
             "title": "Cut Line for Tree",
             "description": "Cut line for tree.",
             "default": 2
+        },
+        "parametrization": {
+            "type": "string",
+            "enum": ["hmm", "kmeans"]
         }
     },
     "required": [
+        "parametrization",
         "cohort",
         "cut_tree"
     ]

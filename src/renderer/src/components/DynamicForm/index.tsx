@@ -21,7 +21,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   initialValues,
   submitText = "Submit",
 }) => {
-  const defaultValues = initialValues && !isEmpty(initialValues) ? initialValues : extractDefaultValues(schema)
+
+  const defaultValues = {
+    ...extractDefaultValues(schema),
+    ...initialValues
+  }
 
   const methods = useForm({
     disabled: blockSubmission,
@@ -30,6 +34,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const properties = Object.entries(schema.properties)
   const readOnly = !properties.some(([_,p])=> !p.readOnly)
+
+  // const handleSubmit = (data) => {
+  //   console.log(data)
+  //   onFormSubmit(data)
+  // }
 
   return (
     <FormProvider {...methods}>

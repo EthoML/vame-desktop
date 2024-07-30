@@ -1,0 +1,14 @@
+{
+  "title": "UMAP Visualization",
+  "type": "object",
+  "properties": {
+      "parametrization": {
+          "type": "string",
+          "enum": ["hmm", "kmeans"],
+          "default": "hmm"
+      }
+  },
+  "required": [
+      "parametrization"
+  ]
+}
