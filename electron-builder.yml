@@ -1,4 +1,4 @@
-appId: com.gladstoneinstitutes.vame-desktop
+appId: com.catalystneuro.vame-desktop
 productName: VAME Desktop
 directories:
   buildResources: resources
@@ -32,7 +32,7 @@ mac:
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
-  artifactName: ${name}-${version}-macos.${ext}
+  artifactName: ${name}-${version}-macos-${arch}.${ext}
   writeUpdateInfo: false
 linux:
   artifactName: ${name}-${version}-linux.${ext}

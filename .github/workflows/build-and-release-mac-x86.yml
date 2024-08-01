@@ -1,4 +1,4 @@
-name: Build and Deploy — Mac
+name: Build and Deploy — Mac Intel
 run-name: ${{ github.actor }} is building a Mac release
 
 on:
@@ -46,4 +46,4 @@ jobs:
       - name: Build and deploy on MacOS
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:mac -- --publish=always
+        run: npm run build:mac -- --publish=always --x64
