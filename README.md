@@ -6,9 +6,9 @@ VAME Desktop has been designed to run each step of a VAME project **only once**.
 
 ## Installation
 
-### Download builded versions:
+### Download Desktop versions:
 
-You can find the builed versions of VAME Desktop on the [release page](https://github.com/catalystneuro/vame-desktop/releases).
+You can find installers for VAME Desktop on the [release page](https://github.com/catalystneuro/vame-desktop/releases).
 
 ## Development mode
 
@@ -38,7 +38,7 @@ Windows:
 This will install all the necessary Python dependencies for the project.
 
 ```bash
-python -m pip install -r requiremente.txt
+python -m pip install -r requirements.txt
 ```
 
 #### with conda:
