@@ -1,6 +1,9 @@
 # VAME Desktop
 A desktop application for the Variational Animal Motion Encoding (VAME) project.
 
+![VAME-Desktop](https://github.com/user-attachments/assets/1b834650-14f5-4dff-8ba0-b29f18178337)
+
+
 ## Overview
 VAME Desktop has been designed to run each step of a VAME project **only once**. This is to ensure that the project is reproducible and that the data is not accidentally overwritten.
 
@@ -9,6 +12,31 @@ VAME Desktop has been designed to run each step of a VAME project **only once**.
 ### Download Desktop versions:
 
 You can find installers for VAME Desktop on the [release page](https://github.com/catalystneuro/vame-desktop/releases).
+
+#### MacOS
+> For M-series Macs, download the -arm64.dmg. For Intel Macs, download the -x64.dmg.
+
+Open the `vame-desktop-<VERSION>-macos-arm64.dmg` or `vame-desktop-<VERSION>-macos-x64.dmg`, and drag and drop the `VAME Desktop` into the `Applications` folder.
+
+Then go to `Applications` in Finder.
+
+![Finder](https://github.com/user-attachments/assets/87c1de95-0a61-455d-8582-71ed2958c649)
+
+Hold `Control ^` on the keyboard, then click open. In the following window, click on open again. This process needs to be done once. After that, the app can be opened from Launchpad as usual.
+
+#### Windows
+
+Double-click on `vame-desktop-<VERSION>-win-setup.exe`. The app will be installed and a shortcut named `VAME Desktop` will be added to your Desktop. Double-click on it to launch the app.
+
+#### Linux Debian
+
+Double-click on `vame-desktop-<VERSION>-linux.deb` or
+
+```sh
+sudo dpkg -i vame-desktop-<VERSION>-linux.deb
+```
+
+The executable will be added to the main applications folder on your Linux distribution.
 
 ## Development mode
 
