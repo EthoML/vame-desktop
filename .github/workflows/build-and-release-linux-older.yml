@@ -1,4 +1,4 @@
-name: Build and Deploy — Linux
+name: Build and Deploy — Linux Ubuntu 20.04
 run-name: ${{ github.actor }} is building a Linux release
 
 on:
