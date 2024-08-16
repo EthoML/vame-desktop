@@ -38,6 +38,10 @@ sudo dpkg -i vame-desktop-<VERSION>-linux.deb
 
 The executable will be added to the main applications folder on your Linux distribution.
 
+## Example data
+
+The app can be run on the input data found [here](https://ethoml.github.io/VAME/docs/getting_started/running/#1-download-the-necessary-resources).
+
 ## Development mode
 
 ### Python
