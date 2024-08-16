@@ -44,4 +44,4 @@ jobs:
       - name: Build on Linux (Ubuntu 20.04)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:linux --publish=always
+        run: LINUX_DISTRO=${{ env.LINUX_DISTRO }} npm run build:linux --publish=always
