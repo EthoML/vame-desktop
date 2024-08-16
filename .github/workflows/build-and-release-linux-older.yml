@@ -1,0 +1,44 @@
+name: Build and Deploy — Linux
+run-name: ${{ github.actor }} is building a Linux release
+
+on:
+  push:
+    branches:
+      - buildubuntu20
+
+permissions:
+  actions: write
+  contents: write
+  packages: write
+
+jobs:
+  deploy-on-linux:
+    runs-on: ubuntu-20.04
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build on Linux (Ubuntu 20.04)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build:ubuntu20 --publish=always
