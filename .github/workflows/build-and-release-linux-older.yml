@@ -19,9 +19,6 @@ jobs:
       run:
         shell: bash -l {0}
 
-    env:
-      LINUX_DISTRO: ubuntu-20.04
-
     steps:
       - uses: actions/checkout@v4
 
@@ -44,4 +41,4 @@ jobs:
       - name: Build on Linux (Ubuntu 20.04)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: LINUX_DISTRO=${{ env.LINUX_DISTRO }} npm run build:linux --publish=always
+        run: npm run build:ubuntu20 --publish=always
