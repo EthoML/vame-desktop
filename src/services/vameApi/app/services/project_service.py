@@ -167,10 +167,13 @@ def load_project(project_path: Path):
 
     umaps_created_kmeans = any(map(lambda videos: len(videos) > 0, images["visualization"]["kmeans"].values()))
 
+    pose_ref_index_description, ref_index_len = get_pose_ref_index_description(original_csvs[0])
+
     # Provide project workflow status
     workflow = dict(
         organized = (project_path / 'data' / 'train').exists(),
-        pose_ref_index_description=get_pose_ref_index_description(original_csvs[0]),
+        pose_ref_index_description=pose_ref_index_description,
+        ref_index_len=ref_index_len,
         modeled = len(images["evaluation"]) > 0,
         segmented = has_latent_vector_files,
         motif_videos_created=(lambda: motif_videos_created_hmm or motif_videos_created_kmeans)(),

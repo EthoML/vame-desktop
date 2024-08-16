@@ -18,5 +18,5 @@ def get_pose_ref_index_description(csv_file_path: str) -> str:
         # Create the string based on body parts
         body_parts_string = ", ".join([f"{i}-{part}" for i, part in enumerate(body_parts)])
 
-    return body_parts_string
+    return body_parts_string, len(body_parts) - 1 if body_parts else None;
 

@@ -71,6 +71,7 @@ declare global {
     workflow: {
       organized: boolean;
       pose_ref_index_description: string;
+      ref_index_len: number;
       modeled: boolean;
       segmented: boolean;
       motif_videos_created: boolean;

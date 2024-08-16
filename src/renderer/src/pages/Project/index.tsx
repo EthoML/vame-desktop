@@ -108,18 +108,29 @@ const Project: React.FC = () => {
   }
 
   const {
-    organized,
-    modeled,
-    segmented,
-    motif_videos_created,
-    community_videos_created,
-    umaps_created,
-  } = project.workflow
-
-  const {
+    egocentric_alignment,
+    create_trainset,
+    evaluate_model,
+    train_model,
+    pose_segmentation,
+    motif_videos,
     community,
-    visualization
+    community_videos,
+    visualization,
   } = project.states
+
+  const organized = egocentric_alignment.execution_state==="success" && create_trainset.execution_state==="success"
+
+  const modeled = evaluate_model.execution_state==="success" && train_model.execution_state==="success"
+
+  const segmented = pose_segmentation.execution_state==="success"
+
+  const motif_videos_created = motif_videos.execution_state==="success" && project.workflow.motif_videos_created
+
+  const community_videos_created = community_videos.execution_state==="success" && project.workflow.community_videos_created
+
+  const umaps_created = visualization.execution_state==="success" && project.workflow.umaps_created
+
 
   const tabs = [
     {
