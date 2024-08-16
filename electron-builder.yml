@@ -35,13 +35,7 @@ dmg:
   artifactName: ${name}-${version}-macos-${arch}.${ext}
   writeUpdateInfo: false
 linux:
-  artifactName: ${name}-${version}-linux.${ext}
-  target:
-    - deb
-  maintainer: electronjs.org
-  category: Utility
-ubuntu20:
-  artifactName: ${name}-${version}-ubuntu20.${ext}
+  artifactName: ${name}-${version}-${env.LINUX_DISTRO}.${ext}
   target:
     - deb
   maintainer: electronjs.org
