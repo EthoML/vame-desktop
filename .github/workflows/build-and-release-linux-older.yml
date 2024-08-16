@@ -1,10 +1,10 @@
-name: Build and Deploy — Linux
+name: Build and Deploy — Linux Ubuntu 20.04
 run-name: ${{ github.actor }} is building a Linux release
 
 on:
   push:
     branches:
-      - main
+      - buildubuntu20
 
 permissions:
   actions: write
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   deploy-on-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     defaults:
       run:
@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build and deploy on Linux(Debian)
+      - name: Build on Linux (Ubuntu 20.04)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:linux --publish=always
+        run: npm run build:ubuntu20 --publish=always
