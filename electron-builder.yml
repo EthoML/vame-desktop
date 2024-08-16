@@ -35,7 +35,7 @@ dmg:
   artifactName: ${name}-${version}-macos-${arch}.${ext}
   writeUpdateInfo: false
 linux:
-  artifactName: ${name}-${version}-${env.LINUX_DISTRO}.${ext}
+  artifactName: ${name}-${version}-${process.env.LINUX_DISTRO}.${ext}
   target:
     - deb
   maintainer: electronjs.org
