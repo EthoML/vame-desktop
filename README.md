@@ -40,7 +40,7 @@ The executable will be added to the main applications folder on your Linux distr
 
 ## Example data
 
-The app can be run on the input data found [here](https://ethoml.github.io/VAME/docs/getting_started/running/#1-download-the-necessary-resources).
+The app can be tested on the sample input data found [here](https://ethoml.github.io/VAME/docs/getting_started/running/#1-download-the-necessary-resources).
 
 ## Development mode
 
