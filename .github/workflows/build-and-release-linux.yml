@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   deploy-on-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
