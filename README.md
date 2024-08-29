@@ -9,6 +9,12 @@ VAME Desktop has been designed to run each step of a VAME project **only once**.
 
 ## Installation
 
+### Requirement:
+
+For some images functions (as UMAP images) [ffmpeg](https://www.ffmpeg.org/) is needed.
+
+Download page: https://www.ffmpeg.org/download.html
+
 ### Download Desktop versions:
 
 You can find installers for VAME Desktop on the [release page](https://github.com/catalystneuro/vame-desktop/releases).
