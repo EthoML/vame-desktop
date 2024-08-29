@@ -19,9 +19,11 @@ const Organize = ({
   blockTooltip,
 }: TabProps) => {
   const pose_ref_index_extra_description = project.workflow.pose_ref_index_description ?? ""
+  const ref_index_len = project.workflow.ref_index_len
 
   const schema = structuredClone(organizeSchema) as unknown as Schema
   schema.properties.pose_ref_index.description = `${schema.properties.pose_ref_index.description} - ${pose_ref_index_extra_description}`
+  schema.properties.pose_ref_index.items.maximum = ref_index_len
 
   const isOrganized = project.workflow.organized
 

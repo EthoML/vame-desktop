@@ -2,9 +2,11 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restx import Api
 from logging.config import dictConfig
+import os
+from app.config import VAME_APP_DIRECTORY
 
 def create_app():
-    app = Flask("VAME API")
+    app = Flask("VAME API", os.path.abspath(VAME_APP_DIRECTORY))
     CORS(app)
     app.config['CORS_HEADERS'] = 'Content-Type'
 

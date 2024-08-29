@@ -185,7 +185,12 @@ class Visualization(Resource):
                 **data,
                 save_logs=True
             )
-            return dict(result=get_visualization_images(project_path))
+            
+            if(data["parametrization"] == "hmm"):
+                return dict(result=get_visualization_images(project_path=project_path,parametrization="hmm-15"))
+            else:
+                return dict(result=get_visualization_images(project_path=project_path,parametrization="kmeans-15"))
+            
         except Exception as exception:
             if not_bad_request_exception(exception):
                 api.abort(500, str(exception))

@@ -43,5 +43,6 @@ linux:
 npmRebuild: false
 publish:
   provider: github
+  publishAutoUpdate: false
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
