@@ -138,7 +138,8 @@ To avoid unecessary releases, follow these steps:
 - Create a branch `git checkout -b <branch_name>`, work on it, and create a pull request to `main`.
 - Update the `package.json` with the new version number.
 - Create a new tag with `git tag v<tag_number>`, push it to the repo with `git push orgin --tags`. **IMPORTANT**: the tag must be in the format `vX.Y.Z` where `X.Y.Z` is the package version number in `package.json`.
-- Merge the PR from `<branch_name>` into `main`. The github actions will create a [Draft Release](https://github.com/catalystneuro/vame-desktop/releases).
+- Create a draft release on github using the tag created.
+- Merge the PR from `<branch_name>` into `main`. The github action will publiss the executable assets to the draft release.
 - Manually edit the draft release, add information about the new features, bug fixes, and breaking changes.
 - Finaly approve and publish the new release.
 
