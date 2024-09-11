@@ -115,6 +115,8 @@ This will start the Electron app on developer mode.
 
 The build process will create a `.exe`, `.dmg` or `.deb` depend on OS. Run differents command on incompatible OS will result on error.
 
+![Build diagram](https://private-user-images.githubusercontent.com/24541631/366426425-ee5c223b-e918-4863-befe-f4f2b92aede4.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjYwNTI2NDAsIm5iZiI6MTcyNjA1MjM0MCwicGF0aCI6Ii8yNDU0MTYzMS8zNjY0MjY0MjUtZWU1YzIyM2ItZTkxOC00ODYzLWJlZmUtZjRmMmI5MmFlZGU0LmpwZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDA5MTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwOTExVDEwNTkwMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTQyNTM2YjNiZDg0MjNiMTQwYTRlZTUyYTU1MDA4NmNkNzQ1NmJhZWUwZGZlMzNjZmFjNDc4M2JiMGI2MDQzYzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.LYN0dHYhxAVjsjjAZbGLQDzDu-HBv7meNqlPODQewsc)
+
 MacOS
 ```bash
 npm run build:mac
@@ -138,7 +140,8 @@ To avoid unecessary releases, follow these steps:
 - Create a branch `git checkout -b <branch_name>`, work on it, and create a pull request to `main`.
 - Update the `package.json` with the new version number.
 - Create a new tag with `git tag v<tag_number>`, push it to the repo with `git push orgin --tags`. **IMPORTANT**: the tag must be in the format `vX.Y.Z` where `X.Y.Z` is the package version number in `package.json`.
-- Merge the PR from `<branch_name>` into `main`. The github actions will create a [Draft Release](https://github.com/catalystneuro/vame-desktop/releases).
+- Create a draft release on github using the tag created.
+- Merge the PR from `<branch_name>` into `main`. The github action will publiss the executable assets to the draft release.
 - Manually edit the draft release, add information about the new features, bug fixes, and breaking changes.
 - Finaly approve and publish the new release.
 

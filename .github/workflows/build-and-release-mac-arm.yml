@@ -1,4 +1,4 @@
-name: Build and Deploy — Mac ARM
+name: Build and Publish — Mac ARM
 run-name: ${{ github.actor }} is building a Mac release
 
 on:
@@ -12,9 +12,9 @@ permissions:
   packages: write
 
 jobs:
-  deploy-on-mac:
+  build-for-mac:
     runs-on: macos-latest
-    
+
     defaults:
       run:
         shell: bash -l {0}
@@ -27,10 +27,10 @@ jobs:
           python-version: "3.11"
 
       - name: install python dependencies
-        run: | 
+        run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -43,7 +43,7 @@ jobs:
           p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
           p12-password: ${{ secrets.MAOS_CERTIFICATE_PWD }}
 
-      - name: Build and deploy on MacOS
+      - name: Build and publish for MacOS arm64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:mac -- --publish=always --arm64
