@@ -83,7 +83,7 @@ python -m pip install -r requirements.txt
 Create the Conda environment for the project by running the following command:
 
 ```bash
-conda env create -f environment.yml 
+conda env create -f environment.yml
 ```
 This will install all the necessary Python dependencies for the project.
 
@@ -130,13 +130,12 @@ Linux Debian
 npm run build:linux
 ```
 
-## Deploy 
+## Publish
 
-The deploy will be trigger every time a new push is maded to the `main` branch with a tag associated, creating a release at [release page](https://github.com/catalystneuro/vame-desktop/releases).
+Publishing will happen every time a new push is maded to the `main` branch with a tag associated, creating a release at [release page](https://github.com/catalystneuro/vame-desktop/releases).
 
-To avoid unecessary deploys, create a branch `git checkout -b <branch_name>`, work on it, and create a pull request once the job is done.
-
-Then create a new tag with `git tag v<tag_number>`, push it to the repo with `git push orgin --tags`.
-
-Then merge the PR into main. The github actions will create a [Draft Release](https://github.com/catalystneuro/vame-desktop/releases) where you can put some infos about it, and finaly approve and publish. 
+To avoid unecessary releases, follow these steps:
+- create a branch `git checkout -b <branch_name>`, work on it, and create a pull request once the job is done.
+- create a new tag with `git tag v<tag_number>`, push it to the repo with `git push orgin --tags`.
+- merge the PR from `<branch_name>` into `main`. The github actions will create a [Draft Release](https://github.com/catalystneuro/vame-desktop/releases) where you can manually add extra info, and finaly approve and publish.
 
