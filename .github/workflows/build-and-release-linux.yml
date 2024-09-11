@@ -1,4 +1,4 @@
-name: Build and Deploy — Linux
+name: Build and Publish — Linux
 run-name: ${{ github.actor }} is building a Linux release
 
 on:
@@ -13,7 +13,7 @@ permissions:
   packages: write
 
 jobs:
-  deploy-on-linux:
+  build-for-linux:
     runs-on: ubuntu-22.04
 
     defaults:
@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build and deploy on Linux(Debian)
+      - name: Build and publish for Linux(Debian)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:linux --publish=always
