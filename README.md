@@ -2,7 +2,7 @@
 
 A web application for the Variational Animal Motion Encoding (VAME) project — an open-source machine learning tool for behavioral segmentation and analyses.
 
-VAME App runs locally: a Python (Flask) backend wraps the [VAME](https://github.com/EthoML/VAME) library and serves a React frontend, which you use in your browser.
+VAME App runs a Python (Flask) backend which calls the [VAME](https://github.com/EthoML/VAME) library and serves a React frontend, which you use in your browser.
 
 ## Requirements
 
