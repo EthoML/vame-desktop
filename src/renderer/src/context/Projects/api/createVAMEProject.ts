@@ -9,6 +9,8 @@ export interface CreateProps {
   pose_estimation_key?: string
   // Reproducibility seed (config.project_random_state); the create form suggests one.
   project_random_state?: number
+  // Frame rate; only sent when no video is selected (otherwise read from the video).
+  fps?: number
 }
 
 export interface CreateResponse {
@@ -38,6 +40,7 @@ export const createVAMEProject = async ({
   processing_module_key,
   pose_estimation_key,
   project_random_state,
+  fps,
 }: CreateProps) => {
   const source_software = inferSourceSoftware(pes_paths)
 
@@ -48,6 +51,8 @@ export const createVAMEProject = async ({
     poses_estimations: pes_paths,
     // Omit when blank/NaN so the backend falls back to VAME's default seed.
     ...(Number.isFinite(project_random_state) ? { project_random_state } : {}),
+    // Only sent when no video is present; with videos, VAME reads fps from them.
+    ...((!videos || videos.length === 0) && Number.isFinite(fps) ? { fps } : {}),
     // The NWB pose-location keys only matter for NWB sources.
     ...(source_software === "NWB"
       ? { processing_module_key, pose_estimation_key }

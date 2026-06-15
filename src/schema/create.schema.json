@@ -53,6 +53,17 @@
             ],
             "multiple": true
         },
+        "fps": {
+            "type": "number",
+            "title": "Frames per second",
+            "description": "Required when no video is selected; otherwise read from the video.",
+            "default": 30,
+            "minimum": 1,
+            "disabledWhen": {
+                "field": "videos",
+                "nonEmpty": true
+            }
+        },
         "project_random_state": {
             "type": "integer",
             "title": "Random seed",

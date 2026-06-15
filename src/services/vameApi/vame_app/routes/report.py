@@ -18,19 +18,36 @@ class Report(Resource):
         responses={200: "Success", 400: "Bad Request", 500: "Internal server error"}
     )
     def post(self):
-        def background_task(config: dict):
+        def background_task(config: dict, num_points: int, overwrite_umap: bool):
             vame.visualization.generate_reports(config=config)
+            # visualize_umap caches results/umap_embedding.nc and reuses it when
+            # present, so new UMAP settings won't apply unless we drop the cache.
+            if overwrite_umap:
+                umap_cache = Path(config["project_path"]) / "results" / "umap_embedding.nc"
+                if umap_cache.exists():
+                    umap_cache.unlink()
             # UMAP embeddings are cohort-wide (all sessions combined) and are
             # written to reports/umap/. They are part of the report artifacts,
             # so generate them in the same step (logs to the same report.log).
-            vame.visualization.visualize_umap(config=config)
+            vame.visualization.visualize_umap(config=config, num_points=num_points)
 
         try:
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
+            # UMAP layout params are read from config; num_points is a kwarg.
+            if data.get("n_neighbors") is not None:
+                config["n_neighbors"] = int(data["n_neighbors"])
+            if data.get("min_dist") is not None:
+                config["min_dist"] = float(data["min_dist"])
+            num_points = int(data["num_points"]) if data.get("num_points") is not None else config.get("num_points", 30000)
+            overwrite_umap = bool(data.get("overwrite_umap"))
+            vame.write_config(
+                config_path=str(Path(project_path) / "config.yaml"),
+                config=config,
+            )
             thread = threading.Thread(
                 target=background_task,
-                kwargs={"config": config},
+                kwargs={"config": config, "num_points": num_points, "overwrite_umap": overwrite_umap},
             )
             thread.start()
             time.sleep(2)

@@ -33,6 +33,8 @@ class CreateTrainset(Resource):
                 config=config,
                 test_fraction=data["test_fraction"],
                 split_mode=data["split_mode"],
+                # Empty selection falls back to None (use all keypoints).
+                keypoints_to_include=data.get("keypoints_to_include") or None,
                 save_logs=True,
             )
             return dict(result=result)
@@ -50,6 +52,8 @@ class TrainModel(Resource):
         def background_task(data, project_path, config):
             config["batch_size"] = data["batch_size"]
             config["max_epochs"] = data["max_epochs"]
+            if data.get("learning_rate") is not None:
+                config["learning_rate"] = float(data["learning_rate"])
             # Cap batches per epoch (decouples epoch length from dataset size);
             # blank/0 => use the whole dataset each epoch (VAME default).
             steps = data.get("steps_per_epoch")

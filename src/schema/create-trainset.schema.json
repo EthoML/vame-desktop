@@ -26,6 +26,14 @@
             "title": "Random seed (optional)",
             "description": "Seed for the reproducible train/test split",
             "minimum": 0
+        },
+        "keypoints_to_include": {
+            "type": "string",
+            "title": "Keypoints to include",
+            "description": "Keypoints used for training; uncheck any to exclude them.",
+            "enum": [],
+            "multiple": true,
+            "checkboxes": true
         }
     },
     "required": [

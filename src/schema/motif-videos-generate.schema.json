@@ -2,6 +2,13 @@
     "title": "Motifs Videos",
     "type": "object",
     "properties": {
+        "length_of_motif_video": {
+            "type": "integer",
+            "title": "Max Video Length (frames)",
+            "description": "Maximum number of frames per motif video clip.",
+            "default": 1000,
+            "minimum": 1
+        },
         "overwrite": {
             "type": "boolean",
             "title": "Overwrite Existing Videos",

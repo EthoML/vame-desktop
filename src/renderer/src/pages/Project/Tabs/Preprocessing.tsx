@@ -103,7 +103,13 @@ const Preprocessing = ({
           run_egocentric_alignment: formData?.run_egocentric_alignment !== undefined ? formData.run_egocentric_alignment : true,
           run_outlier_cleaning: formData?.run_outlier_cleaning !== undefined ? formData.run_outlier_cleaning : true,
           run_savgol_filtering: formData?.run_savgol_filtering !== undefined ? formData.run_savgol_filtering : true,
-          run_rescaling: formData?.run_rescaling !== undefined ? formData.run_rescaling : true
+          run_rescaling: formData?.run_rescaling !== undefined ? formData.run_rescaling : true,
+          // Per-step parameters (only applied by VAME when their step is enabled).
+          pose_confidence: formData?.pose_confidence ?? 0.99,
+          robust: formData?.robust !== undefined ? formData.robust : true,
+          iqr_factor: formData?.iqr_factor ?? 4,
+          savgol_length: formData?.savgol_length ?? 5,
+          savgol_order: formData?.savgol_order ?? 2
         }
         // Call the original onFormSubmit with the converted data
         onFormSubmit(compatibleData)
@@ -117,7 +123,12 @@ const Preprocessing = ({
           run_egocentric_alignment: true,
           run_outlier_cleaning: true,
           run_savgol_filtering: true,
-          run_rescaling: true
+          run_rescaling: true,
+          pose_confidence: 0.99,
+          robust: true,
+          iqr_factor: 4,
+          savgol_length: 5,
+          savgol_order: 2
         })
       }
     }

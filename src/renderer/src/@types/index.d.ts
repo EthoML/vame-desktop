@@ -211,12 +211,20 @@ declare global {
      * - `fileExtension`: visible only when every value of `field` (a file
      *   picker) ends with the given extension (e.g. ".nwb").
      * - `equals`: visible only when `field`'s value strictly equals this.
+     * - `nonEmpty`: visible only when `field` has a non-empty value.
      */
-    visibleWhen?: {
-      field: string;
-      fileExtension?: string;
-      equals?: unknown;
-    };
+    visibleWhen?: FieldCondition;
+    /** Disable (grey out) this field when the condition holds. Same shape as `visibleWhen`. */
+    disabledWhen?: FieldCondition;
+    /** Render indented under its controlling field (e.g. a parameter beneath its toggle). */
+    subfield?: boolean;
+  }
+
+  interface FieldCondition {
+    field: string;
+    fileExtension?: string;
+    equals?: unknown;
+    nonEmpty?: boolean;
   }
 
   export type StringProperty = DefaultPropertyAttrs & {
@@ -248,7 +256,9 @@ declare global {
     type: "string";
     enum: string[];
     multiple?: boolean;
-    default?: string;
+    /** Render the options as a checkbox group instead of a multi-select listbox. */
+    checkboxes?: boolean;
+    default?: string | string[];
   };
 
   export type ObjectProperty = DefaultPropertyAttrs & {

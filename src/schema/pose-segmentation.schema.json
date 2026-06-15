@@ -10,15 +10,35 @@
             "default": 15,
             "minimum": 1
         },
-        "overwrite": {
+        "segmentation_algorithms": {
+            "type": "string",
+            "title": "Segmentation Algorithms",
+            "description": "Which algorithms to run.",
+            "enum": [
+                "hmm",
+                "kmeans"
+            ],
+            "multiple": true,
+            "checkboxes": true,
+            "default": [
+                "hmm",
+                "kmeans"
+            ]
+        },
+        "overwrite_segmentation": {
             "type": "boolean",
             "title": "Overwrite Existing Segmentation",
-            "description": "If true, overwrite any existing segmentation results",
+            "description": "Recompute the motif labels.",
+            "default": false
+        },
+        "overwrite_embeddings": {
+            "type": "boolean",
+            "title": "Overwrite Existing Embeddings",
+            "description": "Recompute the latent embeddings.",
             "default": false
         }
     },
     "required": [
-        "n_clusters",
-        "overwrite"
+        "n_clusters"
     ]
 }

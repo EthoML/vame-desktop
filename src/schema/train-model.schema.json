@@ -14,6 +14,13 @@
             "description": "Maximum number of training epochs",
             "default": 20
         },
+        "learning_rate": {
+            "type": "number",
+            "title": "Learning Rate",
+            "description": "Optimizer step size; lower trains slower but more stably.",
+            "default": 0.0005,
+            "minimum": 0
+        },
         "steps_per_epoch": {
             "type": "integer",
             "title": "Batches per epoch (optional)",

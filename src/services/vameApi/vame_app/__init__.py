@@ -77,6 +77,21 @@ def create_app():
 
     _register_frontend(app)
 
+    # Heal any pipeline steps left at "running" by a previous process. Every
+    # long-running step runs in-process, so nothing survives a restart — any
+    # lingering "running" state is stale and would otherwise show a perpetual
+    # spinner in the UI. Never let this block startup.
+    try:
+        from vame_app.services.project_service import reconcile_stale_running_states
+
+        healed = reconcile_stale_running_states()
+        if healed:
+            app.logger.warning(
+                "Reset stale 'running' states on startup for: %s", ", ".join(healed)
+            )
+    except Exception as exc:  # noqa: BLE001 - startup must not fail on this
+        app.logger.warning("Could not reconcile stale states on startup: %s", exc)
+
     return app
 
 

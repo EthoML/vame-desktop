@@ -128,6 +128,25 @@ const PoseSegmentationAccordion = ({
         };
     }, [isPollingMotif, project.config.project_path, setBlockSubmit]);
 
+    // Block the Run button until the inputs are valid: at least one cluster and
+    // at least one segmentation algorithm selected.
+    const validateSegmentation = (values: Record<string, unknown>): string[] => {
+        const errors: string[] = [];
+        const n = Number(values.n_clusters);
+        if (!Number.isFinite(n) || n < 1) {
+            errors.push("Number of clusters must be greater than zero.");
+        }
+        const algos = Array.isArray(values.segmentation_algorithms)
+            ? values.segmentation_algorithms
+            : values.segmentation_algorithms
+            ? [values.segmentation_algorithms]
+            : [];
+        if (algos.length === 0) {
+            errors.push("Select at least one segmentation algorithm.");
+        }
+        return errors;
+    };
+
     // Handle form submission for segmentation
     const handleRunSegmentation = async (formData: any) => {
         setSegmentationLoading(true);
@@ -192,10 +211,11 @@ const PoseSegmentationAccordion = ({
                 <AccordionContent $isOpen={openSteps[0]}>
                     <div>
                         <DynamicForm
-                            schema={poseSegmentationSchema as Schema}
+                            schema={poseSegmentationSchema as unknown as Schema}
                             blockSubmission={blockSubmit}
                             submitText={segmentationLoading ? "Running..." : "Run Segmentation"}
                             onFormSubmit={handleRunSegmentation}
+                            validate={validateSegmentation}
                             showLogsButton={true}
                             logName={["pose_segmentation"]}
                             projectPath={project.config.project_path}

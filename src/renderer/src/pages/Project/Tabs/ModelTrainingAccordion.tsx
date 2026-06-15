@@ -37,6 +37,16 @@ const ModelTrainingAccordion = ({
     // Independent open/close state for each accordion
     const [openSteps, setOpenSteps] = useState([false, false, false]);
 
+    // Populate the keypoint checkboxes from the project's keypoints, all selected
+    // by default (training uses every keypoint unless the user unchecks some).
+    const createTrainsetSchemaWithKeypoints = React.useMemo(() => {
+        const keypoints: string[] = Array.isArray(project.config?.keypoints) ? project.config.keypoints : [];
+        const schema = structuredClone(createTrainsetSchema) as any;
+        schema.properties.keypoints_to_include.enum = keypoints;
+        schema.properties.keypoints_to_include.default = keypoints;
+        return schema as Schema;
+    }, [project.config?.keypoints]);
+
     // Create Trainset form state
     const [createTrainsetLoading, setCreateTrainsetLoading] = useState(false);
     const [createTrainsetError, setCreateTrainsetError] = useState<string | null>(null);
@@ -117,6 +127,7 @@ const ModelTrainingAccordion = ({
                 test_fraction: formData.test_fraction,
                 split_mode: formData.split_mode,
                 project_random_state: formData.project_random_state,
+                keypoints_to_include: formData.keypoints_to_include,
             });
         } catch (err: any) {
             setCreateTrainsetError(err.message || "Failed to create training set.");
@@ -213,7 +224,7 @@ const ModelTrainingAccordion = ({
                 <AccordionContent $isOpen={openSteps[0]}>
                     <div>
                         <DynamicForm
-                            schema={createTrainsetSchema as Schema}
+                            schema={createTrainsetSchemaWithKeypoints}
                             initialValues={{ project_random_state: project.config.project_random_state ?? 42 }}
                             blockSubmission={blockSubmit}
                             submitText={createTrainsetLoading ? "Creating..." : "Create Training Set"}

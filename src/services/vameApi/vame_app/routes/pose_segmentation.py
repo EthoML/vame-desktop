@@ -17,13 +17,11 @@ class Segment(Resource):
         responses={200: "Success", 400: "Bad Request", 500: "Internal server error"}
     )
     def post(self):
-        def background_task(config: dict, overwrite: bool):
-            # VAME 0.14 split the old `overwrite` flag into two; the UI exposes a
-            # single toggle, so map it to both segmentation and embeddings.
+        def background_task(config: dict, overwrite_segmentation: bool, overwrite_embeddings: bool):
             vame.segment_session(
                 config=config,
-                overwrite_segmentation=overwrite,
-                overwrite_embeddings=overwrite,
+                overwrite_segmentation=overwrite_segmentation,
+                overwrite_embeddings=overwrite_embeddings,
                 save_logs=True,
             )
 
@@ -31,14 +29,21 @@ class Segment(Resource):
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
             config["n_clusters"] = data["n_clusters"]
-            overwrite = data["overwrite"]
+            # Which algorithms to run; fall back to both if nothing was selected.
+            config["segmentation_algorithms"] = data.get("segmentation_algorithms") or ["hmm", "kmeans"]
+            overwrite_segmentation = bool(data.get("overwrite_segmentation"))
+            overwrite_embeddings = bool(data.get("overwrite_embeddings"))
             vame.write_config(
                 config_path=str(Path(project_path) / "config.yaml"),
                 config=config,
             )
             thread = threading.Thread(
                 target=background_task,
-                kwargs={"config": config, "overwrite": overwrite},
+                kwargs={
+                    "config": config,
+                    "overwrite_segmentation": overwrite_segmentation,
+                    "overwrite_embeddings": overwrite_embeddings,
+                },
             )
             thread.start()
             time.sleep(2)
@@ -63,6 +68,12 @@ class MotifVideos(Resource):
         try:
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
+            if data.get("length_of_motif_video") is not None:
+                config["length_of_motif_video"] = int(data["length_of_motif_video"])
+                vame.write_config(
+                    config_path=str(Path(project_path) / "config.yaml"),
+                    config=config,
+                )
             thread = threading.Thread(target=background_task, kwargs={"config": config})
             thread.start()
             time.sleep(2)

@@ -58,20 +58,23 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   // the user edits their dependencies.
   const values = methods.watch()
 
-  const isVisible = (property: Property): boolean => {
-    const cond = property.visibleWhen
-    if (!cond) return true
+  // Evaluate a visibleWhen/disabledWhen condition against the current values.
+  const evalCondition = (cond: NonNullable<Property["visibleWhen"]>): boolean => {
     const dep = (values as Record<string, unknown>)[cond.field]
+    const arr = Array.isArray(dep) ? dep : dep != null && dep !== "" ? [dep] : []
     if (cond.fileExtension) {
-      const arr = Array.isArray(dep) ? dep : dep ? [dep] : []
-      return (
-        arr.length > 0 &&
-        arr.every((p) => String(p).toLowerCase().endsWith(cond.fileExtension!))
-      )
+      return arr.length > 0 && arr.every((p) => String(p).toLowerCase().endsWith(cond.fileExtension!))
     }
+    if (cond.nonEmpty) return arr.length > 0
     if ("equals" in cond) return dep === cond.equals
     return true
   }
+
+  const isVisible = (property: Property): boolean =>
+    !property.visibleWhen || evalCondition(property.visibleWhen)
+
+  const isDisabled = (property: Property): boolean =>
+    !!property.disabledWhen && evalCondition(property.disabledWhen)
 
   // Unmet requirements (empty = valid). Shown once the user starts editing so a
   // pristine form isn't pre-painted with errors, but the button stays disabled.
@@ -92,12 +95,12 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               const required = schema.required?.includes(name)
 
               return (
-                <InputGroup key={name}>
-                  <InputLabel required={required} readOnly={property.readOnly}>
+                <InputGroup key={name} $subfield={property.subfield}>
+                  <InputLabel required={required} readOnly={property.readOnly} disabled={isDisabled(property)}>
                     <span>{property.title ?? header(name)}</span>
                     {property.description && <small>{property.description}</small>}
                   </InputLabel>
-                  <DynamicInput name={name} property={property} required={required} readOnly={property.readOnly} />
+                  <DynamicInput name={name} property={property} required={required} readOnly={property.readOnly} disabled={isDisabled(property)} />
                 </InputGroup>
               )
             })}

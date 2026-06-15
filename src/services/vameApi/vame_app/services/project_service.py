@@ -118,6 +118,41 @@ def is_project_ready(project_path: Path):
     return dict(is_ready=True)
 
 
+def reconcile_stale_running_states() -> list[str]:
+    """Reset orphaned ``"running"`` states left behind by a previous process.
+
+    Every long-running step runs as an in-process background thread, so none can
+    survive a server restart. Any step still marked ``"running"`` at startup is
+    therefore stale (the app was stopped/restarted mid-run) and is rewritten to
+    ``"failed"``. Called once from ``create_app``. Returns the names of the
+    projects that were healed.
+    """
+    healed: list[str] = []
+    for project_path in get_projects():
+        states_path = Path(project_path) / "states" / "states.json"
+        try:
+            with open(states_path, "r") as f:
+                states = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(states, dict):
+            continue
+        changed = False
+        for value in states.values():
+            if isinstance(value, dict) and value.get("execution_state") == "running":
+                value["execution_state"] = "failed"
+                changed = True
+        if not changed:
+            continue
+        try:
+            with open(states_path, "w") as f:
+                json.dump(states, f, indent=4)
+            healed.append(Path(project_path).name)
+        except OSError:
+            continue
+    return healed
+
+
 def create_project(data):
     import vame
     import time

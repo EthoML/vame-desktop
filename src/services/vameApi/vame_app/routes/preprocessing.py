@@ -19,6 +19,15 @@ class Preprocess(Resource):
         try:
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
+            # Per-step parameters live in the config; persist any the user set so
+            # the cleaning/filtering sub-steps pick them up.
+            for key in ("pose_confidence", "robust", "iqr_factor", "savgol_length", "savgol_order"):
+                if data.get(key) is not None:
+                    config[key] = data[key]
+            vame.write_config(
+                config_path=str(Path(project_path) / "config.yaml"),
+                config=config,
+            )
             vame.preprocessing(
                 config=config,
                 centered_reference_keypoint=data["centered_reference_keypoint"],

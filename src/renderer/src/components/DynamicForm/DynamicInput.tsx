@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import FileInput from "./FileSelector";
 import ArrayInput from "./ArrayInput";
-import { Accordion, AccordionContent, AccordionHeader, InputGroup, InputLabel, StyledInput, StyledSelect } from './styles';
+import { Accordion, AccordionContent, AccordionHeader, CheckboxGroup, CheckboxLabel, InputGroup, InputLabel, StyledInput, StyledSelect } from './styles';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
@@ -11,6 +11,8 @@ type DynamicInputProps = {
   property: Property;
   required?: boolean;
   readOnly?: boolean;
+  /** Conditionally disabled (RHF drops the value from submission while disabled). */
+  disabled?: boolean;
 }
 
 const DynamicInput: React.FC<DynamicInputProps> = ({
@@ -18,6 +20,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
   property,
   required,
   readOnly,
+  disabled,
 }) => {
   const itemKey = name
   readOnly = readOnly ?? property.readOnly
@@ -42,6 +45,24 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
   // Handle select fields
   if (type === "enum") {
     const enumProperty = property as EnumProperty
+    // Multi-value enum rendered as a checkbox group (clearer than a multi-select
+    // listbox). RHF aggregates same-named checkboxes into an array of values.
+    if (enumProperty.checkboxes) {
+      return (
+        <CheckboxGroup>
+          {enumProperty.enum.map((option) => (
+            <CheckboxLabel key={option}>
+              <input
+                type="checkbox"
+                value={option}
+                {...register(itemKey, { disabled: disabled || readOnly })}
+              />
+              <span>{option}</span>
+            </CheckboxLabel>
+          ))}
+        </CheckboxGroup>
+      );
+    }
     return (
       <StyledSelect
         {...register(itemKey, { required, disabled: readOnly })}
@@ -77,7 +98,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
         max={numberProperty?.maximum}
         min={numberProperty?.minimum}
         step={isInteger ? 1 : "any"}
-        {...register(itemKey, { required, valueAsNumber: true })}
+        {...register(itemKey, { required, valueAsNumber: true, disabled })}
         readOnly={readOnly}
       />
     );

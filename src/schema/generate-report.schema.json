@@ -1,0 +1,35 @@
+{
+    "title": "Generate Report",
+    "type": "object",
+    "properties": {
+        "n_neighbors": {
+            "type": "integer",
+            "title": "UMAP Neighbors",
+            "description": "Higher values emphasize global structure over local detail.",
+            "default": 200,
+            "minimum": 2
+        },
+        "min_dist": {
+            "type": "number",
+            "title": "UMAP Minimum Distance",
+            "description": "Smaller values pack points more tightly in the embedding.",
+            "default": 0.1,
+            "minimum": 0,
+            "maximum": 1
+        },
+        "num_points": {
+            "type": "integer",
+            "title": "UMAP Points",
+            "description": "Number of points to embed; fewer renders faster.",
+            "default": 30000,
+            "minimum": 1
+        },
+        "overwrite_umap": {
+            "type": "boolean",
+            "title": "Overwrite UMAP Embedding",
+            "description": "Recompute the embedding so the settings above take effect (slow).",
+            "default": false
+        }
+    },
+    "required": []
+}
