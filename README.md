@@ -1,8 +1,12 @@
 # VAME App
 
+[![PyPI version](https://img.shields.io/pypi/v/vame-app.svg)](https://pypi.org/project/vame-app/)
+
 A web application for the Variational Animal Motion Encoding (VAME) project — an open-source machine learning tool for behavioral segmentation and analyses.
 
 VAME App runs a Python (Flask) backend which calls the [VAME](https://github.com/EthoML/VAME) library and serves a React frontend, which you use in your browser.
+
+![VAME App](https://raw.githubusercontent.com/EthoML/vame-app/main/assets/app_diagram.png)
 
 ## Requirements
 
