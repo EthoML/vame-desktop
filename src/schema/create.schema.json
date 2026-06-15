@@ -35,7 +35,7 @@
         "pose_estimation_key": {
             "type": "string",
             "title": "NWB Pose Estimation Key",
-            "description": "Name of the PoseEstimation object inside the processing module.",
+            "description": "Name of the PoseEstimation object inside the processing module",
             "default": "PoseEstimation",
             "visibleWhen": {
                 "field": "pes_paths",
@@ -45,13 +45,30 @@
         "videos": {
             "title": "Video Files (Optional)",
             "type": "string",
-            "description": "Labeled videos corresponding to the pose estimation files. Supported formats: MP4, AVI.",
+            "description": "Labeled videos corresponding to the pose estimation files (.mp4, .avi)",
             "format": "file",
             "accept": [
                 ".mp4",
                 ".avi"
             ],
             "multiple": true
+        },
+        "fps": {
+            "type": "number",
+            "title": "Frames per second",
+            "description": "Required when no video is selected; otherwise read from the video.",
+            "default": 30,
+            "minimum": 1,
+            "disabledWhen": {
+                "field": "videos",
+                "nonEmpty": true
+            }
+        },
+        "project_random_state": {
+            "type": "integer",
+            "title": "Random seed",
+            "description": "Seed for reproducibility",
+            "minimum": 0
         }
     },
     "required": [

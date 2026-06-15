@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import ButtonComponent from "@renderer/components/Button"
 
 // Styled input component with constrained width
@@ -16,6 +16,13 @@ export const StyledInput = styled.input`
     outline: none;
     border-color: var(--color-accent);
   }
+
+  &:disabled {
+    background-color: var(--color-surface-sunken);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 `;
 
 // Styled select component with constrained width
@@ -32,6 +39,13 @@ export const StyledSelect = styled.select`
   &:focus {
     outline: none;
     border-color: var(--color-accent);
+  }
+
+  &:disabled {
+    background-color: var(--color-surface-sunken);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 `;
 
@@ -99,17 +113,57 @@ export const AccordionContent = styled.div<AccordionContentProps>`
   display: ${props => (props.$isOpen ? 'block' : 'none')};
 `;
 
-export const InputGroup = styled.div`
+export const InputGroup = styled.div<{ $subfield?: boolean }>`
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   gap: 4px; /* Reduced gap between label and input */
   margin-bottom: 20px; /* Increased spacing between form items */
+
+  /* A parameter nested under its controlling toggle: indented with a left rail
+     and pulled up tight to read as a child of the field above it. */
+  ${({ $subfield }) =>
+    $subfield &&
+    css`
+      margin-top: -8px;
+      margin-bottom: 12px;
+      margin-left: 28px;
+      padding-left: 12px;
+      border-left: 2px solid var(--color-border);
+    `}
+`;
+
+// A vertical group of labelled checkboxes (multi-select rendered as checkboxes).
+export const CheckboxGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 350px;
+  max-width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-surface);
+`;
+
+export const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: var(--text-sm);
+
+  input {
+    cursor: pointer;
+  }
 `;
 
 interface InputLabelProps {
   required?: boolean;
   readOnly?: boolean;
+  disabled?: boolean;
 }
 
 export const InputLabel = styled.label<InputLabelProps>`
@@ -118,6 +172,13 @@ export const InputLabel = styled.label<InputLabelProps>`
 
   span {
     font-weight: bold;
+  }
+
+  &[disabled] {
+    span,
+    small {
+      color: var(--color-text-muted);
+    }
   }
 
   small {

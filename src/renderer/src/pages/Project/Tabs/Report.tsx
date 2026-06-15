@@ -8,6 +8,7 @@ import DynamicForm from '@renderer/components/DynamicForm';
 import { generateReportVAMEProject } from '../../../context/Projects/api/generateReportVAMEProject';
 import { getProjectStateVAMEProject } from '../../../context/Projects/api/getProjectStateVAMEProject';
 import reportImagesGetSchema from "../../../../../schema/report-get-images.schema.json";
+import generateReportSchema from "../../../../../schema/generate-report.schema.json";
 import { getReportVAMEProject } from '../../../context/Projects/api/getReportVAMEProject';
 import { getUmapVAMEProject } from '../../../context/Projects/api/getUmapVAMEProject';
 import { StepBadge, StepStateLine, ErrorNote } from '@renderer/components/StepStatus';
@@ -42,11 +43,11 @@ const Report: React.FC<TabProps> = ({
     };
 
     // 1. Generate Report
-    const handleGenerateReport = async () => {
+    const handleGenerateReport = async (formData: any) => {
         setReportLoading(true);
         setReportError(null);
         try {
-            await generateReportVAMEProject({ project: project.config.project_path });
+            await generateReportVAMEProject({ project: project.config.project_path, ...formData });
             setIsPollingReport(true);
         } catch (err: any) {
             setReportError(err.message || 'Failed to start report generation.');
@@ -91,7 +92,7 @@ const Report: React.FC<TabProps> = ({
                 </AccordionHeader>
                 <AccordionContent $isOpen={openSteps[0]}>
                     <DynamicForm
-                        schema={{ title: 'Generate Report', type: 'object', properties: {}, required: [] }}
+                        schema={generateReportSchema as unknown as Schema}
                         blockSubmission={blockSubmission || reportLoading || isPollingReport}
                         submitText={reportLoading ? 'Generating...' : 'Generate Report'}
                         onFormSubmit={handleGenerateReport}

@@ -4,44 +4,104 @@
         "centered_reference_keypoint": {
             "type": "string",
             "title": "Centered Reference Keypoint",
-            "description": "Select the reference keypoint for centering.",
+            "description": "Select the reference keypoint for centering",
             "enum": []
         },
         "orientation_reference_keypoint": {
             "type": "string",
             "title": "Orientation Reference Keypoint",
-            "description": "Select the reference keypoint for orientation.",
+            "description": "Select the reference keypoint for orientation",
             "enum": []
         },
         "run_lowconf_cleaning": {
             "type": "boolean",
             "title": "Run Low Confidence Cleaning",
-            "description": "Clean low confidence keypoints during preprocessing.",
+            "description": "Clean low confidence keypoints during preprocessing",
             "default": true
+        },
+        "pose_confidence": {
+            "type": "number",
+            "title": "Confidence Threshold",
+            "description": "Keypoints below this confidence are dropped and interpolated.",
+            "default": 0.99,
+            "minimum": 0,
+            "maximum": 1,
+            "subfield": true,
+            "visibleWhen": {
+                "field": "run_lowconf_cleaning",
+                "equals": true
+            }
         },
         "run_egocentric_alignment": {
             "type": "boolean",
             "title": "Run Egocentric Alignment",
-            "description": "Perform egocentric alignment during preprocessing.",
+            "description": "Perform egocentric alignment during preprocessing",
             "default": true
         },
         "run_outlier_cleaning": {
             "type": "boolean",
             "title": "Run Outlier Cleaning",
-            "description": "Clean outliers during preprocessing.",
+            "description": "Clean outliers during preprocessing",
             "default": true
+        },
+        "robust": {
+            "type": "boolean",
+            "title": "Robust Outlier Detection",
+            "description": "Use IQR-based detection instead of standard deviation.",
+            "default": true,
+            "subfield": true,
+            "visibleWhen": {
+                "field": "run_outlier_cleaning",
+                "equals": true
+            }
+        },
+        "iqr_factor": {
+            "type": "integer",
+            "title": "IQR Factor",
+            "description": "Higher values keep more points; lower values clean more aggressively.",
+            "default": 4,
+            "minimum": 1,
+            "subfield": true,
+            "visibleWhen": {
+                "field": "run_outlier_cleaning",
+                "equals": true
+            }
         },
         "run_savgol_filtering": {
             "type": "boolean",
             "title": "Run Savitzky-Golay Filtering",
-            "description": "Apply Savitzky-Golay filtering during preprocessing.",
+            "description": "Apply Savitzky-Golay filtering during preprocessing",
             "default": true
+        },
+        "savgol_length": {
+            "type": "integer",
+            "title": "Filter Window Length",
+            "description": "Smoothing window in frames; larger values smooth more (must be odd).",
+            "default": 5,
+            "minimum": 1,
+            "subfield": true,
+            "visibleWhen": {
+                "field": "run_savgol_filtering",
+                "equals": true
+            }
+        },
+        "savgol_order": {
+            "type": "integer",
+            "title": "Filter Polynomial Order",
+            "description": "Polynomial order of the Savitzky-Golay filter.",
+            "default": 2,
+            "minimum": 1,
+            "subfield": true,
+            "visibleWhen": {
+                "field": "run_savgol_filtering",
+                "equals": true
+            }
         },
         "run_rescaling": {
             "type": "boolean",
             "title": "Run Rescaling",
-            "description": "Perform rescaling during preprocessing.",
-            "default": false
+            "description": "Perform rescaling during preprocessing",
+            "default": true
         }
     },
     "required": [

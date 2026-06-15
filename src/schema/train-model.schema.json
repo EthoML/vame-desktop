@@ -5,14 +5,39 @@
         "batch_size": {
             "type": "integer",
             "title": "Batch Size",
-            "description": "Number of samples per gradient update.",
+            "description": "Number of samples per gradient update",
             "default": 256
         },
         "max_epochs": {
             "type": "integer",
             "title": "Max Epochs",
-            "description": "Maximum number of training epochs.",
-            "default": 500
+            "description": "Maximum number of training epochs",
+            "default": 20
+        },
+        "learning_rate": {
+            "type": "number",
+            "title": "Learning Rate",
+            "description": "Optimizer step size; lower trains slower but more stably.",
+            "default": 0.0005,
+            "minimum": 0
+        },
+        "steps_per_epoch": {
+            "type": "integer",
+            "title": "Batches per epoch (optional)",
+            "description": "Number of batches to train per epoch. Leave empty to use the whole dataset",
+            "minimum": 1
+        },
+        "continue_training": {
+            "type": "boolean",
+            "title": "Continue training from previous model",
+            "description": "Resume training from the last checkpoint",
+            "default": true
+        },
+        "project_random_state": {
+            "type": "integer",
+            "title": "Random seed (optional)",
+            "description": "Seed for reproducible training",
+            "minimum": 0
         }
     },
     "required": [

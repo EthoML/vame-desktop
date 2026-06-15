@@ -131,16 +131,18 @@ const Project: React.FC = () => {
 
   const projectPreprocessed = preprocessingState.execution_state === "success" && preprocessingVisualizationState.execution_state === "success";
   const trainsetCreated = create_trainset.execution_state === "success";
-  const modelCreated = train_model.execution_state === "success";
+  // A user-stopped ("aborted") run still saves a usable model
+  const modelCreated =
+    train_model.execution_state === "success" ||
+    train_model.execution_state === "aborted";
   const modelEvaluated = evaluate_model.execution_state === "success";
   const segmented = segment_session.execution_state === "success";
   const report_session = project.states?.generate_reports || {};
   const reportCompleted = report_session.execution_state === "success";
 
-  // A step that died (failed/aborted) surfaces a ✕ on its tab so a broken
-  // stage is visible at a glance, not hidden behind an unchanged label.
+
   const isFailed = (s: { execution_state?: string } = {}) =>
-    s.execution_state === "failed" || s.execution_state === "aborted";
+    s.execution_state === "failed";
 
   const tabs = [
     {

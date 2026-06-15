@@ -20,6 +20,20 @@
             ],
             "default": "mode_2",
             "description": "'mode_1': initial fraction form combined data. 'mode_2': random chunks from each session."
+        },
+        "project_random_state": {
+            "type": "integer",
+            "title": "Random seed (optional)",
+            "description": "Seed for the reproducible train/test split",
+            "minimum": 0
+        },
+        "keypoints_to_include": {
+            "type": "string",
+            "title": "Keypoints to include",
+            "description": "Keypoints used for training; uncheck any to exclude them.",
+            "enum": [],
+            "multiple": true,
+            "checkboxes": true
         }
     },
     "required": [

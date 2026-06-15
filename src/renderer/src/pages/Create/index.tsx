@@ -30,6 +30,9 @@ const Create: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  // A fresh reproducibility seed suggested per project (user can override).
+  const suggestedSeed = useMemo(() => Math.floor(Math.random() * 1_000_000), [])
+
   useEffect(() => {
     onVAMEReady(() => setBlockSubmission(false))
   }, [])
@@ -94,6 +97,13 @@ const Create: React.FC = () => {
       if (videos.length > 0 && videos.length !== pes.length)
         errors.push('Add exactly one video per pose file, or none at all.')
 
+      // Without a video, fps can't be auto-detected, so it must be provided.
+      if (videos.length === 0) {
+        const fps = Number(values.fps)
+        if (!Number.isFinite(fps) || fps <= 0)
+          errors.push('Frames per second is required when no video is selected.')
+      }
+
       return errors
     },
     [existingNames]
@@ -131,6 +141,7 @@ const Create: React.FC = () => {
     <PaddedContainer>
       <DynamicForm
         schema={createSchema as unknown as Schema}
+        initialValues={{ project_random_state: suggestedSeed }}
         onFormSubmit={handleFormSubmit}
         blockSubmission={blockSubmission || isSubmitting}
         submitText='Create Project'

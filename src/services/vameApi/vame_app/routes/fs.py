@@ -46,8 +46,9 @@ class FilesystemRoots(Resource):
                 pass
             return jsonify({"roots": roots, "data_root": str(data_root)})
         except Exception as exception:
-            if not_bad_request_exception(exception):
-                api.abort(500, str(exception))
+            # Return clean JSON (not api.abort) so the SPA shows the message
+            # instead of an opaque 500 HTML page.
+            return {"message": str(exception)}, 500
 
 
 @api.route("/fs/list", methods=["GET"])
@@ -70,15 +71,16 @@ class FilesystemList(Resource):
         show_hidden = request.args.get("show_hidden", "false").lower() == "true"
         exts = {e.strip().lower() for e in exts_param.split(",") if e.strip()}
 
+        # All error paths below return clean JSON ({"message": ...}, code)
         try:
             target = resolve_within(data_root, raw_path)
         except PermissionError as exception:
-            api.abort(400, str(exception))
-
-        if not target.exists() or not target.is_dir():
-            api.abort(400, f"Not a directory: '{target}'")
+            return {"message": str(exception)}, 400
 
         try:
+            if not target.is_dir():
+                return {"message": f"Not a directory: '{target}'"}, 400
+
             dirs, files = [], []
             for child in sorted(
                 target.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())

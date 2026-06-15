@@ -10,12 +10,15 @@ import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import DynamicForm from "@renderer/components/DynamicForm";
 import { createTrainsetVAMEProject } from "../../../context/Projects/api/createTrainsetVAMEProject";
 import { trainVAMEProject } from "../../../context/Projects/api/trainVAMEProject";
+import { stopTrainVAMEProject } from "../../../context/Projects/api/stopTrainVAMEProject";
 import { getProjectStateVAMEProject } from "../../../context/Projects/api/getProjectStateVAMEProject";
+import Button from "@renderer/components/Button";
 import { evaluateVAMEProject } from "../../../context/Projects/api/evaluateVAMEProject";
 import createTrainsetSchema from '../../../../../schema/create-trainset.schema.json';
 import trainModelSchema from '../../../../../schema/train-model.schema.json';
 import evaluateModelSchema from '../../../../../schema/evaluate-model.schema.json';
 import ModelVisualizationSection from "./ModelVisualizationSection";
+import TrainingMetricsCharts from "./TrainingMetricsCharts";
 import { StepBadge, StepStateLine, ErrorNote, SuccessNote } from "@renderer/components/StepStatus";
 
 type ModelTrainingAccordionProps = {
@@ -32,7 +35,17 @@ const ModelTrainingAccordion = ({
     blockSubmit,
 }: ModelTrainingAccordionProps) => {
     // Independent open/close state for each accordion
-    const [openSteps, setOpenSteps] = useState([false, false, false, false]);
+    const [openSteps, setOpenSteps] = useState([false, false, false]);
+
+    // Populate the keypoint checkboxes from the project's keypoints, all selected
+    // by default (training uses every keypoint unless the user unchecks some).
+    const createTrainsetSchemaWithKeypoints = React.useMemo(() => {
+        const keypoints: string[] = Array.isArray(project.config?.keypoints) ? project.config.keypoints : [];
+        const schema = structuredClone(createTrainsetSchema) as any;
+        schema.properties.keypoints_to_include.enum = keypoints;
+        schema.properties.keypoints_to_include.default = keypoints;
+        return schema as Schema;
+    }, [project.config?.keypoints]);
 
     // Create Trainset form state
     const [createTrainsetLoading, setCreateTrainsetLoading] = useState(false);
@@ -46,6 +59,10 @@ const ModelTrainingAccordion = ({
     const [trainModelState, setTrainModelState] = useState<string | null>(null);
     const [isPolling, setIsPolling] = useState(false);
 
+    // Stop-training state
+    const [stopping, setStopping] = useState(false);
+    const [stopError, setStopError] = useState<string | null>(null);
+
     // Evaluate Model form state
     const [evaluateError, setEvaluateError] = useState<string | null>(null);
 
@@ -55,7 +72,11 @@ const ModelTrainingAccordion = ({
     const evaluate_model = project.states.evaluate_model || {};
 
     const trainsetCreated = create_trainset.execution_state === "success";
-    const modelCreated = train_model.execution_state === "success";
+    // Aborted (user-stopped) runs still save a usable model, so the Evaluate
+    // step unblocks just like a completed run.
+    const modelCreated =
+        train_model.execution_state === "success" ||
+        train_model.execution_state === "aborted";
     const modelEvaluated = evaluate_model.execution_state === "success";
 
     // Poll train_model state after training starts
@@ -76,13 +97,14 @@ const ModelTrainingAccordion = ({
                         state === "not_found"
                     ) {
                         setIsPolling(false);
+                        setStopping(false);
                         try {
                             await onFormSubmit();
                         } catch (e) {
                             console.error("Error calling onFormSubmit:", e);
                         }
                         setBlockSubmit(false);
-                        setOpenSteps([false, false, false, false]);
+                        setOpenSteps([false, false, false]);
                     }
                 } catch (err) {
                     console.error("Error during polling:", err);
@@ -104,6 +126,8 @@ const ModelTrainingAccordion = ({
                 project: project.config.project_path,
                 test_fraction: formData.test_fraction,
                 split_mode: formData.split_mode,
+                project_random_state: formData.project_random_state,
+                keypoints_to_include: formData.keypoints_to_include,
             });
         } catch (err: any) {
             setCreateTrainsetError(err.message || "Failed to create training set.");
@@ -134,6 +158,20 @@ const ModelTrainingAccordion = ({
             setBlockSubmit(false);
         } finally {
             setTrainLoading(false);
+        }
+    };
+
+    // Handler for stopping a running training. Writes VAME's stop sentinel; the
+    // existing poll above flips to "aborted" once training stops at the next
+    // epoch boundary (and the current model is saved).
+    const handleStopTraining = async () => {
+        setStopping(true);
+        setStopError(null);
+        try {
+            await stopTrainVAMEProject({ project: project.config.project_path });
+        } catch (err: any) {
+            setStopError(err.message || "Failed to request training stop.");
+            setStopping(false);
         }
     };
 
@@ -186,7 +224,8 @@ const ModelTrainingAccordion = ({
                 <AccordionContent $isOpen={openSteps[0]}>
                     <div>
                         <DynamicForm
-                            schema={createTrainsetSchema as Schema}
+                            schema={createTrainsetSchemaWithKeypoints}
+                            initialValues={{ project_random_state: project.config.project_random_state ?? 42 }}
                             blockSubmission={blockSubmit}
                             submitText={createTrainsetLoading ? "Creating..." : "Create Training Set"}
                             onFormSubmit={handleCreateTrainset}
@@ -215,6 +254,7 @@ const ModelTrainingAccordion = ({
                     <div>
                         <DynamicForm
                             schema={trainModelSchema as Schema}
+                            initialValues={{ project_random_state: project.config.project_random_state ?? 42 }}
                             blockSubmission={blockSubmit}
                             submitText={trainLoading ? "Training..." : "Train Model"}
                             onFormSubmit={handleTrainModel}
@@ -224,6 +264,27 @@ const ModelTrainingAccordion = ({
                         />
                         {trainError && <ErrorNote>{trainError}</ErrorNote>}
                         <StepStateLine state={trainModelState} polling={isPolling} noun="Training" />
+                        {isPolling && (
+                            <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
+                                <Button
+                                    variant="danger"
+                                    type="button"
+                                    onClick={handleStopTraining}
+                                    disabled={stopping}
+                                >
+                                    {stopping ? "Stopping…" : "Stop training"}
+                                </Button>
+                                <span style={{ color: "var(--color-text-muted)", fontSize: "var(--text-sm)" }}>
+                                    Stops after the current epoch and saves the current model.
+                                </span>
+                            </div>
+                        )}
+                        {stopError && <ErrorNote>{stopError}</ErrorNote>}
+                        <TrainingMetricsCharts
+                            projectPath={project.config.project_path}
+                            live={isPolling}
+                            enabled={openSteps[1]}
+                        />
                     </div>
                 </AccordionContent>
             </Accordion>
@@ -252,23 +313,10 @@ const ModelTrainingAccordion = ({
                         />
                         {evaluateError && <ErrorNote>{evaluateError}</ErrorNote>}
                         {modelEvaluated && <SuccessNote>Model evaluated successfully.</SuccessNote>}
+                        {modelEvaluated && (
+                            <ModelVisualizationSection project={project} enabled={openSteps[2]} />
+                        )}
                     </div>
-                </AccordionContent>
-            </Accordion>
-            {/* Accordion 4: Visualize Model Results */}
-            <Accordion>
-                <AccordionHeader
-                    $disabled={!modelEvaluated}
-                    onClick={() => handleToggle(3, modelEvaluated)}
-                >
-                    3.4 Visualize Model Results
-                    <StepBadge state={evaluate_model.execution_state} />
-                    <span style={{ marginLeft: "auto" }}>
-                        <FontAwesomeIcon icon={openSteps[3] ? faChevronUp : faChevronDown} />
-                    </span>
-                </AccordionHeader>
-                <AccordionContent $isOpen={openSteps[3]}>
-                    <ModelVisualizationSection project={project} enabled={modelEvaluated} />
                 </AccordionContent>
             </Accordion>
         </PaddedTab>

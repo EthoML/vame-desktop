@@ -9,6 +9,7 @@ import vame
 from . import api
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+from vame_app.services.training_metrics import build_training_figures
 
 
 @api.route("/create-trainset", methods=["POST"])
@@ -20,10 +21,20 @@ class CreateTrainset(Resource):
         try:
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
+            # Optional per-split seed override; persist so it becomes the project seed.
+            seed = data.get("project_random_state")
+            if seed is not None:
+                config["project_random_state"] = int(seed)
+                vame.write_config(
+                    config_path=str(Path(project_path) / "config.yaml"),
+                    config=config,
+                )
             result = vame.create_trainset(
                 config=config,
                 test_fraction=data["test_fraction"],
                 split_mode=data["split_mode"],
+                # Empty selection falls back to None (use all keypoints).
+                keypoints_to_include=data.get("keypoints_to_include") or None,
                 save_logs=True,
             )
             return dict(result=result)
@@ -41,17 +52,46 @@ class TrainModel(Resource):
         def background_task(data, project_path, config):
             config["batch_size"] = data["batch_size"]
             config["max_epochs"] = data["max_epochs"]
+            if data.get("learning_rate") is not None:
+                config["learning_rate"] = float(data["learning_rate"])
+            # Cap batches per epoch (decouples epoch length from dataset size);
+            # blank/0 => use the whole dataset each epoch (VAME default).
+            steps = data.get("steps_per_epoch")
+            config["steps_per_epoch"] = int(steps) if steps else None
+            # Optional per-run seed override; persisted with the config below.
+            seed = data.get("project_random_state")
+            if seed is not None:
+                config["project_random_state"] = int(seed)
+            # Continue from the previously trained model (load saved weights) when
+            # requested; otherwise train from scratch. VAME loads weights only if
+            # pretrained_weights is true and pretrained_model names the saved model
+            # (best_model is "{model_name}_{project}.pkl").
+            if data.get("continue_training"):
+                config["pretrained_weights"] = True
+                config["pretrained_model"] = config["model_name"]
+            else:
+                config["pretrained_weights"] = False
             vame.write_config(
                 config_path=str(Path(project_path) / "config.yaml"),
                 config=config,
             )
-            vame.train_model(config=config, save_logs=True)
-            vame.visualization.plot_loss(
-                config=config,
-                model_name=config["model_name"],
-                save_to_file=True,
-                show_figure=False,
-            )
+            try:
+                vame.train_model(config=config, save_logs=True)
+            except KeyboardInterrupt:
+                # User requested a stop; VAME already recorded "aborted" and saved
+                # the current weights. Fall through to plot whatever completed.
+                pass
+            # Generate the loss figure from the epochs that ran (works for both
+            # completed and aborted runs); never let it mask the training result.
+            try:
+                vame.visualization.plot_loss(
+                    config=config,
+                    model_name=config["model_name"],
+                    save_to_file=True,
+                    show_figure=False,
+                )
+            except Exception:
+                pass
 
         try:
             data, project_path = resolve_request_data(request)
@@ -65,6 +105,28 @@ class TrainModel(Resource):
         except Exception as exception:
             if not_bad_request_exception(exception):
                 api.abort(500, str(exception))
+
+
+@api.route("/train/stop", methods=["POST"])
+class StopTrainModel(Resource):
+    @api.doc(
+        responses={200: "Success", 400: "Bad Request", 500: "Internal server error"}
+    )
+    def post(self):
+        """Request a graceful stop of an in-progress training.
+
+        Writes VAME's stop sentinel via ``vame.stop_training``; the training loop
+        notices it at the next epoch boundary, saves the current model, and
+        records the ``aborted`` state (which the UI polls for).
+        """
+        try:
+            data, project_path = resolve_request_data(request)
+            config = vame.read_config(str(Path(project_path) / "config.yaml"))
+            was_running = vame.stop_training(config=config)
+            return {"status": "stop_requested", "was_running": bool(was_running)}
+        except Exception as exception:
+            # Clean JSON error (flask-restx's api.abort 500s with flask-cors here).
+            return {"message": str(exception)}, 500
 
 
 @api.route("/evaluate", methods=["POST"])
@@ -104,6 +166,28 @@ class EvaluateModel(Resource):
         except Exception as exception:
             if not_bad_request_exception(exception):
                 api.abort(500, str(exception))
+
+
+@api.route("/train-metrics", methods=["POST"])
+class TrainMetrics(Resource):
+    @api.doc(
+        responses={200: "Success", 400: "Bad Request", 500: "Internal server error"}
+    )
+    def post(self):
+        """Live training-loss figures (Plotly specs) from TensorBoard logs.
+
+        Body: ``{"project": "<path>", "model_name"?: "<name>"}``. Returns
+        ``{"epoch_train", "epoch_test", "batch", "has_data", "model_name"}``;
+        safe to poll during training and before any events exist.
+        """
+        try:
+            data, project_path = resolve_request_data(request)
+            config = vame.read_config(str(Path(project_path) / "config.yaml"))
+            model_name = data.get("model_name") or config["model_name"]
+            return jsonify(build_training_figures(project_path, model_name))
+        except Exception as exception:
+            # Clean JSON error (flask-restx's api.abort 500s with flask-cors here).
+            return {"message": str(exception)}, 500
 
 
 @api.route("/model-images", methods=["POST"])
