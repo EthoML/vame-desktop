@@ -118,6 +118,23 @@ def is_project_ready(project_path: Path):
     return dict(is_ready=True)
 
 
+# Projects already reconciled for stale "running" in this process's lifetime.
+# A job can't outlive the process that started it, so the first time we see a
+# project, any "running" on disk is stale and safe to reset; after that we leave
+# it alone (a job this process starts legitimately shows "running").
+_RECONCILED_PROJECTS: set[str] = set()
+
+
+def _reset_running_in_states(states: dict) -> bool:
+    """Flip every step at ``"running"`` to ``"failed"`` in place; return changed."""
+    changed = False
+    for value in states.values():
+        if isinstance(value, dict) and value.get("execution_state") == "running":
+            value["execution_state"] = "failed"
+            changed = True
+    return changed
+
+
 def reconcile_stale_running_states() -> list[str]:
     """Reset orphaned ``"running"`` states left behind by a previous process.
 
@@ -135,14 +152,7 @@ def reconcile_stale_running_states() -> list[str]:
                 states = json.load(f)
         except (OSError, json.JSONDecodeError):
             continue
-        if not isinstance(states, dict):
-            continue
-        changed = False
-        for value in states.values():
-            if isinstance(value, dict) and value.get("execution_state") == "running":
-                value["execution_state"] = "failed"
-                changed = True
-        if not changed:
+        if not isinstance(states, dict) or not _reset_running_in_states(states):
             continue
         try:
             with open(states_path, "w") as f:
@@ -300,6 +310,16 @@ def load_project(project_path: Path):
                 states = None
         else:
             states = None
+
+        if cache_key not in _RECONCILED_PROJECTS:
+            _RECONCILED_PROJECTS.add(cache_key)
+            if isinstance(states, dict) and _reset_running_in_states(states):
+                try:
+                    with open(str(states_path), "w") as file:
+                        json.dump(states, file, indent=4)
+                    mtime = _get_project_mtime(path_obj)
+                except OSError as e:
+                    print(f"Could not persist reconciled states for {path_obj}: {e}")
 
         # Load the config.yaml file
         if config_path.exists():
