@@ -22,7 +22,8 @@ def create_app():
     # Same-origin in production (the frontend is served by this app). CORS is only
     # needed for the dev workflow where the Vite dev server proxies to us; keep it
     # scoped to localhost origins rather than wide-open.
-    CORS(app, origins=["http://localhost:*", "http://127.0.0.1:*"])
+    # Flask-Cors matches origins as regex — escape the dots and match any port.
+    CORS(app, origins=[r"http://localhost:\d+", r"http://127\.0\.0\.1:\d+"])
     app.config["CORS_HEADERS"] = "Content-Type"
 
     dictConfig(

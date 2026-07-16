@@ -2,7 +2,8 @@ import styled from "styled-components";
 
 export const PaddedContainer = styled.div`
   padding: 25px 50px;
-  height: 100vh;
+  min-height: 0; /* shrink within Dashboard's 1fr row instead of overflowing it */
+  overflow-y: auto; /* scroll the form when the window is too short to fit it */
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
