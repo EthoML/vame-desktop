@@ -20,9 +20,10 @@ export type TrainMetricsResult = {
 }
 
 export const getTrainMetrics = async (
-    data: TrainMetricsProps
+    data: TrainMetricsProps,
+    signal?: AbortSignal
 ): Promise<TrainMetricsResult> => {
-    const result = await post<TrainMetricsResult>("train-metrics", { ...data })
+    const result = await post<TrainMetricsResult>("train-metrics", { ...data }, signal)
     if (result.success) {
         return result.data
     } else {

@@ -45,18 +45,22 @@ export async function get<R = unknown>(url: string): Promise<ApiResponse<R>> {
 
 export async function post<R = unknown, T = unknown>(
   url: string,
-  data: T
+  data: T,
+  signal?: AbortSignal
 ): Promise<ApiResponse<R>> {
   try {
     const res = await fetch(buildUrl(url), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data ?? {})
+      body: JSON.stringify(data ?? {}),
+      signal
     })
     const body = await parseBody(res)
     if (!res.ok) return { success: false, error: errorFrom(body, res.status) }
     return { success: true, data: body as R }
   } catch (e) {
+    // Let aborts propagate so callers can tell cancellation from a real failure.
+    if (e instanceof DOMException && e.name === 'AbortError') throw e
     return { success: false, error: e instanceof Error ? e.message : String(e) }
   }
 }
