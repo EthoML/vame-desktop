@@ -9,6 +9,7 @@ import portalocker
 
 from vame_app.config import VAME_PROJECTS_DIRECTORY, GLOBAL_STATES_FILE
 from vame_app.utils.get_project_path import get_project_path
+from vame_app.services.training_config import min_epochs_for_annealing
 
 
 # ---------------------------------------------------------------------------
@@ -475,6 +476,7 @@ def load_project(project_path: Path):
             workflow=workflow,
             states=states,
             last_modified=last_modified,
+            min_epochs=min_epochs_for_annealing(config),
         )
         _PROJECT_CACHE[cache_key] = {
             "data": result,

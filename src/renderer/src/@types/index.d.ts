@@ -154,6 +154,10 @@ declare global {
     creation_datetime: string;
     /** Derived on the backend from the project's files; reflects last pipeline activity. */
     last_modified?: string;
+    /**
+     * Smallest "Max Epochs" that lets KL annealing finish, so training actually
+     * saves a model. */
+    min_epochs?: number | null;
   };
 
   export type TypeName =

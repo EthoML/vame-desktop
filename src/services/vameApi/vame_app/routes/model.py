@@ -10,6 +10,7 @@ from . import api
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
 from vame_app.services.training_metrics import build_training_figures
+from vame_app.services.training_config import check_max_epochs
 
 
 @api.route("/create-trainset", methods=["POST"])
@@ -96,6 +97,10 @@ class TrainModel(Resource):
         try:
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
+            # Reject a run that could never save a model before it burns epochs.
+            too_few_epochs = check_max_epochs(config, data.get("max_epochs"))
+            if too_few_epochs:
+                return {"message": too_few_epochs}, 400
             thread = threading.Thread(
                 target=background_task, args=(data, project_path, config)
             )

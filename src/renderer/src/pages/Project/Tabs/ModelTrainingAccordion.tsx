@@ -47,6 +47,39 @@ const ModelTrainingAccordion = ({
         return schema as Schema;
     }, [project.config?.keypoints]);
 
+    // Below this, KL annealing never completes and training saves no model, so
+    // /train rejects the run. Derived on the backend from the project's annealing
+    // config; null means it could not be determined and no floor is enforced.
+    const minEpochs = project.min_epochs ?? null;
+
+    const trainModelSchemaWithMinEpochs = React.useMemo(() => {
+        const schema = structuredClone(trainModelSchema) as any;
+        if (minEpochs) {
+            const field = schema.properties.max_epochs;
+            field.minimum = minEpochs;
+            // Never let the form open below its own floor.
+            field.default = Math.max(field.default ?? minEpochs, minEpochs);
+            field.description = `${field.description}. At least ${minEpochs} for this project, so KL annealing completes and a model is saved`;
+        }
+        return schema as Schema;
+    }, [minEpochs]);
+
+    // Mirrors check_max_epochs on the backend: disable submit with an inline
+    // message instead of letting the request fail.
+    const validateTrain = React.useCallback(
+        (values: Record<string, unknown>): string[] => {
+            if (!minEpochs) return [];
+            const epochs = Number(values.max_epochs);
+            if (Number.isFinite(epochs) && epochs < minEpochs) {
+                return [
+                    `Max Epochs must be at least ${minEpochs}: below that, KL annealing never completes and training finishes without saving a model.`,
+                ];
+            }
+            return [];
+        },
+        [minEpochs]
+    );
+
     // Create Trainset form state
     const [createTrainsetLoading, setCreateTrainsetLoading] = useState(false);
     const [createTrainsetError, setCreateTrainsetError] = useState<string | null>(null);
@@ -253,7 +286,8 @@ const ModelTrainingAccordion = ({
                 <AccordionContent $isOpen={openSteps[1]}>
                     <div>
                         <DynamicForm
-                            schema={trainModelSchema as Schema}
+                            schema={trainModelSchemaWithMinEpochs}
+                            validate={validateTrain}
                             initialValues={{ project_random_state: project.config.project_random_state ?? 42 }}
                             blockSubmission={blockSubmit}
                             submitText={trainLoading ? "Training..." : "Train Model"}

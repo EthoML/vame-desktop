@@ -206,6 +206,11 @@ export const InputLabel = styled.label<InputLabelProps>`
   }
 `;
 
+// Per-field validation message, shown under the offending input.
+export const FieldError = styled.small`
+  color: var(--color-error);
+`;
+
 // Primary form submit — sized to content (not a fixed 400px block),
 // matching the shared Button's primary variant.
 export const Button = styled.button`
