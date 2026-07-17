@@ -254,6 +254,47 @@ def configure_project(data, project_path: Path):
     return dict(config=None)
 
 
+def _validate_config(path_obj: Path, config) -> str | None:
+    """Why an already-parsed config makes the project unusable; None if it's fine."""
+    if not config:
+        return f"Project at {path_obj} is missing or has invalid config.yaml."
+    if "segmentation_algorithms" not in config:
+        return (
+            f"Project at {path_obj} was created by an incompatible VAME version: its "
+            "config.yaml has no 'segmentation_algorithms' key (it was previously named "
+            "'parametrizations'). Re-create the project from your original pose "
+            "estimation files."
+        )
+    if not any((path_obj / "data" / "raw").glob("*.nc")):
+        return (
+            f"Project at {path_obj} has no pose estimation (.nc) files under data/raw. "
+            "Older VAME versions stored pose data in a different layout. Re-create the "
+            "project from your original pose estimation files."
+        )
+    return None
+
+
+def validate_project(project_path) -> str | None:
+    """Why this project cannot be opened, or None if it is usable.
+
+    Single source of truth for project validity: the /project/validate gate and
+    load_project both go through this, so the two cannot drift apart.
+    """
+    path_obj = Path(project_path)
+    config_path = path_obj / "config.yaml"
+    if not config_path.exists():
+        return (
+            f"No config.yaml found in '{path_obj}'. "
+            "Please choose a valid VAME project directory."
+        )
+    try:
+        with open(config_path, "r") as file:
+            config = yaml.safe_load(file)
+    except Exception as exception:
+        return f"Could not read config.yaml in '{path_obj}': {exception}"
+    return _validate_config(path_obj, config)
+
+
 # Hybrid cache for /load endpoint
 _PROJECT_CACHE = {}
 _CACHE_TTL = 10  # seconds
@@ -333,20 +374,30 @@ def load_project(project_path: Path):
         else:
             config = None
 
+        # Reject an unusable project up front
+        reason = _validate_config(path_obj, config)
+        if reason:
+            result = {"project": str(path_obj), "error": reason}
+            _PROJECT_CACHE[cache_key] = {
+                "data": result,
+                "mtime": mtime,
+                "timestamp": now,
+            }
+            return result
+
         # Heal a stale project_path (e.g. a project moved/renamed since creation)
         # so it matches where it lives now — the frontend keys on it and VAME
         # locates files through it. Persist via VAME's writer to keep the format.
-        if config is not None:
-            actual_project_path = str(path_obj)
-            if config.get("project_path") != actual_project_path:
-                config["project_path"] = actual_project_path
-                try:
-                    from vame.util.auxiliary import write_config
+        actual_project_path = str(path_obj)
+        if config.get("project_path") != actual_project_path:
+            config["project_path"] = actual_project_path
+            try:
+                from vame.util.auxiliary import write_config
 
-                    write_config(str(config_path), config)
-                    mtime = _get_project_mtime(path_obj)
-                except Exception as e:
-                    print(f"Could not persist corrected project_path for {path_obj}: {e}")
+                write_config(str(config_path), config)
+                mtime = _get_project_mtime(path_obj)
+            except Exception as e:
+                print(f"Could not persist corrected project_path for {path_obj}: {e}")
 
         # Imported lazily so this module stays torch-free at import time.
         from vame.video.video import is_video_file
@@ -358,38 +409,6 @@ def load_project(project_path: Path):
             if is_video_file(p)
         ]
         pes_paths = [str(p.resolve()) for p in (path_obj / "data" / "raw").glob("*.nc")]
-
-        # Defensive: check for required config keys and pes_paths
-        if not config:
-            result = {
-                "error": f"Project at {path_obj} is missing or has invalid config.yaml."
-            }
-            _PROJECT_CACHE[cache_key] = {
-                "data": result,
-                "mtime": mtime,
-                "timestamp": now,
-            }
-            return result
-        if "segmentation_algorithms" not in config:
-            result = {
-                "error": f"Project at {path_obj} config.yaml missing 'segmentation_algorithms'."
-            }
-            _PROJECT_CACHE[cache_key] = {
-                "data": result,
-                "mtime": mtime,
-                "timestamp": now,
-            }
-            return result
-        if not pes_paths:
-            result = {
-                "error": f"Project at {path_obj} is missing pose estimation (.nc) files."
-            }
-            _PROJECT_CACHE[cache_key] = {
-                "data": result,
-                "mtime": mtime,
-                "timestamp": now,
-            }
-            return result
 
         # Create the visualization dictionary dynamically - TODO
         n_clusters = config.get("n_clusters")
@@ -491,4 +510,7 @@ def load_project(project_path: Path):
         return result
     except Exception as exception:
         print(f"Exception loading project at {project_path}: {exception}")
-        return {"error": f"Failed to load project at {project_path}: {exception}"}
+        return {
+            "project": str(project_path),
+            "error": f"Failed to load project at {project_path}: {exception}",
+        }

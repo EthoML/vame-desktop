@@ -78,8 +78,11 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
           if (icpResponse.value.success) {
             const projectData = icpResponse.value.data;
             if (projectData.error) {
-              // Return a project object with error info
-              return { error: projectData.error };
+              // Keep the path
+              return {
+                error: projectData.error,
+                config: { project_path: projectData.project },
+              };
             }
             // creation_datetime comes straight from config.yaml.
             const creation_datetime = projectData.config.creation_datetime;

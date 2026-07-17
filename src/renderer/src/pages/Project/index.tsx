@@ -17,6 +17,7 @@ import ModelTrainingAccordion from './Tabs/ModelTrainingAccordion';
 import PoseSegmentationAccordion from './Tabs/PoseSegmentationAccordion';
 import CommunityAnalysisAccordion from './Tabs/CommunityAnalysisAccordion';
 import { MainContainer } from '@renderer/components/Container';
+import { ErrorNote } from '@renderer/components/StepStatus';
 import RawDataTab from './Tabs/RawDataTab';
 import Report from './Tabs/Report';
 
@@ -30,6 +31,7 @@ const Project: React.FC = () => {
   } = useProjects()
 
   const [project, setProject] = useState<ProjectType | undefined>()
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [blockSubmit, setBlockSubmit] = useState(true);
   const [selectedTab, setSelectedTab] = useState<string>("input-data");
 
@@ -38,10 +40,17 @@ const Project: React.FC = () => {
   const loadProject = useCallback(async () => {
     if (!projectPath) return
     const res = await post<ProjectType>('load', { project: projectPath })
-    const data = res.success ? (res.data as any) : null
-    if (data && !data.error) {
-      setProject({ ...data, creation_datetime: data.config?.creation_datetime })
+    if (!res.success) {
+      setLoadError(res.error)
+      return
     }
+    const data = res.data as any
+    if (data?.error) {
+      setLoadError(data.error)
+      return
+    }
+    setLoadError(null)
+    setProject({ ...data, creation_datetime: data.config?.creation_datetime })
   }, [projectPath])
 
   // Function to handle tab submission
@@ -103,10 +112,21 @@ const Project: React.FC = () => {
         ]}
       />
     ) : (
-      <PageHeading title="Loading project…" />
+      <PageHeading title={loadError ? 'Project could not be loaded' : 'Loading project…'} />
     ),
-    [project]
+    [project, loadError]
   )
+
+  if (loadError) {
+    return (
+      <MainContainer>
+        <div>
+          <ErrorNote>{loadError}</ErrorNote>
+          <small>{projectPath}</small>
+        </div>
+      </MainContainer>
+    );
+  }
 
   if (!project) {
     return (

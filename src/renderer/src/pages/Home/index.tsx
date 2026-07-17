@@ -13,16 +13,17 @@ const Home: React.FC = () => {
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const onEdit = useCallback((project: ProjectType) => {
-    navigate(`project?path=${project.config.project_path}`)
+    navigate(`project?path=${project.config?.project_path}`)
   }, [])
 
   const onDelete = useCallback(async (project: ProjectType) => {
     setDeleteError(null)
+    const name = project.config?.project_name ?? project.config?.project_path ?? 'project'
     try {
-      await deleteProject(project.config.project_path)
+      await deleteProject(project.config?.project_path)
     } catch (e) {
       setDeleteError(
-        `Could not delete "${project.config.project_name}": ${e instanceof Error ? e.message : String(e)}`
+        `Could not delete "${name}": ${e instanceof Error ? e.message : String(e)}`
       )
     }
   }, [])

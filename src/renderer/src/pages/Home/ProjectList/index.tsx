@@ -1,4 +1,5 @@
 import Button from "@renderer/components/Button";
+import { ErrorNote } from "@renderer/components/StepStatus";
 import { formatDatetime } from "@renderer/utils/date";
 import {
   ButtonContainer,
@@ -46,13 +47,15 @@ const ProjectsList: React.FC<Props> = ({
           const config = project.config;
           const created = formatDatetime(config?.creation_datetime);
           const modified = formatDatetime(project.last_modified ?? "");
+          const label = config?.project_name ?? (project.error ? "Unloadable project" : "Unknown project");
 
           return (
             <Row key={config?.project_path ?? config?.project_name}>
               <NameCell>
                 <div>
-                  <strong>{config?.project_name ?? "Unknown project"}</strong>
+                  <strong>{label}</strong>
                   <small>{config?.project_path}</small>
+                  {project.error && <ErrorNote>{project.error}</ErrorNote>}
                 </div>
               </NameCell>
               <VersionCell>{config?.vame_version ?? <Muted>—</Muted>}</VersionCell>
@@ -60,14 +63,19 @@ const ProjectsList: React.FC<Props> = ({
               <MetaCell>{modified || <Muted>—</Muted>}</MetaCell>
               <td>
                 <ButtonContainer>
-                  <Button variant="primary" onClick={() => onEdit(project)}>
+                  <Button
+                    variant="primary"
+                    onClick={() => onEdit(project)}
+                    disabled={!!project.error}
+                    title={project.error ? "This project cannot be opened." : undefined}
+                  >
                     Open
                   </Button>
                   <Button
                     variant="danger"
                     onClick={() => {
                       // Confirm before destroying a project on disk.
-                      if (!window.confirm(`Are you sure you want to delete project "${config?.project_name}"?`)) return
+                      if (!window.confirm(`Are you sure you want to delete project "${label}"?`)) return
                       onDelete(project)
                     }}
                   >

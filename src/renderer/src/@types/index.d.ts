@@ -158,6 +158,7 @@ declare global {
      * Smallest "Max Epochs" that lets KL annealing finish, so training actually
      * saves a model. */
     min_epochs?: number | null;
+    error?: string;
   };
 
   export type TypeName =

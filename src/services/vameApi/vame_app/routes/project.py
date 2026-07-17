@@ -12,6 +12,7 @@ from vame_app.services.project_service import (
     is_project_ready,
     register_project,
     load_project,
+    validate_project,
     create_project,
     delete_project,
     configure_project,
@@ -36,6 +37,26 @@ class ProjectReady(Resource):
         except Exception as exception:
             print("exception", exception)
             api.abort(500, str(exception))
+
+
+@api.route("/project/validate", methods=["POST"])
+class ValidateProject(Resource):
+    @api.doc(
+        responses={200: "Success", 400: "Bad Request", 500: "Internal server error"}
+    )
+    def post(self):
+        """Gate an import: report whether a folder is a usable VAME project.
+
+        Checked before the project is opened, so an incompatible one is never
+        symlinked into the projects directory or added to the registry.
+        """
+        try:
+            _, project_path = resolve_request_data(request)
+            reason = validate_project(project_path)
+            return jsonify(dict(valid=reason is None, reason=reason))
+        except Exception as exception:
+            if not_bad_request_exception(exception):
+                api.abort(500, str(exception))
 
 
 @api.route("/project/register")
