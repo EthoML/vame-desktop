@@ -1,5 +1,6 @@
 import Button from "@renderer/components/Button";
 import { ErrorNote } from "@renderer/components/StepStatus";
+import type { Project } from "@renderer/context/Projects/types";
 import { formatDatetime } from "@renderer/utils/date";
 import {
   ButtonContainer,
@@ -13,9 +14,9 @@ import {
 } from "./styles";
 
 interface Props {
-  projects: ProjectType[],
-  onDelete: (project: ProjectType) => void,
-  onEdit: (project: ProjectType) => void
+  projects: Project[],
+  onDelete: (project: Project) => void,
+  onEdit: (project: Project) => void
 }
 
 const ProjectsList: React.FC<Props> = ({
@@ -45,7 +46,7 @@ const ProjectsList: React.FC<Props> = ({
       <tbody>
         {sortedProjects.map((project) => {
           const config = project.config;
-          const created = formatDatetime(config?.creation_datetime);
+          const created = formatDatetime(config?.creation_datetime ?? "");
           const modified = formatDatetime(project.last_modified ?? "");
           const label = config?.project_name ?? (project.error ? "Unloadable project" : "Unknown project");
 

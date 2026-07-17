@@ -1,4 +1,5 @@
 import { useProjects } from '@renderer/context/Projects';
+import type { Project } from '@renderer/context/Projects/types';
 import React, { useCallback, useState } from 'react';
 import { PaddedContainer } from './styles';
 import { ErrorNote } from '@renderer/components/StepStatus';
@@ -12,15 +13,22 @@ const Home: React.FC = () => {
   const navigate = useNavigate()
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
-  const onEdit = useCallback((project: ProjectType) => {
-    navigate(`project?path=${project.config?.project_path}`)
+  const onEdit = useCallback((project: Project) => {
+    const path = project.config?.project_path
+    if (!path) return
+    navigate(`project?path=${path}`)
   }, [])
 
-  const onDelete = useCallback(async (project: ProjectType) => {
+  const onDelete = useCallback(async (project: Project) => {
     setDeleteError(null)
-    const name = project.config?.project_name ?? project.config?.project_path ?? 'project'
+    const path = project.config?.project_path
+    const name = project.config?.project_name ?? path ?? 'project'
+    if (!path) {
+      setDeleteError(`Could not delete "${name}": its location on disk is unknown.`)
+      return
+    }
     try {
-      await deleteProject(project.config?.project_path)
+      await deleteProject(path)
     } catch (e) {
       setDeleteError(
         `Could not delete "${name}": ${e instanceof Error ? e.message : String(e)}`

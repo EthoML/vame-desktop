@@ -26,7 +26,7 @@ const Tabs = ({
 
   useEffect(() => { setActiveTab(selected) }, [selected]);
 
-  const handleTabClick = (id) => setActiveTab(id);
+  const handleTabClick = (id: string) => setActiveTab(id);
 
   return (
     <TabsContainer>

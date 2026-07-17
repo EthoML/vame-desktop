@@ -12,7 +12,7 @@ import { header } from "@renderer/utils/text";
 export interface DynamicFormProps {
   schema: Schema
   initialValues?: Record<string, unknown>
-  onFormSubmit: <T = unknown>(data: T) => void
+  onFormSubmit: (data: any) => void
   blockSubmission?: boolean
   submitText: string
   showLogsButton?: boolean

@@ -11,6 +11,7 @@ import { PaddedContainer, FormOverlay } from './styles';
 
 import { onVAMEReady } from '@renderer/utils/vame';
 import { useProjects } from '@renderer/context/Projects';
+import type { CreateProps } from '@renderer/context/Projects/api';
 
 import createSchema from '../../../../schema/create.schema.json';
 
@@ -109,7 +110,7 @@ const Create: React.FC = () => {
     [existingNames]
   )
 
-  const handleFormSubmit = async (formData) => {
+  const handleFormSubmit = async (formData: CreateProps) => {
     // Set submitting state to show overlay immediately
     setIsSubmitting(true)
     setErrorMessage(null)

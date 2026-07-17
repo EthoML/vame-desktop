@@ -10,6 +10,7 @@ import { get, post } from "@renderer/utils/requests";
 
 import {
   type IProjectContext,
+  type Project,
 } from "./types";
 
 import {
@@ -36,7 +37,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
   const [loadingProjects, setLoadingProjects] = useState<boolean>(true);
   const [loadingPaths, setLoadingPaths] = useState<boolean>(true);
 
-  const [projects, setProjects] = useState<ProjectType[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
 
   // deal with paths
   const [paths, setPaths] = useState<string[]>([]);
@@ -91,7 +92,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
           }
         }
         return;
-      }).filter(p => !!p) as ProjectType[]);
+      }).filter(p => !!p) as Project[]);
 
     } catch (error) {
       window.alert("Something went wrong loading projects.")
@@ -110,7 +111,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     onVAMEReady(loadProjectsData)
   }, [loadProjectsData])
 
-  const createProject = useCallback(async (params) => {
+  const createProject = useCallback(async (params: Parameters<typeof createVAMEProject>[0]) => {
     const res = await createVAMEProject(params)
     await refresh()
     return res
@@ -122,67 +123,67 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     return res
   }, [])
 
-  const createTrainset = useCallback(async (data) => {
+  const createTrainset = useCallback(async (data: Parameters<typeof createTrainsetVAMEProject>[0]) => {
     const res = await createTrainsetVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const train = useCallback(async (data) => {
+  const train = useCallback(async (data: Parameters<typeof trainVAMEProject>[0]) => {
     const res = await trainVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const evaluate = useCallback(async (data) => {
+  const evaluate = useCallback(async (data: Parameters<typeof evaluateVAMEProject>[0]) => {
     const res = await evaluateVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const segment = useCallback(async (data) => {
+  const segment = useCallback(async (data: Parameters<typeof segmentVAMEProject>[0]) => {
     const res = await segmentVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const createMotifVideos = useCallback(async (data) => {
+  const createMotifVideos = useCallback(async (data: Parameters<typeof createMotifVideosVAMEProject>[0]) => {
     const res = await createMotifVideosVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const communityAnalysis = useCallback(async (data) => {
+  const communityAnalysis = useCallback(async (data: Parameters<typeof communityAnalysisVAMEProject>[0]) => {
     const res = await communityAnalysisVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const createCommunityVideos = useCallback(async (data) => {
+  const createCommunityVideos = useCallback(async (data: Parameters<typeof createCommunityVideosVAMEProject>[0]) => {
     const res = await createCommunityVideosVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const createMotifCommunityVideos = useCallback(async (data) => {
+  const createMotifCommunityVideos = useCallback(async (data: Parameters<typeof createMotifVideosVAMEProject>[0]) => {
     const res = await createMotifVideosVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const runPreprocessing = useCallback(async (data) => {
+  const runPreprocessing = useCallback(async (data: Parameters<typeof preprocessingVAMEProject>[0]) => {
     const res = await preprocessingVAMEProject(data)
     await refresh()
     return res
   }, [])
 
-  const getPreprocessingVisualization = useCallback(async (data) => {
+  const getPreprocessingVisualization = useCallback(async (data: Parameters<typeof preprocessingVisualization>[0]) => {
     const res = await preprocessingVisualization(data)
     return res
   }, [])
 
   const getProject = useCallback((path: string) => {
-    return projects.find(p => p.config.project_path === path)
+    return projects.find(p => p.config?.project_path === path)
   }, [projects])
 
   const value = {
