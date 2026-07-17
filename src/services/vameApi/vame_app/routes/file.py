@@ -9,7 +9,9 @@ from pathlib import Path
 @api.route("/files/<path:project>/<path:path>")
 class Files(Resource):
     def get(self, project, path):
-        return send_from_directory(VAME_PROJECTS_DIRECTORY, Path(project) / path)
+        # URL components, not filesystem paths: send_from_directory requires "/"
+        # separators and rejects the "\" a Path would produce on Windows.
+        return send_from_directory(VAME_PROJECTS_DIRECTORY, f"{project}/{path}")
 
 
 @api.route("/exists/<path:project>/<path:path>")

@@ -41,7 +41,6 @@ export type IProjectContext = {
   projects: Project[]
   refresh: () => Promise<void>
   getProject: (path: string) => Project | undefined;
-  getAssetsPath: (projectPath: string, asset: string, basePath?: string) => string | undefined
 
   createProject: typeof createVAMEProject
   deleteProject: typeof deleteVAMEProject

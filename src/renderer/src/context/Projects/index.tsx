@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import { createCustomContext } from "@renderer/utils/createContext";
 import { onConnected, onVAMEReady } from "@renderer/utils/vame";
-import { API_BASE, get, post } from "@renderer/utils/requests";
+import { get, post } from "@renderer/utils/requests";
 
 import {
   type IProjectContext,
@@ -182,28 +182,10 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     return projects.find(p => p.config.project_path === path)
   }, [projects])
 
-  const getAssetsPath = useCallback((projectPath: string, asset: string, basePath = 'files') => {
-    const project = getProject(projectPath)
-
-    if (!project) {
-      console.error("Cant find project")
-      return
-    }
-
-    const { Project, project_path } = project.config
-
-    const fullProjectDirectory = `${Project}${project_path.split(Project).slice(1).join(Project)}`
-
-    const path = encodeURI(`/${basePath}/${fullProjectDirectory}/${asset}`)
-    return `${API_BASE}${path}`
-  }, [getProject])
-
-
   const value = {
     projects,
     refresh,
     getProject,
-    getAssetsPath,
     createProject,
     deleteProject,
     runPreprocessing,
