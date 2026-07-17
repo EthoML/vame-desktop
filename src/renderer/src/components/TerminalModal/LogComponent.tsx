@@ -7,7 +7,7 @@ interface TerminalProps {
   projectPath: string;
 }
 
-const POLL_MS = 1000;
+const POLL_MS = 5000;
 
 const LogComponent: React.FC<TerminalProps> = ({ logName, projectPath }) => {
   const logRef = useRef<HTMLUListElement>(null);
