@@ -348,9 +348,14 @@ def load_project(project_path: Path):
                 except Exception as e:
                     print(f"Could not persist corrected project_path for {path_obj}: {e}")
 
-        # Get all files in the original data directory
+        # Imported lazily so this module stays torch-free at import time.
+        from vame.video.video import is_video_file
+
+        # Get all files in the original data directory.
         videos_paths = [
-            str(p.resolve()) for p in (path_obj / "data" / "raw").glob("*.mp4")
+            str(p.resolve())
+            for p in sorted((path_obj / "data" / "raw").glob("*"))
+            if is_video_file(p)
         ]
         pes_paths = [str(p.resolve()) for p in (path_obj / "data" / "raw").glob("*.nc")]
 
