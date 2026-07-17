@@ -84,7 +84,7 @@ const Report: React.FC<TabProps> = ({
             {/* Accordion 1: Generate Report */}
             <Accordion>
                 <AccordionHeader $disabled={false} onClick={() => handleToggle(0)}>
-                    5.1 Generate Report
+                    6.1 Generate Report
                     <StepBadge state={reportSession.execution_state} />
                     <span style={{ marginLeft: 'auto' }}>
                         <FontAwesomeIcon icon={openSteps[0] ? faChevronUp : faChevronDown} />
@@ -108,7 +108,7 @@ const Report: React.FC<TabProps> = ({
             {/* Accordion 2: Visualize Motif/Community Report */}
             <Accordion>
                 <AccordionHeader $disabled={!reportCompleted} onClick={() => handleToggle(1)}>
-                    5.2 Visualize Motif/Community Report
+                    6.2 Visualize Motif/Community Report
                     <span style={{ marginLeft: 'auto' }}>
                         <FontAwesomeIcon icon={openSteps[1] ? faChevronUp : faChevronDown} />
                     </span>
@@ -135,7 +135,7 @@ const Report: React.FC<TabProps> = ({
             {/* Accordion 3: Visualize UMAP Report */}
             <Accordion>
                 <AccordionHeader $disabled={!reportCompleted} onClick={() => handleToggle(2)}>
-                    5.3 Visualize UMAP Report
+                    6.3 Visualize UMAP Report
                     <span style={{ marginLeft: 'auto' }}>
                         <FontAwesomeIcon icon={openSteps[2] ? faChevronUp : faChevronDown} />
                     </span>
