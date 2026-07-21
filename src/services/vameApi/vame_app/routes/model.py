@@ -6,6 +6,7 @@ from flask import request, jsonify
 import base64
 import vame
 
+from vame_app.services.run_owner import claim
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
 from vame_app.services.training_metrics import build_training_figures
@@ -43,6 +44,7 @@ class CreateTrainset(Resource):
                     "save_logs": True,
                 },
             )
+            claim(project_path, "create_trainset")
             thread.start()
             time.sleep(2)  # Give the thread a moment to start
             return {"status": "started"}
@@ -111,6 +113,7 @@ class TrainModel(Resource):
             thread = threading.Thread(
                 target=background_task, args=(data, project_path, config)
             )
+            claim(project_path, "train_model")
             thread.start()
             time.sleep(2)  # Give the thread a moment to start
             return {"status": "started"}
@@ -175,6 +178,7 @@ class EvaluateModel(Resource):
                 target=vame.evaluate_model,
                 kwargs={"config": config, "save_logs": True},
             )
+            claim(project_path, "evaluate_model")
             thread.start()
             time.sleep(2)  # Give the thread a moment to start
             return {"status": "started"}

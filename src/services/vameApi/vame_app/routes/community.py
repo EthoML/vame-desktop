@@ -7,6 +7,7 @@ from flask_restx import Namespace, Resource
 from flask import request
 import vame
 
+from vame_app.services.run_owner import claim
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
 
@@ -38,6 +39,7 @@ class Community(Resource):
                 target=background_task,
                 kwargs={"config": config, "cut_tree": cut_tree},
             )
+            claim(project_path, "community")
             thread.start()
             time.sleep(2)
             return {"status": "started"}
@@ -62,6 +64,7 @@ class CommunityVideos(Resource):
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
             thread = threading.Thread(target=background_task, kwargs={"config": config})
+            claim(project_path, "community_videos")
             thread.start()
             time.sleep(2)
             return {"status": "started"}

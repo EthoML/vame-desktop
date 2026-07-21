@@ -6,6 +6,7 @@ import vame
 import xarray as xr
 
 from vame_app.utils.resolve_request_util import resolve_request_data
+from vame_app.services.run_owner import resolve_states
 from vame_app.services.project_service import (
     get_projects,
     is_project_ready,
@@ -132,7 +133,7 @@ class StateProject(Resource):
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
             states = vame.read_states(config=config)
-            return dict(states=states)
+            return dict(states=resolve_states(project_path, states))
         except Exception as exception:
             if not_bad_request_exception(exception):
                 api.abort(500, str(exception))

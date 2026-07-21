@@ -8,6 +8,7 @@ import base64
 import vame
 
 from vame_app.services.step_state import set_step_state
+from vame_app.services.run_owner import claim
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
 
@@ -39,6 +40,7 @@ def run_preprocessing(config: dict, project_path, data: dict):
             config=config,
             save_to_file=True,
             show_figure=False,
+            save_logs=True,
         )
         set_step_state(project_path, "preprocessing", "success")
     except Exception:
@@ -68,6 +70,7 @@ class Preprocess(Resource):
                 target=run_preprocessing,
                 kwargs={"config": config, "project_path": project_path, "data": data},
             )
+            claim(project_path, "preprocessing")
             thread.start()
             time.sleep(2)  # Give the thread a moment to start
             return {"status": "started"}

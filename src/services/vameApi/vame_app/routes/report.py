@@ -8,6 +8,7 @@ import base64
 import vame
 
 from vame_app.services.step_state import set_step_state
+from vame_app.services.run_owner import claim
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
 
@@ -62,6 +63,7 @@ class Report(Resource):
                 target=generate_report_artifacts,
                 kwargs={"config": config, "num_points": num_points, "overwrite_umap": overwrite_umap},
             )
+            claim(project_path, "generate_reports")
             thread.start()
             time.sleep(2)
             return {"status": "started"}

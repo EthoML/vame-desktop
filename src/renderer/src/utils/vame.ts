@@ -39,7 +39,7 @@ export const onProjectReady = async (data: string, callback: () => void): Promis
   const poll = async () => {
     const res = await post<{ is_ready: boolean }>('project_ready', { project: data })
     if (!res.success) {
-      alert(res.error)
+      console.error('project_ready poll failed:', res.error)
       return
     }
     if (res.data?.is_ready) {

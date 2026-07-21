@@ -10,6 +10,7 @@ import portalocker
 from vame_app.config import VAME_PROJECTS_DIRECTORY, GLOBAL_STATES_FILE
 from vame_app.utils.get_project_path import get_project_path
 from vame_app.services.training_config import min_epochs_for_annealing
+from vame_app.services.run_owner import resolve_states
 
 
 # ---------------------------------------------------------------------------
@@ -58,8 +59,6 @@ def register_project(project_path) -> dict:
         projects[name] = {"project_path": path}
 
     _update_global_states(mutate)
-    # Known to this process now, so any later "running" is live, not stale.
-    _RECONCILED_PROJECTS.add(path)
     return {"registered": name, "project_path": path}
 
 
@@ -107,64 +106,22 @@ def get_projects():
 def is_project_ready(project_path: Path):
     states_path = Path(project_path) / "states" / "states.json"
 
-    with open(states_path, "r") as file:
-        states = json.load(fp=file)
-
-    if states is None:
+    # A deleted or half-written project has nothing running.
+    try:
+        with open(states_path, "r") as file:
+            states = json.load(fp=file)
+    except (OSError, json.JSONDecodeError):
         return dict(is_ready=True)
 
-    for _, value in states.items():
-        execution_state = value.get("execution_state", None)
-        if execution_state == "running":
+    if not isinstance(states, dict):
+        return dict(is_ready=True)
+
+    states = resolve_states(project_path, states)
+    for value in states.values():
+        if isinstance(value, dict) and value.get("execution_state") == "running":
             return dict(is_ready=False)
 
     return dict(is_ready=True)
-
-
-# Projects already reconciled for stale "running" in this process's lifetime.
-# A job can't outlive the process that started it, so the first time we see a
-# project, any "running" on disk is stale and safe to reset; after that we leave
-# it alone (a job this process starts legitimately shows "running").
-_RECONCILED_PROJECTS: set[str] = set()
-
-
-def _reset_running_in_states(states: dict) -> bool:
-    """Flip every step at ``"running"`` to ``"failed"`` in place; return changed."""
-    changed = False
-    for value in states.values():
-        if isinstance(value, dict) and value.get("execution_state") == "running":
-            value["execution_state"] = "failed"
-            changed = True
-    return changed
-
-
-def reconcile_stale_running_states() -> list[str]:
-    """Reset orphaned ``"running"`` states left behind by a previous process.
-
-    Every long-running step runs as an in-process background thread, so none can
-    survive a server restart. Any step still marked ``"running"`` at startup is
-    therefore stale (the app was stopped/restarted mid-run) and is rewritten to
-    ``"failed"``. Called once from ``create_app``. Returns the names of the
-    projects that were healed.
-    """
-    healed: list[str] = []
-    for project_path in get_projects():
-        _RECONCILED_PROJECTS.add(str(Path(project_path).resolve()))
-        states_path = Path(project_path) / "states" / "states.json"
-        try:
-            with open(states_path, "r") as f:
-                states = json.load(f)
-        except (OSError, json.JSONDecodeError):
-            continue
-        if not isinstance(states, dict) or not _reset_running_in_states(states):
-            continue
-        try:
-            with open(states_path, "w") as f:
-                json.dump(states, f, indent=4)
-            healed.append(Path(project_path).name)
-        except OSError:
-            continue
-    return healed
 
 
 def create_project(data):
@@ -356,15 +313,8 @@ def load_project(project_path: Path):
         else:
             states = None
 
-        if cache_key not in _RECONCILED_PROJECTS:
-            _RECONCILED_PROJECTS.add(cache_key)
-            if isinstance(states, dict) and _reset_running_in_states(states):
-                try:
-                    with open(str(states_path), "w") as file:
-                        json.dump(states, file, indent=4)
-                    mtime = _get_project_mtime(path_obj)
-                except OSError as e:
-                    print(f"Could not persist reconciled states for {path_obj}: {e}")
+        if isinstance(states, dict):
+            states = resolve_states(path_obj, states)
 
         # Load the config.yaml file
         if config_path.exists():
