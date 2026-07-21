@@ -106,13 +106,9 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
 
   const refresh = useCallback(loadProjectsPaths, [])
 
-  useEffect(() => {
-    onConnected(loadProjectsPaths)
-  }, [loadProjectsPaths])
+  useEffect(() => onConnected(loadProjectsPaths), [loadProjectsPaths])
 
-  useEffect(() => {
-    onVAMEReady(loadProjectsData)
-  }, [loadProjectsData])
+  useEffect(() => onVAMEReady(loadProjectsData), [loadProjectsData])
 
   const createProject = useCallback(async (params: Parameters<typeof createVAMEProject>[0]) => {
     const res = await createVAMEProject(params)

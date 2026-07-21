@@ -103,6 +103,10 @@ def get_projects():
     return [entry["project_path"] for entry in states.get("projects", {}).values()]
 
 
+class ProjectBusyError(RuntimeError):
+    """A destructive operation was attempted on a project with a live run."""
+
+
 def is_project_ready(project_path: Path):
     states_path = Path(project_path) / "states" / "states.json"
 
@@ -178,6 +182,13 @@ def delete_project(project_path):
         path_obj = project_path
     else:
         path_obj = Path(project_path)
+
+    # Deleting under a live run would rmtree the directory a worker thread is
+    # still writing to. An orphaned "running" (dead owner) does not block.
+    if not is_project_ready(path_obj)["is_ready"]:
+        raise ProjectBusyError(
+            f"'{path_obj.name}' has a step running. Wait for it to finish before deleting."
+        )
 
     unregister_project(path_obj)
 

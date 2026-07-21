@@ -1,5 +1,5 @@
 import Button from "@renderer/components/Button";
-import { ErrorNote } from "@renderer/components/StepStatus";
+import { ErrorNote, StepBadge } from "@renderer/components/StepStatus";
 import type { Project } from "@renderer/context/Projects/types";
 import { formatDatetime } from "@renderer/utils/date";
 import {
@@ -50,11 +50,19 @@ const ProjectsList: React.FC<Props> = ({
           const modified = formatDatetime(project.last_modified ?? "");
           const label = config?.project_name ?? (project.error ? "Unloadable project" : "Unknown project");
 
+          // Only a hint: the list can be stale, so the backend has the final say.
+          const isRunning = Object.values(project.states ?? {}).some(
+            (step) => (step as { execution_state?: string })?.execution_state === "running"
+          );
+
           return (
             <Row key={config?.project_path ?? config?.project_name}>
               <NameCell>
                 <div>
-                  <strong>{label}</strong>
+                  <strong>
+                    {label}
+                    {isRunning && <StepBadge state="running" />}
+                  </strong>
                   <small>{config?.project_path}</small>
                   {project.error && <ErrorNote>{project.error}</ErrorNote>}
                 </div>
@@ -74,6 +82,8 @@ const ProjectsList: React.FC<Props> = ({
                   </Button>
                   <Button
                     variant="danger"
+                    disabled={isRunning}
+                    title={isRunning ? "A step is running — wait for it to finish." : undefined}
                     onClick={() => {
                       // Confirm before destroying a project on disk.
                       if (!window.confirm(`Are you sure you want to delete project "${label}"?`)) return

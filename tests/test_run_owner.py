@@ -1,6 +1,8 @@
 import json
 import os
 
+import pytest
+
 from vame_app.services import run_owner
 
 
@@ -88,6 +90,60 @@ def test_creating_the_app_does_not_touch_a_discoverable_running_project(
     create_app()
 
     assert (p / "states" / "states.json").read_text() == before
+
+
+def test_delete_refuses_while_a_live_run_owns_a_step(tmp_path, monkeypatch):
+    from vame_app.services import project_service
+
+    p = _project(tmp_path / "projects" / "busy")
+    (p / "config.yaml").write_text("project_path: x\n")
+    monkeypatch.setattr(
+        project_service, "VAME_PROJECTS_DIRECTORY", tmp_path / "projects"
+    )
+    monkeypatch.setattr(
+        project_service, "GLOBAL_STATES_FILE", tmp_path / "states.json"
+    )
+    run_owner.claim(p, "segment_session")
+
+    with pytest.raises(project_service.ProjectBusyError):
+        project_service.delete_project(p)
+
+    assert (p / "config.yaml").exists()
+
+
+def test_delete_proceeds_when_the_running_owner_is_dead(tmp_path, monkeypatch):
+    """A crashed server must not leave a project undeletable."""
+    from vame_app.services import project_service
+
+    p = _project(tmp_path / "projects" / "orphaned")
+    (p / "config.yaml").write_text("project_path: x\n")
+    (p / "states" / "run_owner.json").write_text(json.dumps({"segment_session": 999999}))
+    monkeypatch.setattr(
+        project_service, "VAME_PROJECTS_DIRECTORY", tmp_path / "projects"
+    )
+    monkeypatch.setattr(
+        project_service, "GLOBAL_STATES_FILE", tmp_path / "states.json"
+    )
+
+    assert project_service.delete_project(p)["deleted"] is True
+    assert not p.exists()
+
+
+def test_delete_proceeds_when_nothing_is_running(tmp_path, monkeypatch):
+    from vame_app.services import project_service
+
+    p = _project(tmp_path / "projects" / "idle", state="success")
+    (p / "config.yaml").write_text("project_path: x\n")
+    monkeypatch.setattr(
+        project_service, "VAME_PROJECTS_DIRECTORY", tmp_path / "projects"
+    )
+    monkeypatch.setattr(
+        project_service, "GLOBAL_STATES_FILE", tmp_path / "states.json"
+    )
+    run_owner.claim(p, "segment_session")
+
+    assert project_service.delete_project(p)["deleted"] is True
+    assert not p.exists()
 
 
 def test_is_project_ready_on_deleted_project(tmp_path):

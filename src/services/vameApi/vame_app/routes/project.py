@@ -8,6 +8,7 @@ import xarray as xr
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.services.run_owner import resolve_states
 from vame_app.services.project_service import (
+    ProjectBusyError,
     get_projects,
     is_project_ready,
     register_project,
@@ -102,7 +103,8 @@ class DeleteProject(Resource):
             _, project_path = resolve_request_data(request)
             res = delete_project(project_path)
             return jsonify(res)
-
+        except ProjectBusyError as exception:
+            api.abort(409, str(exception))
         except Exception as exception:
             if not_bad_request_exception(exception):
                 api.abort(500, str(exception))

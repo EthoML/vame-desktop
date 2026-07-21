@@ -79,12 +79,14 @@ const Project: React.FC = () => {
 
 
   useEffect(() => {
-    if (projectPath) {
-      onConnected(() => { loadProject() })
+    if (!projectPath) return
 
-      onProjectReady(projectPath, () => {
-        setBlockSubmit(false);
-      })
+    const stopConnected = onConnected(() => { loadProject() })
+    const stopReady = onProjectReady(projectPath, () => { setBlockSubmit(false) })
+
+    return () => {
+      stopConnected()
+      stopReady()
     }
   }, [projectPath, loadProject])
 

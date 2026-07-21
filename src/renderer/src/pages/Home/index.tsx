@@ -1,6 +1,6 @@
 import { useProjects } from '@renderer/context/Projects';
 import type { Project } from '@renderer/context/Projects/types';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PaddedContainer } from './styles';
 import { ErrorNote } from '@renderer/components/StepStatus';
 import PageHeading from '@renderer/components/PageHeading';
@@ -9,9 +9,12 @@ import ProjectsList from './ProjectList';
 import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
-  const { projects, deleteProject } = useProjects()
+  const { projects, deleteProject, refresh } = useProjects()
   const navigate = useNavigate()
   const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  // Re-read on arrival: a run started elsewhere would otherwise show as idle.
+  useEffect(() => { refresh() }, [refresh])
 
   const onEdit = useCallback((project: Project) => {
     const path = project.config?.project_path

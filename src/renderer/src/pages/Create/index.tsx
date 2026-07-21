@@ -34,9 +34,7 @@ const Create: React.FC = () => {
   // A fresh reproducibility seed suggested per project (user can override).
   const suggestedSeed = useMemo(() => Math.floor(Math.random() * 1_000_000), [])
 
-  useEffect(() => {
-    onVAMEReady(() => setBlockSubmission(false))
-  }, [])
+  useEffect(() => onVAMEReady(() => setBlockSubmission(false)), [])
 
   // Existing project names (lower-cased) to reject duplicates before submitting.
   const existingNames = useMemo(
