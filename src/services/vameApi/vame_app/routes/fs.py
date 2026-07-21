@@ -9,11 +9,12 @@ whether the backend runs on the user's own machine or on a shared/remote server
 from pathlib import Path
 
 from flask import request, jsonify
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 
-from . import api
 from vame_app.config import get_data_root, VAME_PROJECTS_DIRECTORY, resolve_within
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("filesystem", description="Server-side file browsing", path="/")
 
 
 def _entry(path: Path) -> dict:

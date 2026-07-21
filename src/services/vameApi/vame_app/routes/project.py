@@ -1,11 +1,10 @@
 from pathlib import Path
 import json
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import request, jsonify
 import vame
 import xarray as xr
 
-from . import api
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.services.project_service import (
     get_projects,
@@ -19,6 +18,8 @@ from vame_app.services.project_service import (
 )
 
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("project", description="Project lifecycle and state", path="/")
 
 
 @api.route("/projects")
@@ -175,8 +176,8 @@ class RawData(Resource):
             file_path = Path(project_path) / "data" / "raw" / f"{session}.nc"
             if not file_path.exists():
                 api.abort(404, f"Raw data file not found: '{file_path}'")
-            ds = xr.open_dataset(file_path)
-            html = ds._repr_html_()
+            with xr.open_dataset(file_path) as ds:
+                html = ds._repr_html_()
             return jsonify(html=html)
         except Exception as exception:
             if not_bad_request_exception(exception):

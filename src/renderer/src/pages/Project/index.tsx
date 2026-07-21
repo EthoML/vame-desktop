@@ -208,6 +208,8 @@ const Project: React.FC = () => {
               project={project}
               blockSubmission={blockSubmit}
               blockTooltip="Waiting VAME to be ready."
+              // Reload after the threaded run finishes, without re-submitting.
+              onRefresh={async () => submitTab(async () => { }, 'preprocessing')}
               onFormSubmit={
                 async (params) => submitTab(
                   async () => {

@@ -1,9 +1,10 @@
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import send_from_directory, request
-from vame_app.routes import api
 from vame_app.services.file_service import log_file
 from vame_app.config import VAME_PROJECTS_DIRECTORY
 from pathlib import Path
+
+api = Namespace("files", description="Project file and log serving", path="/")
 
 
 @api.route("/files/<path:project>/<path:path>")

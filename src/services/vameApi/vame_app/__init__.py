@@ -51,6 +51,7 @@ def create_app():
     )
 
     from vame_app.routes import (
+        register_exception_handler,
         project,
         file,
         health_check,
@@ -64,17 +65,25 @@ def create_app():
         fs,
     )
 
-    api.add_namespace(health_check.api)
-    api.add_namespace(file.api)
-    api.add_namespace(project.api)
-    api.add_namespace(vame.api)
-    api.add_namespace(preprocessing.api)
-    api.add_namespace(model.api)
-    api.add_namespace(pose_segmentation.api)
-    api.add_namespace(community.api)
-    api.add_namespace(report.api)
-    api.add_namespace(gpu_check.api)
-    api.add_namespace(fs.api)
+    register_exception_handler(api)
+
+    # Each module owns one namespace; register each exactly once. flask-restx
+    # re-registers a namespace's routes on every add_namespace call, so a
+    # repeated call silently duplicates every rule in the URL map.
+    for module in (
+        health_check,
+        file,
+        project,
+        vame,
+        preprocessing,
+        model,
+        pose_segmentation,
+        community,
+        report,
+        gpu_check,
+        fs,
+    ):
+        api.add_namespace(module.api)
 
     _register_frontend(app)
 

@@ -1,13 +1,49 @@
 from pathlib import Path
-from flask_restx import Resource
+import threading
+import time
+from flask_restx import Namespace, Resource
 from flask import request, jsonify
 import base64
 
 import vame
 
-from . import api
+from vame_app.services.step_state import set_step_state
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("preprocessing", description="Pose data preprocessing", path="/")
+
+
+def run_preprocessing(config: dict, project_path, data: dict):
+    """Run the whole "2.1 Run Preprocessing" step: preprocess, then visualize.
+
+    vame.preprocessing() publishes its own "success" on return, so the state is
+    re-set below to cover the visualization.
+    """
+    try:
+        set_step_state(project_path, "preprocessing", "running")
+        vame.preprocessing(
+            config=config,
+            centered_reference_keypoint=data["centered_reference_keypoint"],
+            orientation_reference_keypoint=data["orientation_reference_keypoint"],
+            run_lowconf_cleaning=data["run_lowconf_cleaning"],
+            run_egocentric_alignment=data["run_egocentric_alignment"],
+            run_outlier_cleaning=data["run_outlier_cleaning"],
+            run_savgol_filtering=data["run_savgol_filtering"],
+            run_rescaling=data["run_rescaling"],
+            save_logs=True,
+        )
+        # vame.preprocessing just published "success"; the step is not done yet.
+        set_step_state(project_path, "preprocessing", "running")
+        vame.visualization.preprocessing.preprocessing_visualization(
+            config=config,
+            save_to_file=True,
+            show_figure=False,
+        )
+        set_step_state(project_path, "preprocessing", "success")
+    except Exception:
+        set_step_state(project_path, "preprocessing", "failed")
+        raise
 
 
 @api.route("/preprocessing", methods=["POST"])
@@ -28,23 +64,13 @@ class Preprocess(Resource):
                 config_path=str(Path(project_path) / "config.yaml"),
                 config=config,
             )
-            vame.preprocessing(
-                config=config,
-                centered_reference_keypoint=data["centered_reference_keypoint"],
-                orientation_reference_keypoint=data["orientation_reference_keypoint"],
-                run_lowconf_cleaning=data["run_lowconf_cleaning"],
-                run_egocentric_alignment=data["run_egocentric_alignment"],
-                run_outlier_cleaning=data["run_outlier_cleaning"],
-                run_savgol_filtering=data["run_savgol_filtering"],
-                run_rescaling=data["run_rescaling"],
-                save_logs=True,
+            thread = threading.Thread(
+                target=run_preprocessing,
+                kwargs={"config": config, "project_path": project_path, "data": data},
             )
-            vame.visualization.preprocessing.preprocessing_visualization(
-                config=config,
-                save_to_file=True,
-                show_figure=False,
-            )
-            return jsonify(dict(result="success"))
+            thread.start()
+            time.sleep(2)  # Give the thread a moment to start
+            return {"status": "started"}
 
         except Exception as exception:
             if not_bad_request_exception(exception):

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useStepPolling, stepDisplayState } from "./useStepPolling"
 
 import DynamicForm from "../../../components/DynamicForm"
 import {
@@ -14,7 +15,7 @@ import { TabProps } from "./types"
 import preprocessingSchema from '../../../../../schema/preprocessing.schema.json'
 import { PaddedTab } from "@renderer/components/Tabs/styles"
 import Tippy from "@tippyjs/react"
-import { StepBadge, ErrorNote } from "@renderer/components/StepStatus"
+import { StepBadge, StepStateLine, ErrorNote } from "@renderer/components/StepStatus"
 import SegmentedControl from "@renderer/components/SegmentedControl"
 import ZoomableImage from "@renderer/components/ZoomableImage"
 
@@ -30,12 +31,19 @@ const ErrorFallback = ({ error }: { error: Error }) => (
 const Preprocessing = ({
   project,
   onFormSubmit,
+  onRefresh,
   blockSubmission,
   blockTooltip,
 }: TabProps) => {
   // Accordion open/close state
   const [isPreprocessingOpen, setPreprocessingOpen] = useState(false)
   const [isVisualizeOpen, setVisualizeOpen] = useState(false)
+
+  const preprocessingPoll = useStepPolling(
+    project.config.project_path,
+    "preprocessing",
+    async () => { await onRefresh?.() }
+  )
 
   // Check if project is preprocessed
   const preprocessingState = project.states?.preprocessing || {};
@@ -112,7 +120,7 @@ const Preprocessing = ({
           savgol_order: formData?.savgol_order ?? 2
         }
         // Call the original onFormSubmit with the converted data
-        onFormSubmit(compatibleData)
+        Promise.resolve(onFormSubmit(compatibleData)).then(() => preprocessingPoll.start())
       } catch (err) {
         console.error("Error in form submission:", err)
         // Fallback to a minimal valid submission
@@ -140,7 +148,7 @@ const Preprocessing = ({
             onClick={() => setPreprocessingOpen((v) => !v)}
           >
             2.1 Run Preprocessing
-            <StepBadge state={preprocessingState.execution_state} />
+            <StepBadge state={preprocessingPoll.polling ? "running" : preprocessingState.execution_state} />
             <span style={{ marginLeft: "auto" }}>
               <FontAwesomeIcon icon={isPreprocessingOpen ? faChevronUp : faChevronDown} />
             </span>
@@ -156,12 +164,17 @@ const Preprocessing = ({
                 <DynamicForm
                   initialValues={states}
                   schema={schema}
-                  blockSubmission={blockSubmission}
-                  submitText="Run Preprocessing"
+                  blockSubmission={blockSubmission || preprocessingPoll.polling}
+                  submitText={preprocessingPoll.polling ? "Preprocessing..." : "Run Preprocessing"}
                   onFormSubmit={handleFormSubmit}
                   showLogsButton={true}
                   logName={["preprocessing"]}
                   projectPath={project.config.project_path}
+                />
+                <StepStateLine
+                  state={stepDisplayState(preprocessingPoll, preprocessingState.execution_state)}
+                  polling={preprocessingPoll.polling}
+                  noun="Preprocessing"
                 />
               </>
             </Tippy>

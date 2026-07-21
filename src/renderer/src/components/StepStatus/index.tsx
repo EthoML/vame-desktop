@@ -141,9 +141,7 @@ const lineStyle = (color: string): React.CSSProperties => ({
     fontSize: "var(--text-sm)",
 });
 
-// --- Inline notes for form-level errors / successes -------------------------
-// Soft tinted fill (not a one-sided accent border) keeps them clinical and
-// clearly readable against the form surface.
+// Errors only: StepStateLine already reports success.
 
 const NoteBase = styled.div`
     margin-top: 8px;
@@ -159,11 +157,6 @@ const NoteBase = styled.div`
 const ErrorNoteBox = styled(NoteBase)`
     color: var(--color-error);
     background: var(--color-error-soft);
-`;
-
-const SuccessNoteBox = styled(NoteBase)`
-    color: var(--color-success);
-    background: var(--color-success-soft);
 `;
 
 export const ErrorNote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -196,11 +189,4 @@ export const OptionalTag: React.FC = () => (
     <OptionalTagBox title="This step is optional — skipping or failing it does not block the pipeline.">
         Optional
     </OptionalTagBox>
-);
-
-export const SuccessNote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <SuccessNoteBox>
-        <FontAwesomeIcon icon={faCircleCheck} style={{ marginTop: 2, flexShrink: 0 }} />
-        <span>{children}</span>
-    </SuccessNoteBox>
 );

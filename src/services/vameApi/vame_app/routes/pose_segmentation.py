@@ -2,13 +2,14 @@ from pathlib import Path
 from urllib.parse import quote
 import threading
 import time
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import request
 import vame
 
-from . import api
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("pose-segmentation", description="Pose segmentation", path="/")
 
 
 @api.route("/segment", methods=["POST"])

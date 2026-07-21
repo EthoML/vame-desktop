@@ -58,6 +58,8 @@ def register_project(project_path) -> dict:
         projects[name] = {"project_path": path}
 
     _update_global_states(mutate)
+    # Known to this process now, so any later "running" is live, not stale.
+    _RECONCILED_PROJECTS.add(path)
     return {"registered": name, "project_path": path}
 
 
@@ -147,6 +149,7 @@ def reconcile_stale_running_states() -> list[str]:
     """
     healed: list[str] = []
     for project_path in get_projects():
+        _RECONCILED_PROJECTS.add(str(Path(project_path).resolve()))
         states_path = Path(project_path) / "states" / "states.json"
         try:
             with open(states_path, "r") as f:

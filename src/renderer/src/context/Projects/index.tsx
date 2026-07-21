@@ -2,6 +2,7 @@ import React, {
   type ReactNode,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { createCustomContext } from "@renderer/utils/createContext";
@@ -36,6 +37,8 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
   // Loadings
   const [loadingProjects, setLoadingProjects] = useState<boolean>(true);
   const [loadingPaths, setLoadingPaths] = useState<boolean>(true);
+  const hasLoadedOnce = useRef(false);
+  if (!loadingPaths && !loadingProjects) hasLoadedOnce.current = true;
 
   const [projects, setProjects] = useState<Project[]>([])
 
@@ -204,14 +207,23 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({
     createMotifCommunityVideos,
   }
 
+  // Only the first load may replace children: swapping them out on every
+  // refresh() unmounted the whole app subtree and reset all component state.
+  const showInitialPlaceholder = !hasLoadedOnce.current && (loadingPaths || loadingProjects);
+
   return (
     <ProjectsContext.Provider value={value}>
-      {loadingPaths ?
-        <MainContainer><strong>Finding Projects on VAME projects path</strong></MainContainer> :
-        loadingProjects ?
-          <MainContainer><strong>Loading Projects ...</strong></MainContainer> :
-          <>{children}</>
-      }
+      {showInitialPlaceholder ? (
+        <MainContainer>
+          <strong>
+            {loadingPaths
+              ? 'Finding Projects on VAME projects path'
+              : 'Loading Projects ...'}
+          </strong>
+        </MainContainer>
+      ) : (
+        <>{children}</>
+      )}
     </ProjectsContext.Provider>
   );
 };

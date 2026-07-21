@@ -11,7 +11,7 @@ import DynamicForm from "@renderer/components/DynamicForm";
 import { createTrainsetVAMEProject } from "../../../context/Projects/api/createTrainsetVAMEProject";
 import { trainVAMEProject } from "../../../context/Projects/api/trainVAMEProject";
 import { stopTrainVAMEProject } from "../../../context/Projects/api/stopTrainVAMEProject";
-import { getProjectStateVAMEProject } from "../../../context/Projects/api/getProjectStateVAMEProject";
+import { useStepPolling, stepDisplayState } from "./useStepPolling";
 import Button from "@renderer/components/Button";
 import { evaluateVAMEProject } from "../../../context/Projects/api/evaluateVAMEProject";
 import createTrainsetSchema from '../../../../../schema/create-trainset.schema.json';
@@ -19,7 +19,7 @@ import trainModelSchema from '../../../../../schema/train-model.schema.json';
 import evaluateModelSchema from '../../../../../schema/evaluate-model.schema.json';
 import ModelVisualizationSection from "./ModelVisualizationSection";
 import TrainingMetricsCharts from "./TrainingMetricsCharts";
-import { StepBadge, StepStateLine, ErrorNote, SuccessNote } from "@renderer/components/StepStatus";
+import { StepBadge, StepStateLine, ErrorNote } from "@renderer/components/StepStatus";
 
 type ModelTrainingAccordionProps = {
     project: ProjectType;
@@ -88,16 +88,13 @@ const ModelTrainingAccordion = ({
     const [trainLoading, setTrainLoading] = useState(false);
     const [trainError, setTrainError] = useState<string | null>(null);
 
-    // Polling state for train_model
-    const [trainModelState, setTrainModelState] = useState<string | null>(null);
-    const [isPolling, setIsPolling] = useState(false);
-
     // Stop-training state
     const [stopping, setStopping] = useState(false);
     const [stopError, setStopError] = useState<string | null>(null);
 
     // Evaluate Model form state
     const [evaluateError, setEvaluateError] = useState<string | null>(null);
+    const [evaluateLoading, setEvaluateLoading] = useState(false);
 
     // States
     const create_trainset = project.states.create_trainset || {};
@@ -112,42 +109,30 @@ const ModelTrainingAccordion = ({
         train_model.execution_state === "aborted";
     const modelEvaluated = evaluate_model.execution_state === "success";
 
-    // Poll train_model state after training starts
-    React.useEffect(() => {
-        let interval: NodeJS.Timeout | null = null;
-        if (isPolling) {
-            interval = setInterval(async () => {
-                try {
-                    const projectStates = await getProjectStateVAMEProject({
-                        project: project.config.project_path,
-                    });
-                    const state = projectStates.states?.train_model?.execution_state || null;
-                    setTrainModelState(state);
-                    if (
-                        state === "success" ||
-                        state === "failed" ||
-                        state === "aborted" ||
-                        state === "not_found"
-                    ) {
-                        setIsPolling(false);
-                        setStopping(false);
-                        try {
-                            await onFormSubmit();
-                        } catch (e) {
-                            console.error("Error calling onFormSubmit:", e);
-                        }
-                        setBlockSubmit(false);
-                        setOpenSteps([false, false, false]);
-                    }
-                } catch (err) {
-                    console.error("Error during polling:", err);
-                }
-            }, 3000);
+    const finishStep = async (clearLoading: () => void) => {
+        clearLoading();
+        try {
+            await onFormSubmit();
+        } catch (e) {
+            console.error("Error calling onFormSubmit:", e);
         }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [isPolling, project.config.project_path, setBlockSubmit]);
+        setBlockSubmit(false);
+    };
+
+    const trainsetPoll = useStepPolling(project.config.project_path, "create_trainset", () =>
+        finishStep(() => setCreateTrainsetLoading(false))
+    );
+    const evaluatePoll = useStepPolling(project.config.project_path, "evaluate_model", () =>
+        finishStep(() => setEvaluateLoading(false))
+    );
+    const trainPoll = useStepPolling(project.config.project_path, "train_model", async (state) => {
+        setStopping(false);
+        await finishStep(() => setTrainLoading(false));
+        // Panels hold this step's outcome; collapsing hid it.
+        if (state === "success") {
+            setOpenSteps((prev) => [prev[0], prev[1], true]);
+        }
+    });
 
     // Handler for Create Training Set form submission
     const handleCreateTrainset = async (formData: any) => {
@@ -162,15 +147,10 @@ const ModelTrainingAccordion = ({
                 project_random_state: formData.project_random_state,
                 keypoints_to_include: formData.keypoints_to_include,
             });
+            trainsetPoll.start();
         } catch (err: any) {
             setCreateTrainsetError(err.message || "Failed to create training set.");
-        } finally {
             setCreateTrainsetLoading(false);
-            try {
-                await onFormSubmit();
-            } catch (e) {
-                console.error("Error calling onFormSubmit:", e);
-            }
             setBlockSubmit(false);
         }
     };
@@ -185,12 +165,11 @@ const ModelTrainingAccordion = ({
                 project: project.config.project_path,
                 ...formData,
             });
-            setIsPolling(true);
+            trainPoll.start();
         } catch (err: any) {
             setTrainError(err.message || "Failed to start model training.");
-            setBlockSubmit(false);
-        } finally {
             setTrainLoading(false);
+            setBlockSubmit(false);
         }
     };
 
@@ -211,19 +190,17 @@ const ModelTrainingAccordion = ({
     // Handler for Evaluate Model form submission
     const handleEvaluateModel = async (formData: any) => {
         setBlockSubmit(true);
+        setEvaluateLoading(true);
+        setEvaluateError(null);
         try {
             await evaluateVAMEProject({
                 project: project.config.project_path,
                 ...formData,
             });
+            evaluatePoll.start();
         } catch (err: any) {
             setEvaluateError(err.message || "Failed to start model evaluation.");
-        } finally {
-            try {
-                await onFormSubmit();
-            } catch (e) {
-                console.error("Error calling onFormSubmit:", e);
-            }
+            setEvaluateLoading(false);
             setBlockSubmit(false);
         }
     };
@@ -249,7 +226,7 @@ const ModelTrainingAccordion = ({
                     onClick={() => handleToggle(0, true)}
                 >
                     3.1 Create Training Set
-                    <StepBadge state={create_trainset.execution_state} />
+                    <StepBadge state={trainsetPoll.polling ? "running" : create_trainset.execution_state} />
                     <span style={{ marginLeft: "auto" }}>
                         <FontAwesomeIcon icon={openSteps[0] ? faChevronUp : faChevronDown} />
                     </span>
@@ -259,15 +236,15 @@ const ModelTrainingAccordion = ({
                         <DynamicForm
                             schema={createTrainsetSchemaWithKeypoints}
                             initialValues={{ project_random_state: project.config.project_random_state ?? 42 }}
-                            blockSubmission={blockSubmit}
-                            submitText={createTrainsetLoading ? "Creating..." : "Create Training Set"}
+                            blockSubmission={blockSubmit || trainsetPoll.polling}
+                            submitText={createTrainsetLoading || trainsetPoll.polling ? "Creating..." : "Create Training Set"}
                             onFormSubmit={handleCreateTrainset}
                             showLogsButton={true}
                             logName={["create_trainset"]}
                             projectPath={project.config.project_path}
                         />
                         {createTrainsetError && <ErrorNote>{createTrainsetError}</ErrorNote>}
-                        {trainsetCreated && <SuccessNote>Training set created successfully.</SuccessNote>}
+                        <StepStateLine state={stepDisplayState(trainsetPoll, create_trainset.execution_state)} polling={trainsetPoll.polling} noun="Training set creation" />
                     </div>
                 </AccordionContent>
             </Accordion>
@@ -278,7 +255,7 @@ const ModelTrainingAccordion = ({
                     onClick={() => handleToggle(1, true)}
                 >
                     3.2 Train Model
-                    <StepBadge state={train_model.execution_state} />
+                    <StepBadge state={trainPoll.polling ? "running" : train_model.execution_state} />
                     <span style={{ marginLeft: "auto" }}>
                         <FontAwesomeIcon icon={openSteps[1] ? faChevronUp : faChevronDown} />
                     </span>
@@ -289,16 +266,16 @@ const ModelTrainingAccordion = ({
                             schema={trainModelSchemaWithMinEpochs}
                             validate={validateTrain}
                             initialValues={{ project_random_state: project.config.project_random_state ?? 42 }}
-                            blockSubmission={blockSubmit}
-                            submitText={trainLoading ? "Training..." : "Train Model"}
+                            blockSubmission={blockSubmit || trainPoll.polling}
+                            submitText={trainLoading || trainPoll.polling ? "Training..." : "Train Model"}
                             onFormSubmit={handleTrainModel}
                             showLogsButton={true}
                             logName={["train_model"]}
                             projectPath={project.config.project_path}
                         />
                         {trainError && <ErrorNote>{trainError}</ErrorNote>}
-                        <StepStateLine state={trainModelState} polling={isPolling} noun="Training" />
-                        {isPolling && (
+                        <StepStateLine state={stepDisplayState(trainPoll, train_model.execution_state)} polling={trainPoll.polling} noun="Training" />
+                        {trainPoll.polling && (
                             <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
                                 <Button
                                     variant="danger"
@@ -316,7 +293,7 @@ const ModelTrainingAccordion = ({
                         {stopError && <ErrorNote>{stopError}</ErrorNote>}
                         <TrainingMetricsCharts
                             projectPath={project.config.project_path}
-                            live={isPolling}
+                            live={trainPoll.polling}
                             enabled={openSteps[1]}
                         />
                     </div>
@@ -329,7 +306,7 @@ const ModelTrainingAccordion = ({
                     onClick={() => handleToggle(2, modelCreated)}
                 >
                     3.3 Evaluate Model
-                    <StepBadge state={evaluate_model.execution_state} />
+                    <StepBadge state={evaluatePoll.polling ? "running" : evaluate_model.execution_state} />
                     <span style={{ marginLeft: "auto" }}>
                         <FontAwesomeIcon icon={openSteps[2] ? faChevronUp : faChevronDown} />
                     </span>
@@ -338,15 +315,15 @@ const ModelTrainingAccordion = ({
                     <div>
                         <DynamicForm
                             schema={evaluateModelSchema as Schema}
-                            blockSubmission={blockSubmit}
-                            submitText={"Evaluate Model"}
+                            blockSubmission={blockSubmit || evaluatePoll.polling}
+                            submitText={evaluateLoading || evaluatePoll.polling ? "Evaluating..." : "Evaluate Model"}
                             onFormSubmit={handleEvaluateModel}
                             showLogsButton={true}
                             logName={["evaluate_model"]}
                             projectPath={project.config.project_path}
                         />
                         {evaluateError && <ErrorNote>{evaluateError}</ErrorNote>}
-                        {modelEvaluated && <SuccessNote>Model evaluated successfully.</SuccessNote>}
+                        <StepStateLine state={stepDisplayState(evaluatePoll, evaluate_model.execution_state)} polling={evaluatePoll.polling} noun="Model evaluation" />
                         {modelEvaluated && (
                             <ModelVisualizationSection project={project} enabled={openSteps[2]} />
                         )}
