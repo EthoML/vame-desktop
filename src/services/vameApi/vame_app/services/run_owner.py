@@ -9,6 +9,7 @@ writing to ``states.json``.
 import json
 import logging
 import os
+import sys
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,30 @@ def claim(project_path, step: str) -> None:
 def is_alive(pid) -> bool:
     if not isinstance(pid, int) or pid <= 0:
         return False
+    if sys.platform == "win32":
+        # os.kill(pid, 0) is not a liveness check on Windows: signal 0 is the
+        # same integer value as CTRL_C_EVENT, so it would actually deliver a
+        # real Ctrl+C to the target process's console instead of just probing it.
+        import ctypes
+
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        STILL_ACTIVE = 259
+        handle = ctypes.windll.kernel32.OpenProcess(
+            PROCESS_QUERY_LIMITED_INFORMATION, False, pid
+        )
+        if not handle:
+            return False
+        try:
+            exit_code = ctypes.c_ulong()
+            # A just-exited process object can briefly still open()-succeed;
+            # its exit code (rather than open() succeeding) is the real signal.
+            if not ctypes.windll.kernel32.GetExitCodeProcess(
+                handle, ctypes.byref(exit_code)
+            ):
+                return False
+            return exit_code.value == STILL_ACTIVE
+        finally:
+            ctypes.windll.kernel32.CloseHandle(handle)
     try:
         os.kill(pid, 0)
     except ProcessLookupError:

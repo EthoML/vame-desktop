@@ -40,7 +40,6 @@ def run_preprocessing(config: dict, project_path, data: dict):
             config=config,
             save_to_file=True,
             show_figure=False,
-            save_logs=True,
         )
         set_step_state(project_path, "preprocessing", "success")
     except Exception:
