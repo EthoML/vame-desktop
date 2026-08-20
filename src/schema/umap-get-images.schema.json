@@ -6,7 +6,8 @@
             "type": "string",
             "enum": [
                 "hmm",
-                "kmeans"
+                "kmeans",
+                "hmm_warmstart"
             ]
         }
     },

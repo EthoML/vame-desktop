@@ -16,7 +16,8 @@
             "description": "Which algorithms to run.",
             "enum": [
                 "hmm",
-                "kmeans"
+                "kmeans",
+                "hmm_warmstart"
             ],
             "multiple": true,
             "checkboxes": true,
