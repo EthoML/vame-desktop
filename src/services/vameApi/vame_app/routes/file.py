@@ -1,21 +1,18 @@
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import send_from_directory, request
-from vame_app.routes import api
-from vame_app.services.file_service import check_file_exists, log_file
+from vame_app.services.file_service import log_file
 from vame_app.config import VAME_PROJECTS_DIRECTORY
 from pathlib import Path
+
+api = Namespace("files", description="Project file and log serving", path="/")
 
 
 @api.route("/files/<path:project>/<path:path>")
 class Files(Resource):
     def get(self, project, path):
-        return send_from_directory(VAME_PROJECTS_DIRECTORY, Path(project) / path)
-
-
-@api.route("/exists/<path:project>/<path:path>")
-class FileExists(Resource):
-    def get(self, project, path):
-        return check_file_exists(Path(project), path)
+        # URL components, not filesystem paths: send_from_directory requires "/"
+        # separators and rejects the "\" a Path would produce on Windows.
+        return send_from_directory(VAME_PROJECTS_DIRECTORY, f"{project}/{path}")
 
 
 @api.route("/log/<path:log_name>")

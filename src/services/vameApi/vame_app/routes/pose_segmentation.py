@@ -2,13 +2,15 @@ from pathlib import Path
 from urllib.parse import quote
 import threading
 import time
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import request
 import vame
 
-from . import api
+from vame_app.services.run_owner import claim
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("pose-segmentation", description="Pose segmentation", path="/")
 
 
 @api.route("/segment", methods=["POST"])
@@ -45,6 +47,7 @@ class Segment(Resource):
                     "overwrite_embeddings": overwrite_embeddings,
                 },
             )
+            claim(project_path, "segment_session")
             thread.start()
             time.sleep(2)
             return {"status": "started"}
@@ -75,6 +78,7 @@ class MotifVideos(Resource):
                     config=config,
                 )
             thread = threading.Thread(target=background_task, kwargs={"config": config})
+            claim(project_path, "motif_videos")
             thread.start()
             time.sleep(2)
             return {"status": "started"}

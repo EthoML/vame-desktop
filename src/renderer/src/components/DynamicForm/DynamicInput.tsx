@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import FileInput from "./FileSelector";
 import ArrayInput from "./ArrayInput";
-import { Accordion, AccordionContent, AccordionHeader, CheckboxGroup, CheckboxLabel, InputGroup, InputLabel, StyledInput, StyledSelect } from './styles';
+import { Accordion, AccordionContent, AccordionHeader, CheckboxGroup, CheckboxLabel, FieldError, InputGroup, InputLabel, StyledInput, StyledSelect } from './styles';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
@@ -91,16 +91,33 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
   if (type === "number") {
     const numberProperty = property as NumberProperty
     const isInteger = numberProperty.type === 'integer';
+    const { minimum, maximum } = numberProperty;
+    // The min/max attributes only constrain the spinner — RHF has to know the
+    // bounds too, or a typed-in value passes straight through.
+    const error = methods.formState.errors[itemKey];
 
     return (
-      <StyledInput
-        type="number"
-        max={numberProperty?.maximum}
-        min={numberProperty?.minimum}
-        step={isInteger ? 1 : "any"}
-        {...register(itemKey, { required, valueAsNumber: true, disabled })}
-        readOnly={readOnly}
-      />
+      <>
+        <StyledInput
+          type="number"
+          max={maximum}
+          min={minimum}
+          step={isInteger ? 1 : "any"}
+          {...register(itemKey, {
+            required,
+            valueAsNumber: true,
+            disabled,
+            ...(minimum !== undefined && {
+              min: { value: minimum, message: `Must be at least ${minimum}.` },
+            }),
+            ...(maximum !== undefined && {
+              max: { value: maximum, message: `Must be at most ${maximum}.` },
+            }),
+          })}
+          readOnly={readOnly}
+        />
+        {error?.message && <FieldError>{String(error.message)}</FieldError>}
+      </>
     );
   }
 

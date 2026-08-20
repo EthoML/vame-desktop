@@ -51,6 +51,7 @@ def create_app():
     )
 
     from vame_app.routes import (
+        register_exception_handler,
         project,
         file,
         health_check,
@@ -64,34 +65,27 @@ def create_app():
         fs,
     )
 
-    api.add_namespace(health_check.api)
-    api.add_namespace(file.api)
-    api.add_namespace(project.api)
-    api.add_namespace(vame.api)
-    api.add_namespace(preprocessing.api)
-    api.add_namespace(model.api)
-    api.add_namespace(pose_segmentation.api)
-    api.add_namespace(community.api)
-    api.add_namespace(report.api)
-    api.add_namespace(gpu_check.api)
-    api.add_namespace(fs.api)
+    register_exception_handler(api)
+
+    # Each module owns one namespace; register each exactly once. flask-restx
+    # re-registers a namespace's routes on every add_namespace call, so a
+    # repeated call silently duplicates every rule in the URL map.
+    for module in (
+        health_check,
+        file,
+        project,
+        vame,
+        preprocessing,
+        model,
+        pose_segmentation,
+        community,
+        report,
+        gpu_check,
+        fs,
+    ):
+        api.add_namespace(module.api)
 
     _register_frontend(app)
-
-    # Heal any pipeline steps left at "running" by a previous process. Every
-    # long-running step runs in-process, so nothing survives a restart — any
-    # lingering "running" state is stale and would otherwise show a perpetual
-    # spinner in the UI. Never let this block startup.
-    try:
-        from vame_app.services.project_service import reconcile_stale_running_states
-
-        healed = reconcile_stale_running_states()
-        if healed:
-            app.logger.warning(
-                "Reset stale 'running' states on startup for: %s", ", ".join(healed)
-            )
-    except Exception as exc:  # noqa: BLE001 - startup must not fail on this
-        app.logger.warning("Could not reconcile stale states on startup: %s", exc)
 
     return app
 

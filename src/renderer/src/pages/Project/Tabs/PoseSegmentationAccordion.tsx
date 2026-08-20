@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
     Accordion,
     AccordionHeader,
@@ -12,10 +12,10 @@ import poseSegmentationSchema from "../../../../../schema/pose-segmentation.sche
 import motifVideosGenerateSchema from "../../../../../schema/motif-videos-generate.schema.json";
 import motifVideosGetSchema from "../../../../../schema/motif-videos-get.schema.json";
 import { segmentVAMEProject } from "../../../context/Projects/api/segmentVAMEProject";
-import { getProjectStateVAMEProject } from "../../../context/Projects/api/getProjectStateVAMEProject";
 import { createMotifVideosVAMEProject } from "../../../context/Projects/api/createMotifVideosVAMEProject";
 import { getSegmentVideosVAMEProject } from "../../../context/Projects/api/getSegmentVideosVAMEProject";
-import { StepBadge, StepStateLine, ErrorNote, SuccessNote, OptionalTag } from "@renderer/components/StepStatus";
+import { StepBadge, StepStateLine, ErrorNote, OptionalTag } from "@renderer/components/StepStatus";
+import { useStepPolling, stepDisplayState } from "./useStepPolling";
 import ResultVideoViewer from "@renderer/components/ResultVideoViewer";
 
 const ALGO_OPTIONS = motifVideosGetSchema.properties.segmentation_algorithm.enum as string[];
@@ -36,8 +36,6 @@ const PoseSegmentationAccordion = ({
     const [openSteps, setOpenSteps] = useState([false, false]);
     const [motifLoading, setMotifLoading] = useState(false);
     const [motifError, setMotifError] = useState<string | null>(null);
-    const [isPollingMotif, setIsPollingMotif] = useState(false);
-    const [motifState, setMotifState] = useState<string | null>(null);
 
     const sessionNames: string[] = (project.config as any)?.session_names || [];
 
@@ -46,87 +44,27 @@ const PoseSegmentationAccordion = ({
     const motifCompleted = motif_session.execution_state === "success";
     const [segmentationLoading, setSegmentationLoading] = useState(false);
     const [segmentationError, setSegmentationError] = useState<string | null>(null);
-    const [isPolling, setIsPolling] = useState(false);
-    const [segmentationState, setSegmentationState] = useState<string | null>(null);
 
     // States from project
     const segment_session = project.states?.segment_session || {};
     const segmented = segment_session.execution_state === "success";
 
-    // Polling for segmentation state
-    useEffect(() => {
-        let interval: NodeJS.Timeout | null = null;
-        if (isPolling) {
-            interval = setInterval(async () => {
-                try {
-                    const projectState = await getProjectStateVAMEProject({
-                        project: project.config.project_path,
-                    });
-                    const state = projectState.states?.segment_session?.execution_state || null;
-                    setSegmentationState(state);
-                    if (
-                        state === "success" ||
-                        state === "failed" ||
-                        state === "aborted" ||
-                        state === "not_found"
-                    ) {
-                        setIsPolling(false);
-                        try {
-                            await onFormSubmit();
-                        } catch (e) {
-                            console.error("Error calling onFormSubmit:", e);
-                        }
-                        setBlockSubmit(false);
-                        setOpenSteps([false, false]);
-                    }
-                } catch (err) {
-                    console.error("Error during polling:", err);
-                    setBlockSubmit(false);
-                }
-            }, 3000);
+    const finishStep = async (clearLoading: () => void) => {
+        clearLoading();
+        try {
+            await onFormSubmit();
+        } catch (e) {
+            console.error("Error calling onFormSubmit:", e);
         }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isPolling, project.config.project_path, setBlockSubmit]);
+        setBlockSubmit(false);
+    };
 
-    // Polling for motif videos state
-    useEffect(() => {
-        let interval: NodeJS.Timeout | null = null;
-        if (isPollingMotif) {
-            interval = setInterval(async () => {
-                try {
-                    const projectState = await getProjectStateVAMEProject({
-                        project: project.config.project_path,
-                    });
-                    const state = projectState.states?.motif_videos?.execution_state || null;
-                    setMotifState(state);
-                    if (
-                        state === "success" ||
-                        state === "failed" ||
-                        state === "aborted" ||
-                        state === "not_found"
-                    ) {
-                        setIsPollingMotif(false);
-                        try {
-                            await onFormSubmit();
-                        } catch (e) {
-                            console.error("Error calling onFormSubmit:", e);
-                        }
-                        setBlockSubmit(false);
-                        setOpenSteps([false, false]);
-                    }
-                } catch (err) {
-                    console.error("Error during polling videos:", err);
-                    setBlockSubmit(false);
-                }
-            }, 3000);
-        }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [isPollingMotif, project.config.project_path, setBlockSubmit]);
+    const segmentationPoll = useStepPolling(project.config.project_path, "segment_session", () =>
+        finishStep(() => setSegmentationLoading(false))
+    );
+    const motifPoll = useStepPolling(project.config.project_path, "motif_videos", () =>
+        finishStep(() => setMotifLoading(false))
+    );
 
     // Block the Run button until the inputs are valid: at least one cluster and
     // at least one segmentation algorithm selected.
@@ -157,12 +95,11 @@ const PoseSegmentationAccordion = ({
                 project: project.config.project_path,
                 ...formData,
             });
-            setIsPolling(true);
+            segmentationPoll.start();
         } catch (err: any) {
             setSegmentationError(err.message || "Failed to start segmentation.");
-            setBlockSubmit(false);
-        } finally {
             setSegmentationLoading(false);
+            setBlockSubmit(false);
         }
     };
 
@@ -175,12 +112,11 @@ const PoseSegmentationAccordion = ({
                 project: project.config.project_path,
                 ...formData,
             });
-            setIsPollingMotif(true);
+            motifPoll.start();
         } catch (err: any) {
             setMotifError(err.message || "Failed to start video creation.");
-            setBlockSubmit(false);
-        } finally {
             setMotifLoading(false);
+            setBlockSubmit(false);
         }
     };
 
@@ -203,7 +139,7 @@ const PoseSegmentationAccordion = ({
                     onClick={() => handleToggle(0, true)}
                 >
                     4.1 Run Segmentation
-                    <StepBadge state={segment_session.execution_state} />
+                    <StepBadge state={segmentationPoll.polling ? "running" : segment_session.execution_state} />
                     <span style={{ marginLeft: "auto" }}>
                         <FontAwesomeIcon icon={openSteps[0] ? faChevronUp : faChevronDown} />
                     </span>
@@ -212,8 +148,8 @@ const PoseSegmentationAccordion = ({
                     <div>
                         <DynamicForm
                             schema={poseSegmentationSchema as unknown as Schema}
-                            blockSubmission={blockSubmit}
-                            submitText={segmentationLoading ? "Running..." : "Run Segmentation"}
+                            blockSubmission={blockSubmit || segmentationPoll.polling}
+                            submitText={segmentationLoading || segmentationPoll.polling ? "Running..." : "Run Segmentation"}
                             onFormSubmit={handleRunSegmentation}
                             validate={validateSegmentation}
                             showLogsButton={true}
@@ -221,8 +157,7 @@ const PoseSegmentationAccordion = ({
                             projectPath={project.config.project_path}
                         />
                         {segmentationError && <ErrorNote>{segmentationError}</ErrorNote>}
-                        <StepStateLine state={segmentationState} polling={isPolling} noun="Segmentation" />
-                        {segmented && <SuccessNote>Segmentation completed successfully.</SuccessNote>}
+                        <StepStateLine state={stepDisplayState(segmentationPoll, segment_session.execution_state)} polling={segmentationPoll.polling} noun="Segmentation" />
                     </div>
                 </AccordionContent>
             </Accordion>
@@ -233,7 +168,7 @@ const PoseSegmentationAccordion = ({
                     onClick={() => handleToggle(1, segmented)}
                 >
                     4.2 Create &amp; View Segmented Videos
-                    <StepBadge state={motif_session.execution_state} />
+                    <StepBadge state={motifPoll.polling ? "running" : motif_session.execution_state} />
                     <OptionalTag />
                     <span style={{ marginLeft: "auto" }}>
                         <FontAwesomeIcon icon={openSteps[1] ? faChevronUp : faChevronDown} />
@@ -243,16 +178,15 @@ const PoseSegmentationAccordion = ({
                     <div>
                         <DynamicForm
                             schema={motifVideosGenerateSchema as unknown as Schema}
-                            blockSubmission={blockSubmit}
-                            submitText={motifLoading ? "Creating..." : "Create Segmented Videos"}
+                            blockSubmission={blockSubmit || motifPoll.polling}
+                            submitText={motifLoading || motifPoll.polling ? "Creating..." : "Create Segmented Videos"}
                             onFormSubmit={handleCreateMotifVideos}
                             showLogsButton={true}
                             logName={["motif_videos"]}
                             projectPath={project.config.project_path}
                         />
                         {motifError && <ErrorNote>{motifError}</ErrorNote>}
-                        <StepStateLine state={motifState} polling={isPollingMotif} noun="Video creation" />
-                        {motifCompleted && <SuccessNote>Videos created successfully.</SuccessNote>}
+                        <StepStateLine state={stepDisplayState(motifPoll, motif_session.execution_state)} polling={motifPoll.polling} noun="Video creation" />
 
                         {motifCompleted && (
                             <div style={{ marginTop: "var(--space-5)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--color-border)" }}>

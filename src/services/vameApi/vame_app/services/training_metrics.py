@@ -8,6 +8,7 @@ figure dict means the same builder can later feed report/export artifacts.
 """
 
 import logging
+import threading
 from pathlib import Path
 
 import plotly.graph_objects as go
@@ -50,20 +51,44 @@ def _tb_log_dir(project_path, model_name: str) -> Path:
     return Path(project_path) / "logs" / "tensorboard" / model_name
 
 
+# Persistent EventAccumulator per event file
+_ACC_CACHE: dict[str, tuple[EventAccumulator, int]] = {}
+_CACHE_LOCK = threading.Lock()
+
+
+def _accumulator_for(f: Path) -> EventAccumulator:
+    """Return a reloaded accumulator for one event file, reusing a cached one.
+
+    Reusing the instance makes each Reload parse only newly appended records, so
+    polling cost stays proportional to new data rather than to total history.
+    """
+    key = str(f)
+    size = f.stat().st_size
+    cached = _ACC_CACHE.get(key)
+    # Reuse unless uncached or the file shrank (replaced/truncated); else rebuild.
+    if cached is not None and size >= cached[1]:
+        acc = cached[0]
+    else:
+        acc = EventAccumulator(key, size_guidance={"scalars": 0})
+    acc.Reload()
+    _ACC_CACHE[key] = (acc, size)
+    return acc
+
+
 def _load_accumulators(log_dir: Path):
-    """One EventAccumulator per run, oldest-first.
+    """One EventAccumulator per run, oldest-first (cached and reloaded).
 
     VAME appends a new ``events.out.tfevents.*`` file to the same directory on
     every training run. We load each file separately (by mtime) so we can stitch
     the runs end-to-end with a continuous x-axis, rather than letting a single
     directory-level accumulator merge them with overlapping/reset step numbers.
+    Accumulators are cached across requests (see _accumulator_for), so repeated
+    polls don't re-parse the whole history each time.
     """
-    accumulators = []
-    for f in sorted(log_dir.glob("events.out.tfevents.*"), key=lambda p: p.stat().st_mtime):
-        acc = EventAccumulator(str(f), size_guidance={"scalars": 0})
-        acc.Reload()
-        accumulators.append(acc)
-    return accumulators
+    return [
+        _accumulator_for(f)
+        for f in sorted(log_dir.glob("events.out.tfevents.*"), key=lambda p: p.stat().st_mtime)
+    ]
 
 
 def _series(accumulators, tag: str, max_points: int | None):
@@ -133,18 +158,20 @@ def build_training_figures(project_path, model_name: str) -> dict:
     epoch_train_fig, epoch_test_fig, batch_fig = go.Figure(), go.Figure(), go.Figure()
     has_data = False
 
-    accumulators = _load_accumulators(log_dir) if log_dir.is_dir() else []
-    if accumulators:
-        # scalars=0 -> keep every point (no reservoir sampling); we downsample
-        # the batch series contiguously ourselves.
-        has_data = any(acc.Tags().get("scalars") for acc in accumulators)
-        if has_data:
-            epoch_train_fig = _figure(accumulators, _EPOCH_TRAIN_TRACES, "Train losses", "epoch")
-            epoch_test_fig = _figure(accumulators, _EPOCH_TEST_TRACES, "Test losses", "epoch")
-            batch_fig = _figure(
-                accumulators, _BATCH_TRACES, "Batch losses", "step",
-                max_points=_MAX_BATCH_POINTS,
-            )
+    # Serialize accumulator access
+    with _CACHE_LOCK:
+        accumulators = _load_accumulators(log_dir) if log_dir.is_dir() else []
+        if accumulators:
+            # scalars=0 -> keep every point (no reservoir sampling); we downsample
+            # the batch series contiguously ourselves.
+            has_data = any(acc.Tags().get("scalars") for acc in accumulators)
+            if has_data:
+                epoch_train_fig = _figure(accumulators, _EPOCH_TRAIN_TRACES, "Train losses", "epoch")
+                epoch_test_fig = _figure(accumulators, _EPOCH_TEST_TRACES, "Test losses", "epoch")
+                batch_fig = _figure(
+                    accumulators, _BATCH_TRACES, "Batch losses", "step",
+                    max_points=_MAX_BATCH_POINTS,
+                )
 
     return {
         "epoch_train": epoch_train_fig.to_dict(),

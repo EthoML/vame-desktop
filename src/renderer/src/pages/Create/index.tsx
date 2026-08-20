@@ -11,6 +11,7 @@ import { PaddedContainer, FormOverlay } from './styles';
 
 import { onVAMEReady } from '@renderer/utils/vame';
 import { useProjects } from '@renderer/context/Projects';
+import type { CreateProps } from '@renderer/context/Projects/api';
 
 import createSchema from '../../../../schema/create.schema.json';
 
@@ -33,9 +34,7 @@ const Create: React.FC = () => {
   // A fresh reproducibility seed suggested per project (user can override).
   const suggestedSeed = useMemo(() => Math.floor(Math.random() * 1_000_000), [])
 
-  useEffect(() => {
-    onVAMEReady(() => setBlockSubmission(false))
-  }, [])
+  useEffect(() => onVAMEReady(() => setBlockSubmission(false)), [])
 
   // Existing project names (lower-cased) to reject duplicates before submitting.
   const existingNames = useMemo(
@@ -109,7 +108,7 @@ const Create: React.FC = () => {
     [existingNames]
   )
 
-  const handleFormSubmit = async (formData) => {
+  const handleFormSubmit = async (formData: CreateProps) => {
     // Set submitting state to show overlay immediately
     setIsSubmitting(true)
     setErrorMessage(null)

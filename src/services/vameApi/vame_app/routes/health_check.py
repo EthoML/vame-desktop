@@ -1,5 +1,6 @@
-from flask_restx import Resource
-from . import api
+from flask_restx import Namespace, Resource
+
+api = Namespace("health", description="Liveness and readiness checks", path="/")
 
 
 @api.route("/connected")

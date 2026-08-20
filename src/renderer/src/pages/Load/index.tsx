@@ -5,7 +5,7 @@ import PageHeading from '@renderer/components/PageHeading';
 import { usePageHeader } from '@renderer/context/PageHeader';
 import DynamicForm from '@renderer/components/DynamicForm';
 import { ErrorNote } from '@renderer/components/StepStatus';
-import { get } from '@renderer/utils/requests';
+import { post } from '@renderer/utils/requests';
 
 import loadSchema from '../../../../schema/load-project.schema.json';
 import { PaddedContainer } from '../Create/styles';
@@ -25,21 +25,20 @@ const Load: React.FC = () => {
       return;
     }
 
-    // Validate that the selected folder is a VAME project (has config.yaml).
+    // Gate the import: refuse anything the backend can't actually open, so an
+    // unusable project is never symlinked into the projects directory.
     setChecking(true);
     try {
-      const res = await get<{ entries: { name: string }[] }>(
-        `fs/list?path=${encodeURIComponent(folder)}`
+      const res = await post<{ valid: boolean; reason: string | null }>(
+        'project/validate',
+        { project: folder }
       );
       if (!res.success) {
         setError(res.error);
         return;
       }
-      const hasConfig = res.data.entries.some((e) => e.name === 'config.yaml');
-      if (!hasConfig) {
-        setError(
-          'No config.yaml found in the selected folder. Please choose a valid VAME project directory.'
-        );
+      if (!res.data.valid) {
+        setError(res.data.reason ?? 'This folder is not a valid VAME project.');
         return;
       }
       navigate({

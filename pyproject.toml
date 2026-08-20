@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vame-app"
-version = "0.4.3"
+version = "0.4.4"
 description = "An open-source machine learning tool for behavioral segmentation and analyses."
 readme = "README.md"
 license = { text = "GPL-3.0-only" }
@@ -18,7 +18,7 @@ dependencies = [
     "flask-restx==1.3.0",
     "portalocker==3.1.1",
     "waitress>=3.0.2",
-    "vame-py>=0.14.2",
+    "vame-py>=0.14.4",
 ]
 
 [project.urls]

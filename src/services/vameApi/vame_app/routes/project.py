@@ -1,23 +1,27 @@
 from pathlib import Path
 import json
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import request, jsonify
 import vame
 import xarray as xr
 
-from . import api
 from vame_app.utils.resolve_request_util import resolve_request_data
+from vame_app.services.run_owner import resolve_states
 from vame_app.services.project_service import (
+    ProjectBusyError,
     get_projects,
     is_project_ready,
     register_project,
     load_project,
+    validate_project,
     create_project,
     delete_project,
     configure_project,
 )
 
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("project", description="Project lifecycle and state", path="/")
 
 
 @api.route("/projects")
@@ -36,6 +40,26 @@ class ProjectReady(Resource):
         except Exception as exception:
             print("exception", exception)
             api.abort(500, str(exception))
+
+
+@api.route("/project/validate", methods=["POST"])
+class ValidateProject(Resource):
+    @api.doc(
+        responses={200: "Success", 400: "Bad Request", 500: "Internal server error"}
+    )
+    def post(self):
+        """Gate an import: report whether a folder is a usable VAME project.
+
+        Checked before the project is opened, so an incompatible one is never
+        symlinked into the projects directory or added to the registry.
+        """
+        try:
+            _, project_path = resolve_request_data(request)
+            reason = validate_project(project_path)
+            return jsonify(dict(valid=reason is None, reason=reason))
+        except Exception as exception:
+            if not_bad_request_exception(exception):
+                api.abort(500, str(exception))
 
 
 @api.route("/project/register")
@@ -79,7 +103,8 @@ class DeleteProject(Resource):
             _, project_path = resolve_request_data(request)
             res = delete_project(project_path)
             return jsonify(res)
-
+        except ProjectBusyError as exception:
+            api.abort(409, str(exception))
         except Exception as exception:
             if not_bad_request_exception(exception):
                 api.abort(500, str(exception))
@@ -110,7 +135,7 @@ class StateProject(Resource):
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
             states = vame.read_states(config=config)
-            return dict(states=states)
+            return dict(states=resolve_states(project_path, states))
         except Exception as exception:
             if not_bad_request_exception(exception):
                 api.abort(500, str(exception))
@@ -154,8 +179,8 @@ class RawData(Resource):
             file_path = Path(project_path) / "data" / "raw" / f"{session}.nc"
             if not file_path.exists():
                 api.abort(404, f"Raw data file not found: '{file_path}'")
-            ds = xr.open_dataset(file_path)
-            html = ds._repr_html_()
+            with xr.open_dataset(file_path) as ds:
+                html = ds._repr_html_()
             return jsonify(html=html)
         except Exception as exception:
             if not_bad_request_exception(exception):

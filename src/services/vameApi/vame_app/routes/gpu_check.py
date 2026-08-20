@@ -1,6 +1,7 @@
-from flask_restx import Resource
-from . import api
+from flask_restx import Namespace, Resource
 import torch
+
+api = Namespace("gpu", description="GPU availability", path="/")
 
 
 @api.route("/gpu-check")

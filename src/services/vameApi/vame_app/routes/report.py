@@ -2,14 +2,41 @@ from pathlib import Path
 from urllib.parse import quote
 import threading
 import time
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import request, jsonify
 import base64
 import vame
 
-from . import api
+from vame_app.services.step_state import set_step_state
+from vame_app.services.run_owner import claim
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("report", description="Report generation", path="/")
+
+
+def generate_report_artifacts(config: dict, num_points: int, overwrite_umap: bool):
+    """Run the whole "6.1 Generate Report" step: UMAP figures, then the reports.
+
+    Only ``generate_reports`` carries a ``save_state`` decorator, so it runs last
+    and its own "success" write ends the step. The two are independent:
+    ``visualize_umap`` reads ``results/`` and never touches ``reports/``.
+    """
+    project_path = config["project_path"]
+    try:
+        set_step_state(project_path, "generate_reports", "running")
+
+        # visualize_umap reuses this cache, so new settings need it dropped.
+        if overwrite_umap:
+            umap_cache = Path(project_path) / "results" / "umap_embedding.nc"
+            if umap_cache.exists():
+                umap_cache.unlink()
+        vame.visualization.visualize_umap(config=config, num_points=num_points)
+
+        vame.visualization.generate_reports(config=config)
+    except Exception:
+        set_step_state(project_path, "generate_reports", "failed")
+        raise
 
 
 @api.route("/report", methods=["POST", "GET"])
@@ -18,19 +45,6 @@ class Report(Resource):
         responses={200: "Success", 400: "Bad Request", 500: "Internal server error"}
     )
     def post(self):
-        def background_task(config: dict, num_points: int, overwrite_umap: bool):
-            vame.visualization.generate_reports(config=config)
-            # visualize_umap caches results/umap_embedding.nc and reuses it when
-            # present, so new UMAP settings won't apply unless we drop the cache.
-            if overwrite_umap:
-                umap_cache = Path(config["project_path"]) / "results" / "umap_embedding.nc"
-                if umap_cache.exists():
-                    umap_cache.unlink()
-            # UMAP embeddings are cohort-wide (all sessions combined) and are
-            # written to reports/umap/. They are part of the report artifacts,
-            # so generate them in the same step (logs to the same report.log).
-            vame.visualization.visualize_umap(config=config, num_points=num_points)
-
         try:
             data, project_path = resolve_request_data(request)
             config = vame.read_config(str(Path(project_path) / "config.yaml"))
@@ -46,9 +60,10 @@ class Report(Resource):
                 config=config,
             )
             thread = threading.Thread(
-                target=background_task,
+                target=generate_report_artifacts,
                 kwargs={"config": config, "num_points": num_points, "overwrite_umap": overwrite_umap},
             )
+            claim(project_path, "generate_reports")
             thread.start()
             time.sleep(2)
             return {"status": "started"}

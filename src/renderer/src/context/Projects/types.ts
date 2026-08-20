@@ -12,36 +12,18 @@ import {
   createCommunityVideosVAMEProject,
 } from "./api"
 
-export type ProjectStates = {
-  preprocessing: any;
-  preprocessing_visualization: any;
-  create_trainset: any;
-  evaluate_model: any;
-  train_model: any;
-  segment_session: any;
-  motif_videos: any;
-  community: any;
-  community_videos: any;
-  generate_reports: any; // Added for report generation state
+/**
+ * A row in the projects list. A project that failed to load carries only
+ * `error` and `config.project_path`, so everything is optional
+ */
+export type Project = Partial<Omit<ProjectType, "config">> & {
+  config?: Partial<ProjectType["config"]>;
 };
-
-export interface Project {
-  config?: any;
-  assets?: any;
-  videos?: string[];
-  pes_paths?: string[];
-  workflow?: any;
-  states?: ProjectStates;
-  creation_datetime?: string;
-  last_modified?: string;
-  error?: string;
-}
 
 export type IProjectContext = {
   projects: Project[]
   refresh: () => Promise<void>
   getProject: (path: string) => Project | undefined;
-  getAssetsPath: (projectPath: string, asset: string, basePath?: string) => string | undefined
 
   createProject: typeof createVAMEProject
   deleteProject: typeof deleteVAMEProject

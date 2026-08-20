@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback, useEffect, useRef, useState } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSpinner } from "@fortawesome/free-solid-svg-icons"
 import SegmentedControl from "@renderer/components/SegmentedControl"
@@ -79,7 +79,7 @@ type Props = {
     enabled?: boolean
 }
 
-const POLL_MS = 3000
+const POLL_MS = 10000
 
 const TrainingMetricsCharts: React.FC<Props> = ({ projectPath, live = false, enabled = true }) => {
     const [granularity, setGranularity] = useState<Granularity>("epoch")
@@ -90,41 +90,43 @@ const TrainingMetricsCharts: React.FC<Props> = ({ projectPath, live = false, ena
     const [loading, setLoading] = useState(false)
     const fetchedOnce = useRef(false)
 
-    const fetchMetrics = useCallback(async () => {
-        try {
-            const result = await getTrainMetrics({ project: projectPath })
-            setEpochTrain(result.epoch_train)
-            setEpochTest(result.epoch_test)
-            setBatch(result.batch)
-            setError(null)
-        } catch (err: any) {
-            setError(err.message || "Failed to load training metrics.")
-        }
-    }, [projectPath])
-
-    // Fetch on open and whenever training starts/stops (so the final epoch shows).
+    // Poll while the section is open.
     useEffect(() => {
         if (!enabled) return
-        let cancelled = false
-        ;(async () => {
-            setLoading(true)
-            await fetchMetrics()
-            if (!cancelled) {
-                setLoading(false)
-                fetchedOnce.current = true
-            }
-        })()
-        return () => {
-            cancelled = true
-        }
-    }, [enabled, live, fetchMetrics])
 
-    // Live polling while training runs.
-    useEffect(() => {
-        if (!enabled || !live) return
-        const id = setInterval(fetchMetrics, POLL_MS)
-        return () => clearInterval(id)
-    }, [enabled, live, fetchMetrics])
+        const controller = new AbortController()
+        let timer: ReturnType<typeof setTimeout> | undefined
+        let stopped = false
+
+        const poll = async () => {
+            try {
+                const result = await getTrainMetrics({ project: projectPath }, controller.signal)
+                if (stopped) return
+                setEpochTrain(result.epoch_train)
+                setEpochTest(result.epoch_test)
+                setBatch(result.batch)
+                setError(null)
+            } catch (err: any) {
+                if (stopped || err?.name === "AbortError") return
+                setError(err?.message || "Failed to load training metrics.")
+            } finally {
+                if (!stopped) {
+                    setLoading(false)
+                    fetchedOnce.current = true
+                    if (live) timer = setTimeout(poll, POLL_MS)
+                }
+            }
+        }
+
+        setLoading(true)
+        poll()
+
+        return () => {
+            stopped = true
+            controller.abort()
+            if (timer) clearTimeout(timer)
+        }
+    }, [enabled, live, projectPath])
 
     if (!enabled) return null
 

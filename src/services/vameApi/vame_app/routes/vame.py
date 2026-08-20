@@ -1,9 +1,10 @@
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 from flask import request
 
-from . import api
 from vame_app.utils.resolve_request_util import resolve_request_data
 from vame_app.utils.not_bad_request_exception import not_bad_request_exception
+
+api = Namespace("vame", description="Generative model and core VAME calls", path="/")
 
 
 @api.route("/generative_model", methods=["POST"])

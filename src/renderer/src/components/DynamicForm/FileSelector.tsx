@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { Tree } from "react-arborist";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -44,6 +44,18 @@ const toExts = (accept?: string | string[]): string => {
 
 const basename = (p: string): string => p.split(/[\\/]/).pop() || p;
 
+// Selections are kept sorted by file name: VAME pairs videos to pose files
+// positionally, so the two lists must agree on order. Sort on the name rather
+// than the full path — sessions are keyed by stem, and the lists may come from
+// different directories.
+const byName = (a: string, b: string) =>
+  basename(a).localeCompare(basename(b), undefined, {
+    numeric: true,
+    sensitivity: "base",
+  }) || a.localeCompare(b);
+
+const sortPaths = (paths: string[]): string[] => [...paths].sort(byName);
+
 const entryToNode = (e: FsEntry): TreeNode => ({
   id: e.path,
   name: e.name,
@@ -57,6 +69,14 @@ const entryToNode = (e: FsEntry): TreeNode => ({
 
 const isPlaceholder = (id: string) => id.endsWith(PLACEHOLDER);
 
+// A directory still holding its placeholder child has not been fetched yet.
+const isLoaded = (d: TreeNode): boolean =>
+  !(d.children?.length === 1 && isPlaceholder(d.children[0].id));
+
+// Immediate file children of a directory; undefined while it is still unloaded.
+const dirFiles = (d: TreeNode): TreeNode[] | undefined =>
+  isLoaded(d) ? (d.children ?? []).filter((c) => !c.isDir) : undefined;
+
 const FileInput: React.FC<FileSelectorProps> = ({
   name,
   multiple,
@@ -67,6 +87,7 @@ const FileInput: React.FC<FileSelectorProps> = ({
 }) => {
   const folderMode = !!webkitdirectory;
   const exts = folderMode ? "" : toExts(accept);
+  const { getValues } = useFormContext();
 
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -121,19 +142,25 @@ const FileInput: React.FC<FileSelectorProps> = ({
     return undefined;
   };
 
-  const handleToggle = useCallback(
-    async (id: string) => {
+  // Shared by row expansion and "select all in folder", which needs the listing
+  // even when the user never opened the directory.
+  const ensureChildren = useCallback(
+    async (id: string): Promise<TreeNode[]> => {
       const node = findNode(treeData, id);
-      const needsLoad =
-        node?.isDir &&
-        node.children?.length === 1 &&
-        isPlaceholder(node.children[0].id);
-      if (needsLoad) {
-        const children = await listDir(id);
-        setTreeData((prev) => replaceChildren(prev, id, children));
-      }
+      if (!node?.isDir) return [];
+      if (isLoaded(node)) return node.children ?? [];
+      const children = await listDir(id);
+      setTreeData((prev) => replaceChildren(prev, id, children));
+      return children;
     },
     [treeData, listDir]
+  );
+
+  const handleToggle = useCallback(
+    (id: string) => {
+      void ensureChildren(id);
+    },
+    [ensureChildren]
   );
 
   return (
@@ -158,8 +185,28 @@ const FileInput: React.FC<FileSelectorProps> = ({
           } else if (folderMode || !multiple) {
             onChange([path]);
           } else {
-            onChange([...selected, path]);
+            onChange(sortPaths([...selected, path]));
           }
+        };
+
+        // Select/deselect every file directly inside a folder, fetching the
+        // listing first if it has not been expanded yet.
+        const toggleFolder = async (d: TreeNode) => {
+          if (readOnly) return;
+          const paths = (await ensureChildren(d.id))
+            .filter((c) => !c.isDir)
+            .map((c) => c.id);
+          if (!paths.length) return;
+          // Re-read the field: `selected` was captured before the await, so a
+          // second folder clicked while this one loaded would be clobbered.
+          const raw = getValues(name);
+          const current: string[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
+          const inFolder = new Set(paths);
+          onChange(
+            paths.every((p) => current.includes(p))
+              ? current.filter((p) => !inFolder.has(p))
+              : sortPaths([...new Set([...current, ...paths])])
+          );
         };
 
         return (
@@ -195,6 +242,15 @@ const FileInput: React.FC<FileSelectorProps> = ({
                     const isDir = node.data.isDir;
                     const placeholder = isPlaceholder(node.data.id);
                     const selectable = isSelectable(node.data);
+                    // In multi-file mode directories are not selectable
+                    // themselves, so their checkbox slot bulk-selects the files
+                    // inside instead. `kids` is undefined until the fetch lands.
+                    const bulk = isDir && !!multiple && !folderMode && !placeholder;
+                    const kids = bulk ? dirFiles(node.data) : undefined;
+                    const allSel =
+                      !!kids?.length && kids.every((c) => selectedSet.has(c.id));
+                    const someSel =
+                      !allSel && !!kids?.some((c) => selectedSet.has(c.id));
                     return (
                       <div
                         style={{
@@ -236,6 +292,20 @@ const FileInput: React.FC<FileSelectorProps> = ({
                             disabled={readOnly}
                             onClick={(e) => e.stopPropagation()}
                             onChange={() => toggleSelected(node.data.id)}
+                            style={{ flexShrink: 0 }}
+                          />
+                        ) : bulk ? (
+                          <input
+                            type="checkbox"
+                            ref={(el) => {
+                              if (el) el.indeterminate = someSel;
+                            }}
+                            checked={allSel}
+                            disabled={readOnly}
+                            title="Select all files in this folder"
+                            aria-label={`Select all files in ${node.data.name}`}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={() => void toggleFolder(node.data)}
                             style={{ flexShrink: 0 }}
                           />
                         ) : (
